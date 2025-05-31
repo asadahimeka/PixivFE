@@ -9,8 +9,8 @@ RUN apk add --no-cache git=2.47.2-r0
 COPY . .
 
 # Build the application
-RUN --mount=type=cache,target=/go/pkg \
-    --mount=type=cache,target=/root/.cache/go-build \
+RUN --mount=type=cache,id=gopakcache,target=/go/pkg \
+    --mount=type=cache,id=gobuildcache,target=/root/.cache/go-build \
     ./build.sh build_docker
 
 # Minimal passwd entry for non-privileged user
