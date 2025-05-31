@@ -1,0 +1,20 @@
+{*
+element to indicate an action is in progress, for use with htmx
+
+accepts an id parameter to ensure uniqueness and theme parameter to ensure legibility
+(light for usage on a light bg, dark for usage on a dark bg)
+*}
+
+{{- block twActionIndicator(id, theme) -}}
+  {{ if theme == "light" }}
+    <div
+      id="actionIndicator-{{- id -}}"
+      class="htmx-indicator animate-spin rounded-full size-5 border-4 border-s-blue-400 border-black/20">
+    </div>
+  {{ else if theme == "dark" }}
+  <div
+    id="actionIndicator-{{- id -}}"
+    class="htmx-indicator animate-spin rounded-full size-5 border-4 border-s-blue-400 border-white/10">
+  </div>
+  {{ end }}
+{{ end }}

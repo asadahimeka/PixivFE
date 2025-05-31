@@ -1,0 +1,60 @@
+{{- block NovelNav(baseURL, paths, names, activeState="") }}
+    {{- activeIndex := -1 }}
+    {{- range i, k := paths }}
+        {{- if k == activeState }}
+            {{- activeIndex = i }}
+        {{- end }}
+    {{- end }}
+
+    <!--
+    NOTE: d-flex justify-content-center required here,
+    otherwise nav the underline spans the enitre width of the parent row element
+    -->
+    {{- if activeIndex > 0 }}
+    <div class="col-12 d-flex justify-content-center">
+        <a class="nav-link d-inline text-center text-body-secondary fw-semibold"
+            href="{{ baseURL }}{{paths[activeIndex-1]}}">
+            {{ names[activeIndex-1] }}
+        </a>
+    </div>
+    {{- end }}
+
+    <div class="col-12 d-flex justify-content-center">
+        <span class="nav-link d-inline text-center active border-bottom border-4 border-custom-color fw-bold"
+              aria-current="page">
+            {{ names[activeIndex] }}
+        </span>
+    </div>
+
+    {{- if activeIndex < len(paths) - 1 }}
+    <div class="col-12 d-flex justify-content-center">
+        <a class="nav-link d-inline text-center text-body-secondary fw-semibold"
+            href="{{ baseURL }}{{paths[activeIndex+1]}}">
+            {{ names[activeIndex+1] }}
+        </a>
+    </div>
+    {{- end }}
+{{- end }}
+
+{{- block MangaNav(baseURL, navData) }}
+    <!--
+    NOTE: d-flex justify-content-center required here,
+    otherwise nav the underline spans the enitre width of the parent row element
+    -->
+    {{- if len(navData.Next.Title) > 0 }}
+    <div class="col-12 d-flex justify-content-center">
+        <a class="nav-link d-inline text-center text-body-secondary fw-semibold"
+            href="{{ baseURL }}{{navData.Next.ID}}">
+            Next: {{ navData.Next.Title }}
+        </a>
+    </div>
+    {{- end }}
+    {{- if len(navData.Prev.Title) > 0 }}
+    <div class="col-12 d-flex justify-content-center">
+        <a class="nav-link d-inline text-center text-body-secondary fw-semibold"
+            href="{{ baseURL }}{{navData.Prev.ID}}">
+            Previous: {{ navData.Prev.Title }}
+        </a>
+    </div>
+    {{- end }}
+{{- end }}

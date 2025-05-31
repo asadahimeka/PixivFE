@@ -1,0 +1,23 @@
+{{- Mode := isset(Queries.mode) ? Queries.mode : "safe" -}}
+
+<div
+  id="content"
+  class="[.htmx-added]:opacity-0 duration-200 ease-out opacity-100 transition-opacity"
+>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" >
+    {{- include "../fragments/twSmall-tn" .Artworks }}
+  </div>
+
+  <div
+    class="flex justify-center"
+    hx-get="/api/v1/discovery?type=artwork&mode={{- Mode -}}"
+    hx-trigger="revealed"
+    hx-swap="afterend settle:200ms show:none"
+    hx-target="closest #content"
+    hx-indicator="#contentLoading"
+  >
+    <div id="contentLoading" class="htmx-indicator pt-24 pb-12">
+      <div class="animate-spin rounded-full size-7 border-6 border-s-blue-400 border-white/10"></div>
+    </div>
+  </div>
+</div>

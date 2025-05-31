@@ -1,0 +1,39 @@
+{{- import "../blocks/twFollowButtons" }}
+
+<div class="grid grid-cols-12 gap-8">
+  <div class="col-span-12 md:col-span-4 flex items-start gap-6">
+    <a
+      href="/users/{{ .ID }}"
+      title="View {{ .Name }}'s profile"
+      class="contents"
+    >
+      <img src="{{ .Avatar }}" alt="{{ .Name }}'s avatar" class="size-24 shrink-0 aspect-square rounded-full avatar-outline-glow object-cover">
+    </a>
+
+    <div class="flex flex-col items-start w-full gap-6">
+      <a
+        href="/users/{{ .ID }}"
+        title="View {{ .Name }}'s profile"
+        class="contents"
+      >
+        <div class="animated-underline text-xl font-bold line-clamp-1">{{ .Name }}</div>
+      </a>
+
+      {{- if .Comment -}}
+        <p class="text-neutral-300 text-sm/6 line-clamp-3 text-wrap wrap-anywhere -mt-4">
+          {{ raw: parsePixivRedirect(.Comment) }}
+        </p>
+        {{- else -}}
+        <div class="text-neutral-500 text-sm italic -mt-4">No description added</div>
+      {{- end -}}
+
+      {{ yield twFollowButtons(data=., style="filled") }}
+    </div>
+  </div>
+
+  <div class="col-span-12 md:col-span-8 grid grid-rows-1 grid-flow-col *:w-48 *:snap-start *:scroll-ms-2 snap-x snap-mandatory overflow-x-scroll gap-6 ps-2 pt-2 pb-4 -ms-2 -mt-2 -mb-4 fade-right-sharp pe-32">
+    {{ include "twSmall-tn" .Artworks }}
+  </div>
+</div>
+
+<hr class="col-span-12 border-neutral-800">

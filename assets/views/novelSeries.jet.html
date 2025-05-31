@@ -1,0 +1,126 @@
+{{- extends "layout/default" }}
+{{- import "blocks/twPagination" }}
+{{- block body() }}
+
+<!-- Prefetch links -->
+<link rel="prefetch" href="/users/{{ .User.ID }}/novels">
+
+<div
+  class="row justify-content-center g-4"
+  hx-boost="false"
+>
+  <div class="col-12 col-lg-9">
+    <div class="custom-card">
+      <div class="custom-card-body bg-charcoal-surface1 p-4">
+        <div class="row g-4">
+          <div class="col-12 col-md-4">
+            <!-- Cover art -->
+            <a href="/novel/series/{{ .NovelSeries.ID }}">
+              <img src="{{ .NovelSeries.Cover.Urls.Four80Mw }}" alt="{{ .NovelSeries.Title }}" class="d-block img-fluid rounded mx-auto" />
+            </a>
+          </div>
+          <div class="col-12 col-md-8 d-flex flex-column">
+            <h3 class="text-body-secondary mb-2">
+                Series of {{ .NovelSeries.Total }} works
+            </h3>
+
+            <!-- Title -->
+            <h1 class="mb-2">{{ .NovelSeries.Title }}</h1>
+
+            <!-- Author -->
+            <div class="d-flex align-items-baseline mb-2">
+              <a href="/users/{{ .User.ID }}/novels" class="text-decoration-none">
+                <img src="{{ .User.Avatar }}" alt="{{ .User.Name }}" class="rounded-circle me-2" style="width: 30px; height: 30px" />
+              </a>
+              <h4 class="mb-0">
+                <a href="/users/{{ .User.ID }}" class="text-body text-decoration-none">
+                  {{ .User.Name }}
+                </a>
+              </h4>
+            </div>
+
+            <!-- Word count and reading time -->
+            <p class="small text-body-secondary">
+              <span>{{ .NovelSeries.PublishedTotalCharacterCount }} character(s)</span> &middot; <span>{{ floor: .NovelSeries.PublishedReadingTime / 60 }} mins</span>
+            </p>
+
+            <!-- View Pixiv original button -->
+            <div class="d-flex">
+              <a href="https://pixiv.net/novel/series/{{ .NovelSeries.ID }}" class="custom-btn-secondary btn-sm mb-3">
+                <i class="bi bi-box-arrow-up-right me-2"></i>View on pixiv.net
+              </a>
+            </div>
+
+            <!-- Description -->
+            <p>{{ raw: parsePixivRedirect(.NovelSeries.Caption) }}</p>
+
+            <!-- Tags -->
+            <div class="d-flex flex-wrap align-items-center mb-2">
+              {{- if .NovelSeries.AiType == 2 }}
+              <span class="badge bg-warning text-dark me-2 mb-2">AI-generated</span>
+              {{- end }}
+              {{- if .NovelSeries.XRestrict != 0 }}
+                {* NOTE: different logic than usual due to isEmphasize not existing *}
+                <span class="badge bg-danger me-2 mb-2">{{ if .NovelSeries.XRestrict == 1 }} R-18 {{ else }} R-18G {{ end }}</span>
+              {{- end }}
+              {{- if .NovelSeries.IsOriginal }}
+              <span class="badge bg-primary me-2 mb-2">Original</span>
+              {{- end }}
+              {{- if .NovelSeries.GenreID != "0" }}
+              <span class="badge bg-secondary me-2 mb-2">{{ getNovelGenre(.NovelSeries.GenreID) }}</span>
+              {{- end }}
+              {{- range .NovelSeries.Tags }}
+                {{- if isEmphasize(.) }}
+                {* Intentionally empty to not render anything to avoid duplication *}
+                {{- else }}
+                <span class="badge fw-normal text-muted me-2 mb-2 p-0 text-wrap text-break text-start">
+                  <a href="/tags/{{ escapeString(.) }}" class="text-decoration-none text-wrap text-break">#{{ . }}</a>
+                </span>
+                {{- end }}
+              {{- end }}
+            </div>
+
+            <!-- Metadata -->
+            <div class="d-flex flex-wrap text-body-secondary small mb-3">
+              <div class="me-3 mb-2 mb-lg-0">
+                <i class="bi bi-book me-2"></i>{{ .NovelSeries.Total }} episode(s)
+              </div>
+              {* TODO: Enabling this line triggers an error.
+              <div class="me-3 mb-2 mb-lg-0">
+                <i class="bi bi-calendar me-2"></i>Updated on {{parseTime: .NovelSeries.UpdateDate }}
+              </div>
+              *}
+            </div>
+
+            <!-- Read first episode button -->
+            <div class="mt-auto">
+              <a href="/novel/{{ .NovelSeries.FirstNovelID }}" class="custom-btn-secondary">
+                <i class="bi bi-book me-2"></i>Read first episode
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 mt-5">
+    <h2>{{ len(.NovelSeriesContents) }} works in this series</h2>
+    <div class="row row-cols-1 row-cols-lg-2 g-4">
+      {{- range .NovelSeriesContents }}
+      <div class="col mt-1">
+        <div class="custom-novel-card bg-transparent p-3 py-4 thumbnail-hover-dark">
+          {{- include "fragments/novelSeriesContents-tn" . }}
+        </div>
+        <hr class="my-0">
+      </div>
+      {{- end }}
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {{- url := "/novel/series/" + .NovelSeries.ID + "?p="}}
+  {{- paginationData := createPaginator(url, "#checkpoint", .Page, .PageLimit, 1, 5) }}
+  {{- yield twPagination(data=paginationData) }}
+</div>
+{{- end }}

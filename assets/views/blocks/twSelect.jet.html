@@ -1,0 +1,22 @@
+{{- block twSelect(name, values, labels, activeState="") -}}
+<select
+  id="{{ name }}"
+  name="{{ name }}"
+  class="peer/{{ name }} w-full form-select"
+>
+  {{- range i, value := values -}}
+    {{ if value == "START_OPTGROUP" }}
+      <optgroup label="{{ labels[i] }}">
+      {{ else if value == "END_OPTGROUP" }}
+        </optgroup>
+      {{ else }}
+      <option
+        value="{{ value }}"
+        {{ activeState == value ? "selected" : "" }}
+      >
+        {{ labels[i] }}
+      </option>
+    {{ end }}
+  {{- end -}}
+</select>
+{{- end -}}

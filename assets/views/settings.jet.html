@@ -1,0 +1,769 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twUnderlineNavInput" }}
+{{- import "blocks/twUnderlineNavButton" }}
+{{- block body() }}
+<div class="flex flex-col w-full max-w-3xl text-neutral-300 text-sm/6 gap-8" hx-boost="true" hx-target="next .form-htmx-target" hx-swap="outerHTML" hx-push-url="false">
+  <h1 class="flex items-center gap-2 text-xl font-medium text-neutral-100">
+    <span class="material-symbols-rounded-fill-24">settings</span>
+    Settings
+  </h1>
+  <p class="text-sm text-neutral-400 -mt-6">Personalize your preferences on this PixivFE instance.</p>
+
+  {{- ids := slice("cat-nav-account", "cat-nav-pixiv", "cat-nav-site", "cat-nav-filter", "cat-nav-novels", "cat-nav-language", "cat-nav-advanced", "cat-nav-reset") -}}
+  {{- names := slice(
+    `<span class="material-symbols-rounded-20">person</span>Account`,
+    `<span class="material-symbols-rounded-20">manage_accounts</span>Pixiv`,
+    `<span class="material-symbols-rounded-20">tune</span> Behavior`,
+    `<span class="material-symbols-rounded-20">filter_alt</span> Filter`,
+    `<span class="material-symbols-rounded-20">book</span> Novels`,
+    `<span class="material-symbols-rounded-20">language</span> Language`,
+    `<span class="material-symbols-rounded-20">bolt</span> Advanced`,
+    `<span class="material-symbols-rounded-20">reset_wrench</span> Reset`
+  ) -}}
+  {{- profileIds := slice("cat-pro-language", "cat-pro-display") -}}
+  {{- profileNames := slice(
+    `<span class="material-symbols-rounded-20">translate</span>Language
+    and location`,
+    `<span class="material-symbols-rounded-20">image</span>
+    Display settings`,
+   ) -}}
+  {{- yield twUnderlineNavInput(ids=ids, names=names) -}}
+
+  <!-- Account -->
+  <div class="hidden group-has-[input#cat-nav-account:checked]/body:flex flex-col gap-4 ps-5" id="account" role="tabpanel" aria-labelledby="account-tab">
+    <!-- Header -->
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Account</h2>
+      <p class="text-xs text-neutral-400">Manage your pixiv account connection.</p>
+    </div>
+
+    {{ if !LoggedIn }}
+      <div class="text-base font-bold text-neutral-100 -mb-2">Log in</div>
+      <p>
+        Signing in with your pixiv account will allow you to access these features:
+      </p>
+      <ul class="list-disc list-inside -mt-2">
+        <li>Personalized results for <span class="font-bold">Discovery</span></li>
+        <li>Fully featured <span class="font-bold">Landing</span></li>
+        <li>
+          <span class="font-bold">Like</span> and
+          <span class="font-bold">bookmark</span> works
+        </li>
+      </ul>
+      <p>
+        To sign in, you'll need your account's
+        <code class="bg-neutral-950">PHPSESSID</code> cookie (your "token").
+        Username/password sign-in isn't supported for technical reasons.
+      </p>
+      <p>
+        For obtaining your token, refer to
+        <a
+          href="https://pixivfe-docs.pages.dev/hosting/api-authentication/"
+          class="text-link text-neutral-200 hover:text-neutral-100"
+          >our documentation</a
+        >.
+      </p>
+      <form id="login-form" action="/settings/token" method="post" class="contents">
+        <label for="token" class="form-label -mb-2">Token</label>
+        <input
+          type="password"
+          class="form-control w-84 max-w-full -mb-2"
+          id="token"
+          name="token"
+          placeholder="123456_AaBbccDDeeFFggHHIiJjkkllmMnnooPP"
+        />
+        <div class="form-text">
+          The underscore separates your member ID (left side) from a random string
+          (right side).
+        </div>
+        <button type="submit" class="filled-button text-sm font-medium">Log in</button>
+      </form>
+      <div class="form-htmx-target" hidden></div>
+      {{ else }}
+      {{- username := CookieList["pixivfe-Username"] -}}
+      {{- userID := CookieList["pixivfe-UserID"] -}}
+      {{- userAvatar := CookieList["pixivfe-UserAvatar"] -}}
+      {{- settings := .SelfSettings.UserStatus -}}
+
+      <div class="text-base font-bold text-neutral-100 -mb-2">Account details</div>
+      <p>You are currently logged in as:</p>
+      <div class="flex items-center gap-3">
+        <a href="/users/{{ userID }}" class="self-start">
+          <img
+            src="{{ userAvatar}}"
+            alt="{{ username }}"
+            class="aspect-square object-cover rounded-full size-10 min-w-10 avatar-outline-glow"
+          />
+        </a>
+        <div class="flex flex-col">
+          <a href="/users/{{ userID }}" class="w-fit">
+            <div
+              class="text-lg font-bold text-neutral-200 hover:text-neutral-100 line-clamp-1 animated-underline"
+            >
+              {{- username -}}
+            </div>
+          </a>
+          <div
+            class="text-neutral-400 text-sm"
+          >
+            User ID: {{ userID }}
+          </div>
+          <div
+            class="text-neutral-400 text-sm"
+          >
+            User account: {{ settings.UserAccount }}
+          </div>
+	  <div class="text-neutral-400 text-sm">
+	    Birth date: {{ settings.UserBirth }}
+	  </div>
+	  <div class="text-neutral-400 text-sm">
+	    Account creation date: {{ settings.UserCreateTime }}
+	  </div>
+	  <div class="text-neutral-400 text-sm">
+	    User mail address: {{ settings.UserMailAddress }}
+	  </div>
+	  <div class="text-neutral-400 text-sm">
+	    Account location: {{ settings.Location }}
+	  </div>
+	  <div class="text-neutral-400 text-sm">
+	    Is premium: {{ settings.UserPremium }}
+	  </div>
+	  <div class="text-neutral-400 text-sm">
+	    Is illustrator: {{ settings.IsIllustCreator }}
+	  </div>
+	  <div class="text-neutral-400 text-sm">
+	    Is writer: {{ settings.IsNovelCreator }}
+	  </div>
+        </div>
+      </div>
+
+      <hr class="border-neutral-700 my-2">
+
+      <div class="text-base font-bold text-neutral-100 -mb-2">Log out</div>
+      <p>Logging out will securely end your session and immediately remove your session token.</p>
+      <form id="logout-form" action="/settings/logout" method="post" class="contents">
+        <button type="submit" class="outlined-danger-button text-red-400 text-sm font-medium">Log out</button>
+      </form>
+      <div class="form-htmx-target" hidden></div>
+    {{ end }}
+  </div>
+
+  <!-- Site Behavior -->
+  <div class="hidden group-has-[input#cat-nav-pixiv:checked]/body:flex
+	      flex-col gap-4 ps-5" id="pixiv" role="tabpanel"
+       aria-labelledby="pixiv-tab">
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Pixiv</h2>
+      <p class="text-xs text-neutral-400">Configure your pixiv's account.</p>
+    </div>
+
+    {{- yield twUnderlineNavButton(ids=profileIds, names=profileNames) -}}
+
+    <div class="flex flex-col border-pixivfe-300 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 id="cat-pro-language" class="text-lg text-neutral-100">Language
+      and location</h2>
+    </div>
+
+    <form id="language-form"
+      action="/settings/pixiv/language" method="post"
+	  class="contents">
+      <label for="pixiv-language" class="form-label -mb-2">Language</label>
+      <select class="form-select w-48 max-w-full -mb-2"
+	      id="pixiv-language" name="pixiv-language">
+        <option value="ja">
+	  日本語
+        </option>
+        <option value="en">
+	  English
+        </option>
+        <option value="ko">
+	  한국어
+        </option>
+        <option value="zh-CN">
+	  简体中文
+        </option>
+        <option value="zh-TW">
+	  繁體中文
+        </option>
+      </select>
+      <label for="pixiv-region" class="form-label -mb-2">Country/region</label>
+      {{- regionList := getRegionList() -}}
+      <select class="form-select w-48 max-w-full -mb-2"
+	      id="pixiv-region"
+	      name="pixiv-region">
+	{{- range regionList -}}
+        <option value="{{.[0]}}">
+	  {{- .[1] -}}
+        </option>
+	{{- end -}}
+      </select>
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div id="form-htmx-target" hidden></div>
+
+    <!-- Display -->
+    <div class="flex flex-col border-pixivfe-300 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 id="cat-pro-display" class="text-lg text-neutral-100">Display settings</h2>
+    </div>
+
+    <form id="display-settings-form"
+      action="/settings/pixiv/display-settings" method="post" class="contents">
+      <div class="text-sm font-bold text-neutral-100
+      -mb-2">Explicit content</div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="explicit-content-sensitive" name="explicit-content-sensitive"/>
+        <label class="form-check-label"
+        for="explicit-content-sensitive">Display works that may
+          contain sensitive content</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="explicit-content-r18" name="explicit-content-r18"/>
+        <label class="form-check-label" for="explicit-content-r18">Show explicit content (R-18)</label>
+	</div>
+      <div class="form-check">
+	<input class="form-check-input" type="checkbox" id="explicit-content-r18g" name="explicit-content-r18g"/>
+        <label class="form-check-label" for="explicit-content-r18g">Show ero-guro content (R-18G)</label>
+      </div>
+      <hr >
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="show-ai" name="show-ai"/>
+        <label class="form-check-label" for="show-ai">Display AI-generated work</label>
+      </div>
+      <div class="form-text ps-[22px] -mt-3">
+	You can choose to hide AI-generated works on most pages. <a href="https://www.pixiv.help/hc/articles/11866167926809">About AI-generated work</a>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="save-read-progress" name="save-read-progress"/>
+        <label class="form-check-label" for="save-read-progress">Save reading progress</label>
+      </div>
+      <div class="form-text ps-[22px] -mt-3">
+	You can save the spot where you last left off reading for each
+	novel. <a href="https://www.pixiv.help/hc/articles/20022046865561">About reading progress</a>
+      </div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div id="form-htmx-target" hidden></div>
+  </div>
+
+  <!-- Site Behavior -->
+  <div class="hidden group-has-[input#cat-nav-site:checked]/body:flex flex-col gap-4 ps-5" id="site" role="tabpanel" aria-labelledby="site-tab">
+    <!-- Header -->
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Site Behavior</h2>
+      <p class="text-xs text-neutral-400">Configure PixivFE's behavior and user interface.</p>
+    </div>
+
+    {*
+    This form displays a dropdown with available proxy servers.
+      - The default proxy server is shown first, labeled with "(default)."
+      - The built-in proxy is shown next.
+      - All available proxies are listed.
+      - The currently selected proxy is always marked with "(current)."
+    *}
+    <div class="text-base font-bold text-neutral-100 -mb-2">Image proxy server</div>
+    <p>PixivFE loads images through a proxy server to protect your privacy. You can choose from either the pre-defined list, or specify a custom URL.</p>
+
+    <form id="image-proxy-form" action="/settings/imageServer" method="post" class="contents">
+      <label for="image-proxy" class="form-label -mb-2">Select an image proxy server</label>
+      {{- a, _ := CookieList["pixivfe-ImageProxy"] -}}
+      {{- currentProxy := a != "" ? a : .DefaultProxyServer -}}
+      {{- isCustom := a != "" && a != .DefaultProxyServer && a != "/proxy/i.pximg.net" -}}
+      {{- isInList := false -}}
+      {{- range .ProxyList -}}
+        {{- if . == a -}}
+          {{- isInList = true -}}
+        {{- end -}}
+      {{- end -}}
+      {{- isCustom = isCustom && !isInList -}}
+
+      <select class="form-select peer w-84 max-w-full -mb-2" id="image-proxy" name="image-proxy" required>
+        {* Default proxy option *}
+        {{- isCurrent := currentProxy == .DefaultProxyServer -}}
+        <option value="{{ .DefaultProxyServer }}" {{ isCurrent ? "selected" : "" }}>{{ .DefaultProxyServer }} (default{{ isCurrent ? ", current" : "" }})</option>
+
+        {* Built-in proxy option *}
+        {{- isCurrent := currentProxy == "/proxy/i.pximg.net" -}}
+        <option value="/proxy/i.pximg.net" {{ isCurrent ? "selected" : "" }}>/proxy/i.pximg.net (built-in{{ isCurrent ? ", current" : "" }})</option>
+
+        {* All proxy list options *}
+        {{- range .ProxyList }}
+          {{- isCurrent := currentProxy == . -}}
+          <option value="{{ . }}" {{ isCurrent ? "selected" : "" }}>{{ . }}{{ isCurrent ? " (current)" : "" }}</option>
+        {{- end }}
+
+        <option value="custom" {{ isCustom ? "selected" : "" }}>Custom{{ isCustom ? " (current)" : "" }}</option>
+      </select>
+      <div id="image-proxy-help" class="form-text">Image proxy servers.</div>
+
+      <div class="hidden peer-[&:has(option[value='custom']:checked)]:contents">
+        <label for="custom-image-proxy" class="form-label -mb-2">Custom image proxy server</label>
+        <input
+          type="text"
+          class="form-control w-84 max-w-full -mb-2"
+          id="custom-image-proxy"
+          name="custom-image-proxy"
+          placeholder="https://example.com"
+          autocomplete="off"
+          value='{{ isCustom ? a : "" }}'
+        />
+        <div id="custom-image-proxy-help" class="form-text">
+          Enter a custom proxy server URL.
+        </div>
+      </div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    {* currently doesn't do anything in the backend *}
+    {*
+    <div class="text-base font-bold text-neutral-100 -mb-2">Time zone</div>
+    <p>
+      Setting the time zone ensures that dates are interpreted and displayed correctly in the application.
+    </p>
+    <form id="time-zone-form" action="/settings/timeZone" method="post" class="contents">
+      <div class="mb-3">
+        <label for="current-time-zone" class="form-label">Current</label>
+        {{- timeZoneValue := CookieList["pixivfe-TZ"] }}
+        {{- if timeZoneValue != "" -}}
+        <input class="form-control" type="text" value="{{ timeZoneValue }}" aria-label="Current image proxy" id="current-image-proxy" disabled readonly />
+        {{- else }}
+        <input class="form-control" type="text" value="Etc/UTC" aria-label="Current time zone" id="current-time-zone" disabled readonly />
+        {{ end -}}
+        <div id="current-time-zone-help" class="form-text">The time zone currently set.</div>
+      </div>
+      <div class="mb-3">
+        <label for="time-zone" class="form-label">New</label>
+        <input type="text" class="form-control" id="time-zone" name="time-zone" placeholder="America/New_York" autocomplete="off" />
+        <div id="time-zone-help" class="form-text">
+          The value must be a valid <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank" and rel="noopener noreferrer" class="text-decoration-none">tz database name<i class="bi bi-box-arrow-up-right align-top small ms-1"></i></a>.
+        </div>
+      </div>
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+    *}
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Visual effects</div>
+    <p>
+      Choose whether visual effects such as backdrop blur are used in the user interface.
+    </p>
+    <form id="visual-effects-form" action="/settings/visualEffects" method="post" class="contents">
+      {{- visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] }}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="visual-effects" name="visual-effects" {{ if visualEffectsEnabled == "true" }}checked{{- end }} />
+        <label class="form-check-label" for="visual-effects">Enable visual effects</label>
+      </div>
+      <div class="form-text ps-[22px] -mt-3">
+        Enables visual effects throughout the user interface. May negatively impact performance on lower end devices.
+      </div>
+
+      <div class="text-base font-bold text-neutral-100 -mb-2">Seasonal effects</div>
+      {{- seasonalEffectsDisabled := CookieList["pixivfe-SeasonalEffectsDisabled"] }}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="seasonal-effects" name="seasonal-effects" {{ if seasonalEffectsDisabled != "" }}checked{{- end }} />
+        <label class="form-check-label" for="seasonal-effects">Disable seasonal effects</label>
+      </div>
+      <div class="form-text ps-[22px] -mt-3">
+	  Choose whether seasonal effects should be shown for artworks
+	  with special tags (ex. <a href="/tags/pixivSakuraEffect"
+	  class="text-link text-neutral-200 hover:text-neutral-100" rel="noopener">#pixivSakuraEffect</a>).
+      </div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Open artworks in new tab</div>
+    <p>Choose whether clicking on artwork thumbnails opens the full artwork in the same tab or a new tab.</p>
+    <form id="ttnt-form" action="/settings/thumbnailToNewTab" method="post" class="contents">
+      {{- ttntValue := CookieList["pixivfe-ThumbnailToNewTab"] }}
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" role="switch" id="ttnt-switch" name="ttnt" value="_blank" {{- if ttntValue == "_blank" }}checked{{- end }} />
+        <label class="form-check-label" for="ttnt-switch">Open in new tab</label>
+      </div>
+      <div id="ttnt-switch-help" class="form-text ps-[22px] -mt-3">When enabled, clicking on artwork thumbnails will open the full artwork in a new browser tab.</div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Artwork preview pop-ups</div>
+    {{- artworkPreviewValue := CookieList["pixivfe-ArtworkPreview"] }}
+    <p>Configure how artwork previews are displayed when interacting with thumbnails.</p>
+    <form id="artwork-preview-form" action="/settings/artworkPreview" method="post" class="contents">
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="app" id="app-c" value="cover" {{- if artworkPreviewValue == "cover" }}checked{{- end }} />
+        <label class="form-check-label" for="app-c">Cover</label>
+      </div>
+      <div id="app-c-help" class="form-text ps-[22px] -mt-3">Open the previewer when you click into the thumbnails. Quickly preview artworks without leaving the current page.</div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="app" id="app-b" value="button" {{- if artworkPreviewValue == "button" }}checked{{- end }} />
+        <label class="form-check-label" for="app-b">Button</label>
+      </div>
+      <div id="app-b-help" class="form-text ps-[22px] -mt-3">Add a button at the bottom-right of the thumbnails and open the previewer when you click into it. Provides more control over when previews are shown.</div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="app" id="app-d" value="" {{- if artworkPreviewValue == "" }}checked{{- end }} />
+        <label class="form-check-label" for="app-d">Disable</label>
+      </div>
+      <div id="app-d-help" class="form-text ps-[22px] -mt-3">No previewing. Clicking on thumbnails will directly open the full artwork page.</div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Logo style</div>
+    {{- logoStyleValue := CookieList["pixivfe-LogoStyle"] }}
+    <p>Choose between the standard PixivFE logo or an alternative design created by <a href="https://codeberg.org/PixivFE/PixivFE/issues/4#issuecomment-1017835" rel="noopener" class="text-link text-neutral-200 hover:text-neutral-100">@dragongoose</a> as a fun variation.</p>
+    <form id="locale-form" action="/settings/set-cookie" method="post" class="contents" class="row g-2 me-2">
+      <input type="hidden" name="key" value="pixivfe-LogoStyle">
+      <select class="form-select w-32 max-w-full" id="locale" name="value" required>
+        <option value="standard" {{- if logoStyleValue == "standard" || logoStyleValue == "" }} selected{{- end }}>Standard</option>
+        <option value="alternative" {{- if logoStyleValue == "alternative" }} selected{{- end }}>Alternative</option>
+      </select>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+  </div>
+
+  <!-- Filter -->
+  <div class="hidden group-has-[input#cat-nav-filter:checked]/body:flex flex-col gap-4 ps-5" id="filter" role="tabpanel" aria-labelledby="filter-tab">
+    <!-- Header -->
+
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Content Filter</h2>
+      <p class="text-xs text-neutral-400">Hide items you don't want to see.</p>
+    </div>
+
+    <p>If you use an account here, please enable all in <a href="https://www.pixiv.net/settings/viewing">Pixiv Display Settings</a>. Content filtered by Pixiv will not show up here.</p>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Filter artworks</div>
+    <p>Control the visibility of specific types of content.</p>
+    <p>
+      <span class="font-bold">Censor</span> will mask thumbnails, whereas
+      <span class="font-bold">Hide</span> will remove them from browsing entirely.
+    </p>
+    <form id="filter-form" action="/settings/filter" method="post" class="contents">
+      {{- hideR18 := CookieList["pixivfe-HideArtR18"] }}
+      {{- hideR18G := CookieList["pixivfe-HideArtR18G"] }}
+      {{- censorAI := CookieList["pixivfe-CensorArtAI"] }}
+      {{- hideAI := CookieList["pixivfe-HideArtAI"] }}
+
+      {{- visibilityArtR18 := CookieList["pixivfe-VisibilityArtR18"] }}
+      {{- visibilityArtR18G := CookieList["pixivfe-VisibilityArtR18G"] }}
+      {{- visibilityArtAI := CookieList["pixivfe-VisibilityArtAI"] }}
+
+      <label for="visibility-art-r18" class="form-label -mb-2">R-18 content visibility</label>
+      <select class="form-select w-48 max-w-full -mb-2" id="visibility-art-r18" name="visibility-art-r18">
+        {{- isCurrent := visibilityArtR18 == "" -}}
+        <option value="" {{ if isCurrent }} selected{{- end -}}>
+          Show {{ isCurrent ? "(default, current)" : "(default)" }}
+        </option>
+
+        {{- isCurrent := visibilityArtR18 == "censor" -}}
+        <option value="censor" {{ if isCurrent }} selected{{- end -}}>
+          Censor {{ isCurrent ? "(current)" : "" }}
+        </option>
+
+        {{- isCurrent := visibilityArtR18 == "hide" -}}
+        <option value="hide" {{ if isCurrent }} selected{{- end -}}>
+          Hide {{ isCurrent ? "(current)" : "" }}
+        </option>
+      </select>
+      <div id="visibility-art-r18-help" class="form-text">
+        Control the visibility of R18 artwork. This includes sexually explicit material suitable for adults (<a href="https://dic.pixiv.net/en/a/R-18" target="_blank" and rel="noopener noreferrer" class="text-link text-neutral-300 hover:text-neutral-200">more on pixpedia</a>).
+      </div>
+
+      <label for="visibility-art-r18g" class="form-label -mb-2">R-18G content visibility</label>
+      <select class="form-select w-48 max-w-full -mb-2" id="visibility-art-r18g" name="visibility-art-r18g">
+        {{- isCurrent := visibilityArtR18G == "" -}}
+        <option value="" {{ if isCurrent }} selected{{- end -}}>
+          Show {{ isCurrent ? "(default, current)" : "(default)" }}
+        </option>
+
+        {{- isCurrent := visibilityArtR18G == "censor" -}}
+        <option value="censor" {{ if isCurrent }} selected{{- end -}}>
+          Censor {{ isCurrent ? "(current)" : "" }}
+        </option>
+
+        {{- isCurrent := visibilityArtR18G == "hide" -}}
+        <option value="hide" {{ if isCurrent }} selected{{- end -}}>
+          Hide {{ isCurrent ? "(current)" : "" }}
+        </option>
+      </select>
+      <div id="visibility-art-r18g-help" class="form-text">
+        Control the visibility of R18G artwork. This includes extremely graphic or violent material (<a href="https://dic.pixiv.net/en/a/R-18G" target="_blank" and rel="noopener noreferrer" class="text-link text-neutral-300 hover:text-neutral-200">more on pixpedia</a>).
+      </div>
+
+      <label for="visibility-art-ai" class="form-label -mb-2">AI art visibility</label>
+      <select class="form-select w-48 max-w-full -mb-2" id="visibility-art-ai" name="visibility-art-ai">
+        {{- isCurrent := visibilityArtAI == "" -}}
+        <option value="" {{ if isCurrent }} selected{{- end -}}>
+          Show {{ isCurrent ? "(default, current)" : "(default)" }}
+        </option>
+
+        {{- isCurrent := visibilityArtAI == "censor" -}}
+        <option value="censor" {{ if isCurrent }} selected{{- end -}}>
+          Censor {{ isCurrent ? "(current)" : "" }}
+        </option>
+
+        {{- isCurrent := visibilityArtAI == "hide" -}}
+        <option value="hide" {{ if isCurrent }} selected{{- end -}}>
+          Hide {{ isCurrent ? "(current)" : "" }}
+        </option>
+      </select>
+      <div id="visibility-art-ai-help" class="form-text">Control the visibility of AI-generated artwork.</div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Artist Blacklist</div>
+    <p>Hide works by the following artists. 1 user id (integer) per line.
+      <br/>You can find the user id as a part of the URL on any user page. e.g. /users/&lt;id&gt;</p>
+    <form id="raw-settings-form" action="/settings/set-cookie" method="post" class="contents">
+      <input type="hidden" name="key" value="pixivfe-BlacklistArtist">
+
+      <textarea name="value" class="form-control font-mono" name="raw" rows="10" spellcheck="false">
+        {{- CookieList["pixivfe-BlacklistArtist"] -}}
+      </textarea>
+
+      <button type="submit" class="outlined-button text-sm font-medium -mb-2">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Tag Blacklist</div>
+    <p>Hide works with any of the following tags. 1 tag per line.
+      <br/>No translated tag names please.</p>
+
+    <details>
+      <summary>Known AI tags</summary>
+      <pre>
+ai-assisted
+ai_generated
+aiartwork
+aigenerated
+aigirl
+aiイラスト
+ai作品
+ai生成
+ai生成イラスト
+ai生成作品
+ai画像
+ai绘画
+novelai
+novelaidiffusion
+stablediffusion
+      </pre>
+    </details>
+    <form id="raw-settings-form" action="/settings/set-cookie" method="post" class="contents">
+      <input type="hidden" name="key" value="pixivfe-BlacklistTag">
+
+      <textarea name="value" class="form-control font-mono" name="raw" rows="10" spellcheck="false">
+        {{- CookieList["pixivfe-BlacklistTag"] -}}
+      </textarea>
+
+      <button type="submit" class="outlined-button text-sm font-medium -mb-2">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+  </div>
+
+  <!-- Novels -->
+  <div class="hidden group-has-[input#cat-nav-novels:checked]/body:flex flex-col gap-4 ps-5" id="novels" role="tabpanel" aria-labelledby="novels-tab">
+    <!-- Header -->
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Novels</h2>
+      <p class="text-xs text-neutral-400">Customize the interface of
+      the novel page!</p>
+    </div>
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Font family</div>
+    {{- novelFontTypeValue := CookieList["pixivfe-NovelFontType"] }}
+    <p>Choose the font style for displaying novels. Affects the readability and aesthetic of the text.</p>
+
+    <form id="novel-font-form" action="/settings/novelFontType" method="post" class="contents">
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="font-type" id="font-type-mincho" value="mincho" {{- if novelFontTypeValue == "mincho" }}checked{{- end }} />
+        <label class="form-check-label" for="font-type-mincho">Mincho</label>
+      </div>
+      <div id="font-type-mincho-help" class="form-text ps-[22px] -mt-3">A serif font style that resembles traditional Japanese printing. Often used for formal or literary content, it provides a classic and elegant look.</div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="font-type" id="font-type-gothic" value="gothic" {{- if novelFontTypeValue == "gothic" || novelFontTypeValue == "" }}checked{{- end }} />
+        <label class="form-check-label" for="font-type-gothic">Gothic</label>
+      </div>
+      <div id="font-type-gothic-help" class="form-text ps-[22px] -mt-3">A sans-serif font style that's clean and modern. Often used for easy readability on digital screens, it offers a contemporary appearance.</div>
+
+      <details class="border border-neutral-700 rounded">
+        <summary class="cursor-pointer text-neutral-100 text-sm font-medium p-3">Typeface samples</summary>
+        <div class="p-4">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex flex-col w-full md:w-1/2 gap-2">
+              <h3 class="font-medium text-neutral-100">Mincho</h3>
+              <p class="font-['Noto_Serif_JP',_serif]">
+                吾輩は猫である。名前はまだ無い。どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。
+              </p>
+            </div>
+            <div class="flex flex-col w-full md:w-1/2 gap-2">
+              <h3 class="font-medium text-neutral-100">Gothic</h3>
+              <p class="font-['Noto_Sans_JP',_sans-serif]">
+                吾輩は猫である。名前はまだ無い。どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。
+              </p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+
+    <hr class="border-neutral-700 my-2">
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Force text orientation</div>
+    {{- novelViewModeValue := CookieList["pixivfe-NovelViewMode"] }}
+    <p>Set the text orientation for novels. Affects how the text is displayed and read on the page.</p>
+    <form id="novel-view-mode-form" action="/settings/novelViewMode" method="post" class="contents">
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="view-mode" id="tx-ori-h" value="1" {{- if novelViewModeValue == "1" }}checked{{- end }} />
+        <label class="form-check-label" for="tx-ori-h">Horizontal</label>
+      </div>
+      <div id="tx-ori-h-help" class="form-text ps-[22px] -mt-3">
+        Forces the text to be displayed horizontally, left-to-right. Common for most languages, and better suited for smaller screens or those more accustomed to Western text layouts.
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="view-mode" id="tx-ori-v" value="2" {{- if novelViewModeValue == "2" }}checked{{- end }} />
+        <label class="form-check-label" for="tx-ori-v">Vertical</label>
+      </div>
+      <div id="tx-ori-v-help" class="form-text ps-[22px] -mt-3">
+        Forces the text to be displayed vertically, top-to-bottom and right-to-left. Traditional for some East Asian languages and provides a unique reading experience, especially for longer texts.
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="view-mode" id="tx-ori-n" value="" {{- if novelViewModeValue == "" }}checked{{- end }} />
+        <label class="form-check-label" for="tx-ori-n">Don't force</label>
+      </div>
+      <div id="tx-ori-n-help" class="form-text ps-[22px] -mt-3">
+        Uses the original text orientation as set by the author. Respects the intended layout of the novel.
+      </div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+  </div>
+
+  <!-- Language -->
+  <div class="hidden group-has-[input#cat-nav-language:checked]/body:flex flex-col gap-4 ps-5" id="language" role="tabpanel" aria-labelledby="language-tab">
+    <!-- Header -->
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Language</h2>
+      <p class="text-xs text-neutral-400">Site language configurations.</p>
+    </div>
+
+    {* TODO: create a separate endpoint in routes/settings for a tailored confirmation message *}
+    <div class="text-base font-bold text-neutral-100 -mb-2">Display language</div>
+    {{- localeValue := CookieList["pixivfe-Locale"] }}
+    <p>Select your preferred display language from the dropdown menu below.</p>
+    <form id="locale-form" action="/settings/set-cookie" method="post" class="contents">
+      <input type="hidden" name="key" value="pixivfe-Locale">
+      <div class="col-auto">
+        <select class="form-select" id="locale" name="value" required>
+          {{- isCurrent := localeValue == "en" || localeValue == "" -}}
+          <option value="en" {{ if isCurrent }} selected{{- end -}}>
+            English {{ isCurrent ? "(current)" : "" }}
+          </option>
+
+          {{- isCurrent := localeValue == "vi-VN" -}}
+          <option value="vi-VN" {{ if isCurrent }} selected{{- end -}}>
+            Vietnamese {{ isCurrent ? "(current)" : "" }}
+          </option>
+
+          {{- isCurrent := localeValue == "zh-TW" -}}
+          <option value="zh-TW" {{ if isCurrent }} selected{{- end -}}>
+            Chinese Traditional {{ isCurrent ? "(current)" : "" }}
+          </option>
+        </select>
+      </div>
+
+      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+  </div>
+
+  <!-- Advanced -->
+  <div class="hidden group-has-[input#cat-nav-advanced:checked]/body:flex flex-col gap-4 ps-5" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
+    <!-- Header -->
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Advanced</h2>
+      <p class="text-xs text-neutral-400">More control over options.</p>
+    </div>
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Raw settings</div>
+    <p>View all of your current cookie values in a raw format.</p>
+    <p>
+      You can copy these settings to quickly configure your preferences on another
+      PixivFE instance, or make bulk changes to multiple preferences at once.
+    </p>
+    <p>
+      When importing settings, any invalid or unrecognized values will be ignored to
+      prevent configuration errors.
+    </p>
+    <!-- Save raw settings -->
+    <form id="raw-settings-form" action="/settings/raw" method="post" class="contents">
+      <!-- NOTE: do not modify this <textarea> - weird whitespace will appear -->
+      <textarea class="form-control font-mono" name="raw" rows="22" spellcheck="false">
+        {{- range CookieListOrdered -}}
+          {{- .K -}}={{- .V + "\n" -}}
+        {{- end -}}
+      </textarea>
+
+      <button type="submit" class="outlined-button text-sm font-medium -mb-2">Set raw settings</button>
+      <div id="set-raw-settings-help" class="form-text">Applies the raw settings entered above. This action will overwrite your current configuration with the provided values.</div>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+  </div>
+
+  <!-- Reset -->
+  <div class="hidden group-has-[input#cat-nav-reset:checked]/body:flex flex-col gap-4 ps-5" id="reset" role="tabpanel" aria-labelledby="reset-tab">
+    <!-- Header -->
+    <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 -ms-5 pb-2 gap-1">
+      <h2 class="text-lg text-neutral-100">Reset</h2>
+      <p class="text-xs text-neutral-400">Reset stuff.</p>
+    </div>
+
+    <div class="text-base font-bold text-neutral-100 -mb-2">Reset all preferences</div>
+    <p>You can reset all cookies and use PixivFE's default preferences instead.</p>
+    <form id="reset-all-form" action="/settings/reset-all" method="post" class="contents">
+      <button type="submit" class="outlined-danger-button text-red-400 text-sm font-medium -mb-2">Reset all preferences</button>
+      <div id="reset-all-help" class="form-text">
+        This action will reset all your preferences to default values. It cannot be undone.
+      </div>
+    </form>
+    <div class="form-htmx-target" hidden></div>
+  </div>
+</div>
+{{- end }}

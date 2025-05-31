@@ -1,0 +1,22 @@
+{{- extends "layout/default" }}
+{{- block body() }}
+<div class="row justify-content-center g-4">
+  <h1 class="text-center">Diagnostics</h1>
+  <div class="col-9">
+    <div class="alert alert-info" role="alert">
+      <p class="text-center mb-0">
+        <span class="fw-bold">Tip:</span> Refresh page to see updated data. <a href="/diagnostics/reset">Reset Data</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-9">
+    <div class="d-block vh-100" id="vis"></div>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/vega@5.30.0.js"></script>
+<script type="text/javascript" src="/js/vega-lite@5.21.0.js"></script>
+<script type="text/javascript" src="/js/vega-embed@6.26.0.js"></script>
+<script type="text/javascript" src="/js/flamegraph.js"></script>
+{{- end }}

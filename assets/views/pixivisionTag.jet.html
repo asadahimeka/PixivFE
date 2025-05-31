@@ -1,0 +1,48 @@
+{{- extends "layout/twDefault" -}}
+{{- import "blocks/twPixivisionEntry" }}
+{{- import "blocks/twPagination" -}}
+
+{{- block body() -}}
+
+<div id="checkpoint" class="flex flex-col w-full max-w-7xl gap-8 mx-auto scroll-mt-20">
+  {* pixivision only renders this data on the first page *}
+  {{- if .Page == 1 -}}
+    <div class="flex flex-col md:flex-row gap-6">
+      <img
+        src="{{- .Tag.Thumbnail -}}"
+        width="384"
+        height="280"
+        class="rounded object-cover mx-auto"
+      />
+      <div class="flex flex-col self-center gap-4">
+        <p class="font-bold text-2xl">
+          {{- .Tag.Title -}}
+        </p>
+        <p class="text-sm font-medium text-neutral-300 -mt-3">
+          {{ .Tag.Total }} articles
+        </p>
+        <p class="text-sm/6 text-neutral-300">{{- .Tag.Description -}}</p>
+      </div>
+    </div>
+  {{- end -}}
+
+  {* TODO: refactor this element as a reusable component *}
+  <div class="flex items-start text-sm gap-2">
+    <a href="/pixivision" class="breadcrumb-link">Top</a>
+    <span class="material-symbols-rounded-20 text-neutral-400 select-none">chevron_right</span>
+    <span class="text-neutral-100">{{- .Tag.Title -}}</>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {{- range .Tag.Articles -}}
+      {{- yield twPixivisionEntry(data=., extended=true) -}}
+    {{- end -}}
+  </div>
+
+  <!-- Pagination -->
+  {{- url := "/pixivision/t/" + .ID + "?p=" -}}
+  {{- paginationData := createPaginator(url, "#checkpoint", .Page, -1, 1, 5) -}}
+  {{- yield twPagination(data=paginationData) -}}
+</div>
+
+{{- end -}}

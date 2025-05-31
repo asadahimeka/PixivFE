@@ -1,0 +1,165 @@
+{* this is scratch area to put code snippets *}
+
+  {{- if Token }}
+  <div class="switcher">
+    <span class="switch-title">Filter</span>
+    <a href="/?mode=all" class="switch-button">All</a>
+    <a href="/?mode=r18" class="switch-button">R-18</a>
+  </div>
+  <div class="component-header">
+    <h2>Newest works by users you follow</h2>
+    <a href="/self/following_works">See more</a>
+  </div>
+  <div class="artwork-container-scroll">
+    {{- include "fragments/small-tn" .Artworks.Following }}
+  </div>
+  <br />
+  <h2>Recently completed commissions</h2>
+  <div class="artwork-container">
+    {{- include "fragments/small-tn" .Artworks.Commissions }}
+  </div>
+  <br />
+  <h2>Recommended works</h2>
+  <div class="artwork-container">
+    {{- include "fragments/small-tn" .Artworks.Recommended }}
+  </div>
+  <br />
+
+  <div class="component-header">
+    <h2>Daily rankings</h2>
+    <a href="/ranking">See more</a>
+  </div>
+  <div class="artwork-container-scroll">
+    {{- range rank := .Artworks.Rankings }}
+    <div class="artwork-large artwork">
+      <div class="artwork-additional">
+        <div class="artwork-position">{{ rank + 1 }}</div>
+
+        {{- if .Pages > 1 }}
+        <div class="artwork-page-count">
+          <span class="boxbox"> &boxbox;&nbsp; </span>
+          <span>2</span>
+        </div>
+        {{- end }}
+      </div>
+      <a href="/artworks/{{ .ID }}#checkpoint">
+        <img src="{{ .Thumbnail }}" alt="{{ .Title }}" />
+      </a>
+
+      <div class="artwork-title">
+        <a href="/artworks/{{ .ID }}#checkpoint"> {{ .Title }} </a>
+      </div>
+      <div class="artwork-author">
+        <a href="/users/{{ .UserID }}">
+          <img
+            src="{{ .UserAvatar }}"
+            alt="{{ .UserName }}"
+            class="artwork-thumbnail-artist-avatar border-rounded"
+          />
+          <span>{{ .UserName }}</span></a
+        >
+      </div>
+    </div>
+    {{- end }}
+  </div>
+  <br />
+
+  {* <h2>Pixivision</h2>
+  <div class="thumbnail-container">
+    {{- range .Artworks.Pixivision }}
+    <a href="{{ .URL }}" class="spotlight-thumbnail">
+      <img
+        src="{{ .Thumbnail }}"
+        alt="{{ .Title }}"
+        class="spotlight-master-image"
+      />
+      <div class="spotlight-title-wrapper">
+        <h2 class="spotlight-title">{{ .Title }}</h2>
+      </div>
+    </a>
+    {{- end }}
+  </div>
+  <br /> *}
+
+  <h2>Works by recommended users</h2>
+  <div class="artwork-container">
+    {{- include "fragments/small-tn" .Artworks.Users }}
+  </div>
+  <br />
+  {{- range .Artworks.RecommendByTags }}
+  <h2>Recommended illustrations tagged #{{.Name}}</h2>
+  <div class="artwork-container">
+    {{- include "fragments/small-tn" .Artworks }}
+  </div>
+  <br />
+  {{- end }}
+  <h2>Welcome!</h2>
+  <p>Please check out the sidebar for more features. There used to be a small ranking container here...</p>
+  {* <h2>Newest works</h2>
+       <div class="artwork-container-scroll">
+       {{- include "fragments/small-tn" .Artworks.Newest }}
+       </div>
+       {{- else }}
+       <p><a href="/login">Login</a> to access more features!</p>
+       <p>
+       Enjoying this frontend so far? I need your opinions and ideas to improve
+       this UI! Share them
+       <a href="https://codeberg.org/VnPower/pixivfe/issues/21">here</a>!
+       </p>
+       <div class="component-header">
+       <h2>Daily rankings</h2>
+       <a href="/ranking">See more</a>
+       </div>
+       <div class="artwork-container-scroll">
+       {{- range rank := .Artworks.Rankings }}
+       <div class="artwork-large artwork">
+       <div class="artwork-additional">
+       <div class="artwork-position">{{ rank + 1 }}</div>
+
+       {{- if .Pages > 1 }}
+       <div class="artwork-page-count">
+       <span class="boxbox"> &boxbox;&nbsp; </span>
+       <span>2</span>
+       </div>
+       {{- end }}
+       </div>
+       <a href="/artworks/{{ .ID }}#checkpoint">
+       <img src="{{ .Thumbnail }}" alt="{{ .Title }}" />
+       </a>
+
+       <div class="artwork-title">
+       <a href="/artworks/{{ .ID }}#checkpoint"> {{ .Title }} </a>
+       </div>
+       <div class="artwork-author">
+       <a href="/users/{{ .UserID }}">
+       <img
+       src="{{ .UserAvatar }}"
+       alt="{{ .UserName }}"
+       class="artwork-thumbnail-artist-avatar border-rounded"
+       />
+       <span>{{ .UserName }}</span></a
+       >
+       </div>
+       </div>
+       {{- end }}
+       </div>
+       <br /> *}
+
+  {* <h2>Pixivision</h2>
+  <div class="thumbnail-container">
+    {{- range .Artworks.Pixivision }}
+    <a href="{{ .URL }}" class="spotlight-thumbnail">
+      <img
+        src="{{ .Thumbnail }}"
+        alt="{{ .Title }}"
+        class="spotlight-master-image"
+      />
+      <div class="spotlight-title-wrapper">
+        <h2 class="spotlight-title">{{ .Title }}</h2>
+      </div>
+    </a>
+    {{- end }}
+  </div>
+  <br /> *}
+
+  {{- end }}

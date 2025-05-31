@@ -1,0 +1,32 @@
+{{ likeIndicatorID := "likeIndicatorID" }}
+
+<form
+  action="/self/like/{{ .Illust.ID }}"
+  method="post"
+  hx-target="this"
+  hx-target-4*="body"
+  hx-swap="outerHTML show:none"
+  hx-indicator="#actionIndicator-{{ likeIndicatorID }}"
+  hx-disabled-elt="#likeButton"
+  hx-push-url="false"
+>
+  <input
+    type="hidden"
+    id="like_return_path"
+    name="return_path"
+    class="hidden"
+    value='{{ if HtmxCurrentPath != "" }} {{- HtmxCurrentPath -}} {{ else }} {{- CurrentPath -}} {{ end }}'
+  >
+
+  <input type="hidden" id="like_count" name="like_count" class="hidden" value="{{ .Illust.Likes }}">
+
+  <button
+    id="likeButton"
+    type="submit"
+    class="outlined-button text-sm font-medium gap-2"
+  >
+    <span class="material-symbols-rounded-20">thumb_up</span>
+    <span class="inline">{{- prettyNumber(.Illust.Likes) -}}</span>
+    {{- yield twActionIndicator(id=likeIndicatorID, theme="dark") -}}
+  </button>
+</form>

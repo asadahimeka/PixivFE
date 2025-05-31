@@ -1,0 +1,231 @@
+* Scope
+This document outlines the features PixivFE is going to implement from Pixiv.
+To track the implementation of features that are **unique** to PixivFE, see the [[https://pixivfe-docs.pages.dev/dev/roadmap/][roadmap]].
+
+A set of user & system requirements were documented in the project to form a baseline against which developers can:
+- measure progress
+- define what is in-scope and out-of-scope
+- record decisions
+- declare the intent of the project
+- bring back their sanity
+
+Acceptance criteria for each requirement is in accordance with Pixiv's features unless otherwise stated.
+
+This document was +blatantly copied from+ inspired by [[https://github.com/labwc/labwc-scope][labwc's project scope]].
+
+* Categorisation
+Requirements are categorised as follows:
+
+- **A**: in-scope: "must have" for minimum viable product
+- **B+**: in-scope: "should/cover have" - likely to be implemented at some point
+- **B**: discretionary: if devs feel like it and benefits are greater than cost (burden) of maintenance and complexity
+- **C**: out-of-scope: not intended to be implemented
+
+* Priorities
+
+1. Stabilize current scope and fix issues and bugs. This is quite important. We do not want to spend time on an expanding scope with new features until the project is reliable at its current scope.
+2. Implement Cat A requirements.
+3. Implement Cat B+ requirements.
+4. Review Cat B requirements and try to demote as many as possible to C
+
+* Sections
+
+- Requirements are organised into the sections listed below.
+- The first digit in the reference number relates to the section.
+
+1. General
+2. Features
+
+* Requirements
+** 1.1 General
+
+| Cat | Status | Ref | Description | Comment |
+|     |        |     |             |         |
+
+** 2.1 Features - Home page
+| Cat | Status   |    Ref | Description                              | Comment                                                    |
+|-----+----------+--------+------------------------------------------+------------------------------------------------------------|
+| A   | Complete |  2.1.1 | "Recommended works" section              |                                                            |
+| A   | Complete |  2.1.2 | "Daily ranking" section                  |                                                            |
+| A   |          |  2.1.3 | "Requested illustrations" section        | Commisioned works                                          |
+| A   | Complete |  2.1.4 | "Newest articles on pixivision" section  |                                                            |
+| A   |          |  2.1.5 | "Popular tags" section                   |                                                            |
+| A   |          |  2.1.6 | "Ongoing contests" section               |                                                            |
+| A   |          |  2.1.7 | "Popular Projects" section               |                                                            |
+| A   |          |  2.1.8 | "Recommended users" section              |                                                            |
+| A   | Complete |  2.1.9 | "Recommended by tags" section            | ex: Recommended illustrations tagged #...                  |
+| A   |          | 2.1.10 | "Newest following (Booth) posts" section |                                                            |
+| A   | Complete | 2.1.11 | "Newest by allow" section                |                                                            |
+| B+  |          | 2.1.12 | "Edition recommended" section            | Exists in API but can't be found on page by default.       |
+| B+  |          | 2.1.13 | "MyPixiv" section                        | Exists in API but can't be found on page by default.       |
+| A   |          | 2.1.14 | "Popular lives" section                  | Exists in API but can't be found on page by default.       |
+| A   |          | 2.1.15 | "Following lives" section                | Exists in API, some criterias must be met to be available. |
+| B+  |          | 2.1.16 | "User events" section                    | Exists in API. Unknown behavior.                           |
+| A   |          | 2.1.17 | "Illust series"                          | Exists in API but can't be found on page by default.       |
+
+** 2.2 Features - Artwork/novel page
+
+**Note**: This section may require a separate document to further explain these features
+
+| Cat | Status   |    Ref | Description                       | Comment                                 |
+|-----+----------+--------+-----------------------------------+-----------------------------------------|
+| A   | Complete |  2.2.1 | Display artwork images            |                                         |
+| A   | Complete |  2.2.2 | Display user-provided metadatas   | Title, description, tags,...            |
+| A   | Complete |  2.2.3 | Display basic generated metadatas | Date, rating,...                        |
+| B   | Partial  |  2.2.4 | Display extra generated metadatas | "Restrict", "Sanity Level",...          |
+| A   | Complete |  2.2.5 | Recent works by user              |                                         |
+| A   | Partial  |  2.2.6 | Display comments                  |                                         |
+| B+  |          |  2.2.7 | Send comments                     |                                         |
+| B+  |          |  2.2.8 | Send emojis and stickers          |                                         |
+| A   | Complete |  2.2.9 | Related works                     |                                         |
+| A   | Complete | 2.2.10 | Artwork interaction               | Bookmarks and like                      |
+| B+  |          | 2.2.11 | "Share this work" button          | Creating a post on X, Facebook,...      |
+| B+  |          | 2.2.12 | Mute settings                     | Blocking tags and users on Pixiv's side |
+| B+  |          | 2.2.13 | Reporting                         |                                         |
+| B+  |          | 2.2.14 | Adding tags                       |                                         |
+| A   | Complete | 2.2.15 | Display novels                    |                                         |
+| A   | Complete | 2.2.16 | Furigana support                  |                                         |
+| A   | Complete | 2.2.17 | Novel embedded artworks           |                                         |
+| A   | Partial  | 2.2.18 | Illust/novel series               |                                         |
+
+** 2.3 Features - User page
+
+| Cat | Status   |    Ref | Description                       | Comment                           |
+|-----+----------+--------+-----------------------------------+-----------------------------------|
+| A   | Complete |  2.3.1 | User banner                       |                                   |
+| A   | Complete |  2.3.2 | Basic user information            | Name, bio, following,...          |
+| A   | Complete |  2.3.3 | External links                    |                                   |
+| A   |          |  2.3.4 | "Featured artworks" section       | For homepage                      |
+| A   |          |  2.3.5 | "Series" section                  | For homepage                      |
+| A   | Complete |  2.3.6 | "Illustrations and Manga" section | For homepage                      |
+| B+  |          |  2.3.7 | Detailed user information         | Location, gender, age, setups,... |
+| A   | Complete |  2.3.8 | User interactions                 | Following                         |
+| A   | Complete |  2.3.9 | Frequent tags                     |                                   |
+| A   | Complete | 2.3.10 | Illustration page                 |                                   |
+| A   | Complete | 2.3.11 | Manga page                        |                                   |
+| A   | Complete | 2.3.12 | Novels page                       |                                   |
+| A   | Complete | 2.3.13 | Bookmark page                     |                                   |
+| B   |          | 2.3.14 | Open request                      |                                   |
+| C   |          | 2.3.15 | Commisioning                      |                                   |
+| A   |          | 2.3.16 | Filter by tags                    |                                   |
+
+** 2.4 Features - Ranking page
+
+| Cat | Status   |   Ref | Description             | Comment            |
+|-----+----------+-------+-------------------------+--------------------|
+| A   | Complete | 2.4.1 | Display ranking         |                    |
+| A   | Complete | 2.4.2 | Content type selection  |                    |
+| A   | Complete | 2.4.3 | Mode selection          | Daily, weekly,...  |
+| B+  |          | 2.4.4 | Additional ranking data | Yesterday rank,... |
+| A   | Complete | 2.4.5 | Date selection          |                    |
+
+** 2.5 Features - Ranking calendar
+
+| Cat | Status   |   Ref | Description     | Comment |
+|-----+----------+-------+-----------------+---------|
+| A   | Complete | 2.5.1 | Display ranking |         |
+| A   | Complete | 2.5.2 | Mode selection  |         |
+| A   | Complete | 2.5.3 | Date selection  |         |
+
+** 2.6 Features - Tag page
+
+| Cat | Status   |    Ref | Description                          | Comment                           |
+|-----+----------+--------+--------------------------------------+-----------------------------------|
+| A   | Complete |  2.6.1 | Profile image, description           |                                   |
+| A   | Complete |  2.6.2 | Related tags                         |                                   |
+| A   | Complete |  2.6.3 | Popular works preview                |                                   |
+| A   | Complete |  2.6.4 | Display images                       |                                   |
+| B+  |          |  2.6.5 | "Add to your favorites"              | Favorite tags                     |
+| A   | Complete |  2.6.6 | Sort by date                         |                                   |
+| A   |          |  2.6.7 | Generic search targets               |                                   |
+| A   | Complete |  2.6.8 | Search keyword matching              |                                   |
+| A   |          |  2.6.9 | AI-generated works filtering         |                                   |
+| B   |          | 2.6.10 | Filter presets                       | For resolutions, ratios, tools    |
+| B+  |          | 2.6.11 | Date filtering                       | From date to date                 |
+| B+  |          | 2.6.12 | Bundle works by the same creator     |                                   |
+| C   |          | 2.6.13 | Filter by bookmark counts            | Require Premium                   |
+| B   |          | 2.6.14 | Search query hacks for popular works | It's a hack - could be inaccurate |
+| A   |          | 2.6.15 | Popular illust tags                  |                                   |
+| A   |          | 2.6.16 | Popular novel tags                   |                                   |
+| A   |          | 2.6.17 | Recommended by tags                  |                                   |
+| A   |          | 2.6.18 | Group into novel series              |                                   |
+| A   |          | 2.6.19 | Text length filtering                |                                   |
+| A   |          | 2.6.20 | Display only original novels         |                                   |
+
+** 2.7 Features - Discovery page
+| Cat | Status   |   Ref | Description    | Comment |
+|-----+----------+-------+----------------+---------|
+| A   | Complete | 2.7.1 | Illusts        |         |
+| A   | Complete | 2.7.2 | Mangas         |         |
+| A   | Complete | 2.7.3 | Novels         |         |
+| A   | Complete | 2.7.4 | Mode selection |         |
+| A   | Complete | 2.7.5 | Users          |         |
+
+** 2.8 Features - Newest page
+| Cat | Status   |   Ref | Description    | Comment |
+|-----+----------+-------+----------------+---------|
+| A   | Complete | 2.8.1 | Illusts        |         |
+| A   |          | 2.8.2 | Mangas         |         |
+| A   |          | 2.8.3 | Novels         |         |
+| A   |          | 2.8.4 | Mode selection |         |
+
+** 2.9 Features - pixivision
+| Cat | Status   |   Ref | Description         | Comment                |
+|-----+----------+-------+---------------------+------------------------|
+| A   | Complete | 2.9.1 | Articles            |                        |
+| A   | Complete | 2.9.2 | Categories          | /c                     |
+| A   | Complete | 2.9.3 | Tags                | /t                     |
+| B+  |          | 2.9.4 | Monthly ranking     |                        |
+| B+  |          | 2.9.5 | Featured            |                        |
+| A   |          | 2.9.6 | Searching           |                        |
+| B+  |          | 2.9.7 | RSS support         |                        |
+| B   |          | 2.9.8 | Accurate pagination | /Truly a Pixiv moment/ |
+
+** 2.10 Features - My profile
+| Cat | Status   |     Ref | Description           | Comment          |
+|-----+----------+---------+-----------------------+------------------|
+| C   |          |  2.10.1 | Profile settings      |                  |
+| A   | Complete |  2.10.2 | Your bookmarks        |                  |
+| A   |          |  2.10.3 | Following users       |                  |
+| A   |          |  2.10.4 | My pixiv users        |                  |
+| A   |          |  2.10.5 | My followers          |                  |
+| B   |          |  2.10.6 | Mass bookmark editing |                  |
+| B+  |          |  2.10.7 | Notifications         |                  |
+| C   |          |  2.10.8 | Browsing history      |                  |
+| C   |          |  2.10.9 | Dashboard             |                  |
+| B+  |          | 2.10.10 | Markers               | Novel bookmarks? |
+| B+  |          | 2.10.11 | Messages              |                  |
+
+** 2.11 Features - User actions
+| Cat | Status   |    Ref | Description      | Comment               |
+|-----+----------+--------+------------------+-----------------------|
+| A   | Complete | 2.11.1 | Log in           |                       |
+| A   | Complete | 2.11.2 | Log out          |                       |
+| B   |          | 2.11.3 | Account settings | On Pixiv, not PixivFE |
+| C   |          | 2.11.4 | Work posting     |                       |
+
+** 2.12 Features - Contests page
+| Cat | Status |    Ref | Description                   | Comment                                       |
+|-----+--------+--------+-------------------------------+-----------------------------------------------|
+| B+  |        | 2.12.1 | Contest home page             | [[here][https://www.pixiv.net/contest/]]                |
+| B+  |        | 2.12.2 | Contest individual page       | [[Example][https://www.pixiv.net/contest/wutheringwaves2]] |
+| B+  |        | 2.12.3 | Contests result announcements | [[Here][https://www.pixiv.net/contest/result.php]]      |
+
+** 2.13 Features - Requests page
+| Cat | Status |    Ref | Description                                                | Comment |
+|-----+--------+--------+------------------------------------------------------------+---------|
+| A   |        | 2.13.1 | "Works from creators accepting requests" section           |         |
+| A   |        | 2.13.2 | Frequent requested tags                                    |         |
+| A   |        | 2.13.3 | "Creators who recently started accepting requests" section |         |
+| A   |        | 2.13.4 | In-progress requests                                       |         |
+| A   |        | 2.13.5 | Illustrations section                                      |         |
+| A   |        | 2.13.6 | Manga section                                              |         |
+| A   |        | 2.13.7 | Ugoira section                                             |         |
+| A   |        | 2.13.8 | Novels section                                             |         |
+
+** 2.14 Features - Users' projects page
+| Cat | Status |    Ref | Description                  | Comment |
+|-----+--------+--------+------------------------------+---------|
+| A   |        | 2.14.1 | Top page                     |         |
+| A   |        | 2.14.2 | Illustrations and Manga page |         |
+| A   |        | 2.14.3 | Novels page                  |         |

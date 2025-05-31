@@ -1,0 +1,32 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twPillNav" }}
+{{- block body() }}
+
+<div class="flex flex-col w-full max-w-7xl gap-8">
+  <div class="flex w-fit items-center text-xl font-semibold gap-2 border-b-2 border-b-pixivfe-400 pb-2 pe-24">
+    {{ raw: icon("a825d46253e8ba01ba183be93e1d5b7604f2794f", "bi bi-stars") }}
+    Newest
+  </div>
+
+  <div class="text-neutral-400 text-xs -mt-4">
+    The latest works on pixiv.
+  </div>
+
+  <div class="flex items-center -mt-4">
+    {{- baseURL := "/newest" }}
+    {{- paths := slice("", "?r18=true") }}
+    {{- names := slice("Safe", "R-18") }}
+    {{- activeState := isset(Queries.r18) ? "?r18=" + Queries.r18 : "" }}
+    {{- yield twPillNav(baseURL=baseURL, paths=paths, names=names, activeState=activeState) }}
+    <!-- <div class="hidden">
+      <p>Safe</p>
+      <p>R-18</p>
+    </div> -->
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+    {{- include "fragments/twSmall-tn" .Items }}
+  </div>
+
+</div>
+{{- end }}

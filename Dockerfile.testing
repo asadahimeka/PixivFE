@@ -1,0 +1,74 @@
+### Dockerfile.testing
+## Intended to provide a reproducible testing environment for PixivFE
+## Not for production use; please use the regular Dockerfile instead if you want to host PixivFE
+## Adapted from: https://github.com/playwright-community/playwright-go/blob/6b672dbd24505206feca7c2b660da8d616c6393f/Dockerfile.example
+
+### Instructions:
+## To build and run with Playwright (default):
+# docker buildx build -t pixivfe-testing -f ./Dockerfile.testing . --load
+# docker run --rm -it --name pixivfe-testing pixivfe-testing
+
+## To build and run without Playwright:
+# docker buildx build -t pixivfe-testing-no-playwright -f ./Dockerfile.testing --target no-playwright . --load
+# docker run --rm -it --name pixivfe-testing-no-playwright pixivfe-testing-no-playwright
+
+### Notes:
+## Likely can be made more DRY, but this works well enough
+
+### Stage 1: Modules caching with correct Playwright CLI version
+FROM golang:1.24.3-bookworm AS modules
+COPY go.mod go.sum /modules/
+WORKDIR /modules
+RUN go mod download
+RUN PWGO_VER=$(grep -oE "playwright-go v\S+" ./go.mod | sed 's/playwright-go //g') \
+  && go install github.com/playwright-community/playwright-go/cmd/playwright@${PWGO_VER}
+
+### Stage 2a: Final without Playwright
+FROM ubuntu:noble AS no-playwright
+
+WORKDIR /app
+
+# Install correct Go version
+ADD https://golang.org/dl/go1.24.3.linux-amd64.tar.gz /usr/local
+RUN tar -C /usr/local -xzf /usr/local/go1.24.3.linux-amd64.tar.gz && rm /usr/local/go1.24.3.linux-amd64.tar.gz
+
+# Update PATH definition for Go binary
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Copy the project directory
+COPY . /app
+
+RUN go build -o /app/pixivfe
+
+# Set the entrypoint to the binary name
+ENTRYPOINT ["/app/pixivfe"]
+
+### Stage 2b: Final with Playwright (default)
+FROM ubuntu:noble
+
+WORKDIR /app
+
+# Copy resources from modules stage
+COPY --from=modules /go/pkg /go/pkg
+COPY --from=modules /go/bin/playwright /go/bin/playwright
+
+# Install correct Go version
+ADD https://golang.org/dl/go1.24.3.linux-amd64.tar.gz /usr/local
+RUN tar -C /usr/local -xzf /usr/local/go1.24.3.linux-amd64.tar.gz && rm /usr/local/go1.24.3.linux-amd64.tar.gz
+
+# Update PATH definition for Go binary and Playwright
+ENV PATH="/usr/local/go/bin:/go/bin:${PATH}"
+
+# Run playwright install --with-deps
+RUN apt-get update && apt-get install -y ca-certificates tzdata \
+  # Install dependencies and all browsers (or specify one)
+  && playwright install --with-deps \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy the project directory last to avoid invalidating the cache for the Playwright installation
+COPY . /app
+
+RUN go build -o /app/pixivfe
+
+# Set the entrypoint to the binary name
+ENTRYPOINT ["/app/pixivfe"]

@@ -1,0 +1,17 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twImageDisplay" }}
+
+{{- block body() }}
+
+{{ visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] }}
+
+{{ relativeTimeData := relativeTime(.Illust.Date) }}
+
+<!-- Prefetch links -->
+<!-- <link rel="prefetch" href="/users/{{ .Illust.User.ID }}" /> -->
+
+<div class="flex flex-col w-full max-w-7xl gap-8">
+  {{ include "partials/artworkPartial" . }}
+</div>
+
+{{- end }}

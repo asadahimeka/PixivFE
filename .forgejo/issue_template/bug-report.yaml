@@ -1,0 +1,158 @@
+name: 🐛 Bug report
+description: Report a bug or error in PixivFE
+title: "Bug: <brief description>"
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue with PixivFE!
+
+        Please fill out the information below to help us diagnose and fix the problem.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug description
+      description: |
+        Provide a clear and detailed description of the bug you encountered.
+
+        Be sure to also describe what you expected to happen instead of the observed behavior.
+      placeholder: |
+        Example: "When I try to view the "Illustrations" tab on `/users/10`, I get an error page instead of a page with the artworks."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: |
+        List the exact steps needed to reproduce the issue. Be as specific as possible.
+      placeholder: |
+        1. Go to `/users/10`
+        2. Click the "Illustrations" tab
+        3. See error page
+    validations:
+      required: true
+
+  - type: textarea
+    id: http-status-code
+    attributes:
+      label: HTTP status code
+      description: |
+        Provide the HTTP status code shown at the top of the page (e.g., "HTTP 404" or "HTTP 500").
+      placeholder: |
+        500
+    validations:
+      required: true
+      is_number: true
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error message
+      description: |
+        If you received an error message, please copy and paste it here.
+
+        If you have access to the application logs, include any related stack traces.
+      placeholder: |
+        "Failed to fetch artwork data: connection timed out"
+    validations:
+      required: false
+
+  - type: input
+    id: instance-url
+    attributes:
+      label: PixivFE instance URL
+      description: |
+        Which PixivFE instance were you using when this bug occurred?
+
+        You can skip this if you are using a self-hosted instance and don't want to share the URL publicly.
+      placeholder: "https://pixivfe.example.com"
+    validations:
+      required: false
+
+  - type: input
+    id: instance-revision
+    attributes:
+      label: PixivFE instance revision
+      description: |
+        Which revision of PixivFE is the instance running?
+
+        You can view this information on the instance's /about page.
+      placeholder: "2025.03.25-b0ee4ab0"
+    # -- We need to know the specific code revision, not just the release
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Browser
+      description: Which browser(s) have you observed this issue on?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Opera
+        - Brave
+        - Tor Browser
+        - Other (please specify in environment details)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      description: Which operating system(s) have you observed this issue on?
+      multiple: true
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS
+        - Other (please specify in environment details)
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment-details
+    attributes:
+      label: Additional environment details
+      description: |
+        Please provide any additional details about your environment:
+        - Browser version
+        - OS version
+        - Device type (desktop, tablet, smartphone)
+        - Any relevant browser extensions or settings
+      placeholder: |
+        Firefox 120.0.1 on Windows 11, desktop PC with no relevant extensions
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context, screenshots, or information about the problem here.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification
+      description: Please confirm the following before submitting your bug report.
+      options:
+        - label: I have searched existing issues to avoid creating a duplicate report
+          required: true
+        - label: I have included all information needed to reproduce this issue
+          required: true
+        # - label: I have verified this bug occurs on the latest version of PixivFE
+        #   required: true

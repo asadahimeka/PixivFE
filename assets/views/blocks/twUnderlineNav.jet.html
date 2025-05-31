@@ -1,0 +1,17 @@
+{{- block twUnderlineNav(baseURL, paths, names, activeState) -}}
+<ul class="grid grid-flow-col auto-cols-min justify-items-start overflow-x-auto gap-2">
+  {{- range i, k := paths -}}
+    <li
+      class="{{ activeState == k ? "border-pixivfe-400 font-semibold" : "border-transparent text-neutral-300 fill-neutral-300 hover:text-neutral-200 hover:fill-neutral-200" }}
+            border-b-2 pb-2">
+      <a
+        class="flex items-center font-medium hover:bg-neutral-700 rounded-lg px-3 py-2 gap-2 transition"
+        href="{{ baseURL }}{{k}}"
+      >
+        {{ raw(icons[i]) }}
+        {{ names[i] }}
+      </a>
+    </li>
+  {{- end -}}
+</ul>
+{{- end -}}

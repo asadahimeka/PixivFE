@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Read this on PixivFE" />
+
+    {{ title := "PixivFE" }}
+    {{- if isset(.Title) -}}
+    {{ title = .Title + " - PixivFE" }}
+    {{ end -}}
+    <title>{{ title }}</title>
+
+    {* TODO: figure out custom themes (e.g. charcoal theme) *}
+    <link href="/css/bootstrap-style.css?hash=19fd3683" rel="stylesheet" fetchpriority="high" integrity="sha256-Gf02g6a37bUHEI24c38q3OgrYA8d7RG4I6unZ7e62Pc=" />
+
+    <link rel="stylesheet" href="/css/bootstrap-icons-1.11.3/bootstrap-icons.min.css" />
+
+    <link href="/img/favicon.png" rel="icon" />
+
+    <script src="/js/htmx@2.0.4.min.js" integrity="sha512-2kIcAizYXhIn8TzUvqzEDZNuDZ+aW7yE/+f1HJHXFjQcGNfv1kqzJSTBRBSlOgp6B/KZsz1K0a3ZTqP9dnxioQ==" defer></script>
+    <script src="/js/hyperscript.org@0.9.13.min.js" integrity="sha384-5yQ5JTatiFEgeiEB4mfkRI3oTGtaNpbJGdcciZ4IEYFpLGt8yDsGAd7tKiMwnX9b"></script>
+    <!-- <script src="/js/idiomorph@0.3.0.js"></script> -->
+    <script src="/js/on-page-load.js" integrity="sha384-FBakXYEa42a0uP3tfUR9CyQRC/Alh/X+9boxQmVFZ7D6KV35lCzL3PhPwRSs+09n"></script>
+    <script src="/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"></script>
+    {* TODO: load these JS files only on pages that require them *}
+    <script src="/js/illust-preview.js" integrity="sha384-dMB50ketw2GwpAxOl/+BBjaQ7sTiL6CNtFAQN02oUcQlaFGD6dukwlDIe/8O4bsm" defer></script>
+    {* TODO: can be annoying when you accidentally scroll inside a horizontal scroll area instead of the main content *}
+    <!-- <script src="/js/horizontal-scroll.js" defer></script> -->
+    <script src="/js/comment-pagination.js" integrity="sha384-wislBAKZhWW3lwafk+EhRulmD6QtzxtgCmS9uuXRg4qLAXwdiQm2aOHwoBBK/2eY" defer></script>
+    {{- if CurrentPath == "/settings" }}
+    <script src="/js/proxy-toggle.js" integrity="sha384-spn7RogsG0IKnrrTKHcboqynjrgfI0hUKmOad2DglE1uxltbVIpAgkhauVFlA8vD" defer></script>
+    {{- end }}
+
+    <meta content="summary_large_image" name="twitter:card" />
+
+    <meta property="og:title" content="{{ title }}" />
+    <meta property="og:site_name" content="PixivFE" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="{{ CurrentPath }}" />
+
+    {{- if isset(.MetaAuthor) }}
+    <link rel="alternate" type="application/json+oembed" href="{{ BaseURL }}/oembed?a={{ .MetaAuthor }}&u={{ BaseURL }}/users/{{ .MetaAuthorID }}" />
+    {{- else }}
+    <link rel="alternate" type="application/json+oembed" href="{{ BaseURL }}/oembed" />
+    {{- end -}}
+    {{- if isset(.MetaDescription) }}
+    <meta property="og:description" content="{{.MetaDescription}}" />
+    {{- end -}}
+    {{- if isset(.MetaImage) }}
+    <meta property="og:image" content="{{ .MetaImage }}" />
+    {{- end }}
+
+    <!-- Prefetch rules -->
+    <!-- NOTE: not using Speculation Rules API due to being unavailable in Firefox -->
+    <!-- <link rel="prefetch" href="/" />
+    <link rel="prefetch" href="/discovery" />
+    <link rel="prefetch" href="/ranking" />
+    <link rel="prefetch" href="/rankingCalendar" />
+    <link rel="prefetch" href="/newest" /> -->
+
+    <!-- Hide elements that require JS when scripting is disabled; only works when inline styling is allowed -->
+    <noscript>
+      {* NOTE: formatting for the i18n crawler *}
+      <style>.js-required {display: none !important;}</style>
+    </noscript>
+  </head>
+
+  {* NOTE: hx-swap="show:window:top" isn't needed when we hx-boost the body *}
+  {* NOTE: we need to specify settle in hx-swap otherwise htmx won't apply the classes; duration set low for minimal impact *}
+  <body
+    class="bg-neutral-900"
+    hx-indicator="#loading-indicator"
+  >
+    {{ include "limiter" }}
+    <div id="loading-indicator" class="fixed-top z-3"></div>
+    <nav class="navbar bg-charcoal-surface1 py-3 mb-4 js-required" id="main-navbar">
+      <div class="container">
+        <div class="d-flex">
+          <!-- Offcanvas menu for navigation items -->
+          <button class="navbar-toggler border-0 p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <!-- Icon and title -->
+          {{ if CookieList["pixivfe-LogoStyle"] == "" || CookieList["pixivfe-LogoStyle"] == "standard" }}
+          <a href="/">
+            <img src="/img/favicon.svg" alt="PixivFE icon" width="30" height="30" class="me-2" />
+          </a>
+          <span class="h2 m-0">
+            <a class="text-body text-decoration-none mb-0" href="/">PixivFE</a>
+          </span>
+          {{- else if CookieList["pixivfe-LogoStyle"] == "alternative" }}
+          <a href="/">
+            <img src="/img/logo-alt.gif" alt="PixivFE icon" height="30" />
+          </a>
+          {{- end }}
+        </div>
+
+        <!-- Search bar (visible on md and larger devices) -->
+        <div class="position-absolute top-50 start-50 translate-middle d-none d-md-block">
+          <form class="d-flex" action="/tags" method="post" autocomplete="off">
+            <input class="form-control bg-charcoal-surface2 rounded-pill border-0" type="search" name="name" required placeholder="🔍 Search artworks" aria-label="Search" />
+          </form>
+        </div>
+
+        <!-- Search icon (visible on smaller devices) -->
+        <div class="d-md-none ms-auto">
+          <button class="btn btn-link text-body p-0 me-1" type="button" data-bs-toggle="modal" data-bs-target="#searchModal">
+            {{ raw: icon("search-24", "bi bi-search") }}
+          </button>
+        </div>
+
+        {* TODO: figure out how to have the logged in user's avatar and name in the navbar *}
+        <!-- <a class="h5 text-decoration-none mb-0 d-flex align-items-center" href="/">
+            <img src=" .User.Avatar " width="30" height="30" class="d-inline-block rounded-circle object-fit-cover me-2">
+            <p class="m-0"> .User.Name </p>
+          </a> -->
+      </div>
+
+      <!-- Offcanvas navigation -->
+      {* NOTE: located under the nav element otherwise some of the default styling doesn't apply (e.g. hover state for nav-link) *}
+      {* NOTE: need to disable hx-boost on the offcanvas otherwise you can't scroll upon page navigation *}
+      <div class="offcanvas offcanvas-start bg-charcoal-surface1 border-0" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" hx-boost="false">
+          <!-- Offcanvas header -->
+        <div class="offcanvas-header d-flex align-items-start">
+          <div class="d-flex flex-column w-75">
+            <h2 class="display-6 offcanvas-title mb-0" id="offcanvasNavbarLabel"><a class="text-body text-decoration-none" href="/">PixivFE</a></h2>
+            <span class="text-body-secondary mb-0">An open-source alternative frontend for Pixiv that doesn't suck.</span>
+          </div>
+          {* TODO: p-4 is a dirty hack to 'align' the close button with the title; inconsistent across devices *}
+          <button type="button" class="btn-close text-reset p-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <!-- Offcanvas body -->
+        <div class="offcanvas-body">
+          <ul class="navbar-nav me-auto">
+            <div class="mb-4">
+              <h3>Explore</h3>
+              <li class="nav-item">
+                <a class="nav-link" href="/discovery"><i class="bi bi-compass me-2" title="compass"></i>Discovery</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/ranking"><i class="bi bi-bar-chart-line me-2" title="crown"></i>Ranking</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/rankingCalendar"><i class="bi bi-calendar me-2" title="calendar"></i>Ranking calendar</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/newest"><i class="bi bi-stars me-2" title="sparkling"></i>Newest</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/pixivision"><i class="bi bi-palette me-2"></i>pixivision</a>
+              </li>
+            </div>
+            <div class="mb-4">
+              <h3>Your profile</h3>
+              <li class="nav-item">
+                <a class="nav-link" href="/self/followingWorks"><i class="bi bi-people me-2" title="users"></i>Latest works by followed</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/self/bookmarks"><i class="bi bi-heart me-2" title="user"></i>Your bookmarks</a>
+              </li>
+            </div>
+            <div class="mb-4">
+              <h3>Settings & info</h3>
+              <li class="nav-item">
+                <a class="nav-link" href="/settings"><i class="bi bi-gear me-2" title="settings"></i>Settings</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/about"><i class="bi bi-info-circle me-2" title="about"></i>About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="https://codeberg.org/vnpower/pixivfe"><i class="bi bi-globe me-2" title="globe"></i>Source code</a>
+              </li>
+            </div>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <noscript>
+      {{- include "../noscript/navbar" }}
+    </noscript>
+
+    <main class="container mb-5">
+      {{- yield body() }}
+    </main>
+
+    <div id="site-config" class="d-none">
+      <span id="artworkPreview">{{CookieList["pixivfe-ArtworkPreview"]}}</span>
+    </div>
+
+    <!-- End of main content -->
+
+    <!-- Search modal -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true" hx-boost="false">
+      <div class="modal-dialog">
+        <div class="modal-content bg-charcoal-surface1 rounded-5 border-0 p-4">
+          <div class="modal-header border-0 p-0 mb-3">
+            <h2 class="modal-title" id="searchModalLabel">Search</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <form action="/tags" method="post" autocomplete="off">
+              <input class="form-control bg-charcoal-surface2 rounded-pill border-0" type="search" name="name" required placeholder="🔍 Search artworks" aria-label="Search" />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

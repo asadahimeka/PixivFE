@@ -1,0 +1,601 @@
+openapi: 3.0.3
+info:
+  title: "pixiv Touch API"
+  version: 1.0.0
+  description: Mobile API for accessing pixiv data
+servers:
+  - url: "https://www.pixiv.net/touch/ajax"
+    description: Pixiv touch API server
+
+security:
+  - PHPSESSID: []
+
+paths:
+  /ranking/illust:
+    get:
+      tags: [Illust]
+      summary: Get illustration rankings
+      parameters:
+        - name: mode
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              [
+                daily,
+                weekly,
+                monthly,
+                rookie,
+                original,
+                daily_ai,
+                male,
+                female,
+                daily_r18,
+                weekly_r18,
+                r18g,
+                daily_r18_ai,
+                male_r18,
+                female_r18,
+              ]
+          description: |
+            The ranking mode. Note that allowed values depend on the `type` parameter:
+            - When `type=all`:
+              - `daily`
+              - `weekly`
+              - `monthly`
+              - `rookie`
+              - `original`
+              - `daily_ai`
+              - `male`
+              - `female`
+              - `daily_r18`
+              - `weekly_r18`
+              - `r18g`
+              - `daily_r18_ai`
+              - `male_r18`
+              - `female_r18`
+            - When `type=illust` or `type=manga`:
+              - `daily`
+              - `weekly`
+              - `monthly`
+              - `rookie`
+              - `daily_r18`
+              - `weekly_r18`
+              - `r18g`
+            - When `type=ugoira`:
+              - `daily`
+              - `weekly`
+              - `daily_r18`
+              - `weekly_r18`
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [all, illust, manga, ugoira]
+          description: |
+            Work type filter. Affects available modes:
+            - all: All content types
+            - illust: Illustrations
+            - manga: Manga
+            - ugoira: Animations
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: date
+          in: query
+          schema:
+            type: string
+            default: 2020-01-01
+        - name: lang
+          in: query
+          schema:
+            type: string
+            example: en
+          description: Language preference (handled via Accept-Language header in API_GET instead)
+        - name: version
+          in: query
+          schema:
+            type: string
+            example: a3bac059026a1f3197f79eef0c8fb3692685da8b
+          description: Unknown parameter, ignore
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneralRankingResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneralRankingResponse"
+
+  /ranking/novel:
+    get:
+      tags: [Novel]
+      summary: Get novel rankings
+      parameters:
+        - name: mode
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              [
+                daily,
+                weekly,
+                monthly,
+                rookie,
+                weekly_original,
+                weekly_ai,
+                male,
+                female,
+                daily_r18,
+                weekly_r18,
+                r18g,
+                weekly_r18_ai,
+                male_r18,
+                female_r18,
+              ]
+          description: |
+            The ranking mode.
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: date
+          in: query
+          schema:
+            type: string
+            default: 2020-01-01
+        - name: work_lang
+          in: query
+          schema:
+            type: string
+            enum:
+              [
+                en,
+                ja,
+                ko,
+                zh-cn,
+                zh-tw,
+                id,
+                da,
+                de,
+                es,
+                es-419,
+                tl,
+                fr,
+                hr,
+                it,
+                nl,
+                pl,
+                pt-br,
+                pt-pt,
+                vi,
+                tr,
+                ru,
+                ar,
+                th,
+              ]
+        - name: lang
+          in: query
+          schema:
+            type: string
+            example: en
+          description: Language preference (handled via Accept-Language header in API_GET instead)
+        - name: version
+          in: query
+          schema:
+            type: string
+            example: a3bac059026a1f3197f79eef0c8fb3692685da8b
+          description: Unknown parameter, ignore
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NovelRankingResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NovelRankingResponse"
+
+  /illust/details/many:
+    get:
+      tags: [Illust]
+      summary: Get details for multiple illustrations
+      parameters:
+        - name: illust_ids[]
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Array of illustration IDs to fetch details for
+        - name: lang
+          in: query
+          schema:
+            type: string
+            example: en
+          description: Language preference (handled via Accept-Language header in API_GET instead)
+        - name: version
+          in: query
+          schema:
+            type: string
+            example: a3bac059026a1f3197f79eef0c8fb3692685da8b
+          description: Unknown parameter, ignore
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IllustDetailsManyResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IllustDetailsManyResponse"
+
+components:
+  securitySchemes:
+    PHPSESSID:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+        message:
+          type: string
+        body:
+          type: object
+      required: [error, message, body]
+
+    RankingItem:
+      type: object
+      properties:
+        illustId:
+          type: string
+        rank:
+          type: integer
+      required: [illustId, rank]
+
+    AuthorDetails:
+      type: object
+      properties:
+        user_id:
+          type: string
+        user_name:
+          type: string
+        user_account:
+          type: string
+      required: [user_id, user_name, user_account]
+
+    TitleCaptionTranslation:
+      type: object
+      properties:
+        work_title:
+          type: string
+          nullable: true
+        work_caption:
+          type: string
+          nullable: true
+
+    CoverImage:
+      type: object
+      properties:
+        urls:
+          type: object
+          properties:
+            "240mw":
+              type: string
+            "480mw":
+              type: string
+            "128x128":
+              type: string
+            original:
+              type: string
+      required: [urls]
+
+    GeneralRankingResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            body:
+              type: object
+              properties:
+                rankingDate:
+                  type: string
+                  format: date
+                ranking:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/RankingItem"
+              required: [rankingDate, ranking]
+
+    NovelSeries:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content_order:
+          type: integer
+        first_novel_id:
+          type: string
+        is_concluded:
+          type: boolean
+        is_watched:
+          type: boolean
+        is_notifying:
+          type: boolean
+
+    NovelDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        comment:
+          type: string
+        user_id:
+          type: string
+        scene:
+          type: string
+        restrict:
+          type: string
+        x_restrict:
+          type: string
+        is_original:
+          type: boolean
+        language:
+          type: string
+          enum: [ja, ko]
+        character_count:
+          type: string
+        word_count:
+          type: integer
+        comment_off_setting:
+          type: integer
+        ai_type:
+          type: integer
+        text_length:
+          type: integer
+        user_name:
+          type: string
+        url:
+          type: string
+          format: uri
+        genre:
+          type: string
+        marker_count:
+          type: integer
+        bookmark_count:
+          type: integer
+        rating_count:
+          type: integer
+        rating_view:
+          type: integer
+        series:
+          $ref: "#/components/schemas/NovelSeries"
+        title_caption_translation:
+          $ref: "#/components/schemas/TitleCaptionTranslation"
+        cover_image:
+          $ref: "#/components/schemas/CoverImage"
+        is_mypixiv:
+          type: boolean
+        is_private:
+          type: boolean
+        is_howto:
+          type: boolean
+        use_word_count:
+          type: boolean
+        reading_time:
+          type: integer
+        url_s:
+          type: string
+          format: uri
+        url_big:
+          type: string
+          format: uri
+        upload_timestamp:
+          type: integer
+        reupload_timestamp:
+          type: integer
+        profile_image_url:
+          type: string
+          format: uri
+        work_type:
+          type: string
+          enum: [novel]
+        tags:
+          type: array
+          items:
+            type: string
+        comment_html:
+          type: string
+        author_details:
+          $ref: "#/components/schemas/AuthorDetails"
+      required: [id, title, user_id]
+
+    NovelRankingResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            body:
+              type: object
+              properties:
+                novel_details:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/NovelDetail"
+              required: [novel_details]
+
+    IllustSeries:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        title:
+          type: string
+        caption:
+          type: string
+        total:
+          type: string
+        content_order:
+          type: string
+        url:
+          type: string
+          nullable: true
+        update_date:
+          type: string
+          nullable: true
+        first_illust_id:
+          type: string
+          nullable: true
+        latest_illust_id:
+          type: string
+          nullable: true
+        latest_work:
+          type: string
+          nullable: true
+        user:
+          type: string
+          nullable: true
+        userId:
+          type: string
+        coverImage:
+          type: string
+          nullable: true
+        workCount:
+          type: string
+        display_series_content_count:
+          type: string
+        firstWorkId:
+          type: string
+          nullable: true
+        is_watched:
+          type: boolean
+        is_notifying:
+          type: boolean
+
+    IllustDetail:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        tags:
+          type: array
+          items:
+            type: string
+        title_caption_translation:
+          $ref: "#/components/schemas/TitleCaptionTranslation"
+        is_mypixiv:
+          type: boolean
+        is_private:
+          type: boolean
+        is_howto:
+          type: boolean
+        is_original:
+          type: boolean
+        alt:
+          type: string
+        url_s:
+          type: string
+          format: uri
+        url_sm:
+          type: string
+          format: uri
+        url_w:
+          type: string
+          format: uri
+        url_ss:
+          type: string
+          format: uri
+          nullable: true
+        url_big:
+          type: string
+          format: uri
+          nullable: true
+        url_placeholder:
+          type: string
+          nullable: true
+        upload_timestamp:
+          type: integer
+        location_mask:
+          type: boolean
+        id:
+          type: string
+        user_id:
+          type: string
+        title:
+          type: string
+        width:
+          type: string
+        height:
+          type: string
+        restrict:
+          type: string
+        x_restrict:
+          type: string
+        type:
+          type: string
+        sl:
+          type: integer
+        book_style:
+          type: string
+        page_count:
+          type: string
+        comment_off_setting:
+          type: integer
+        ai_type:
+          type: integer
+        comment:
+          type: string
+        author_details:
+          $ref: "#/components/schemas/AuthorDetails"
+        series:
+          $ref: "#/components/schemas/IllustSeries"
+      required: [id, user_id, title, author_details]
+
+    IllustDetailsManyResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            body:
+              type: object
+              properties:
+                illust_details:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/IllustDetail"
+              required: [illust_details]

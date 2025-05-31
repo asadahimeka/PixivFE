@@ -1,0 +1,629 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twPagination" }}
+{{- import "blocks/twTabNavAlt" }}
+{{- import "blocks/twPillNav" }}
+{{- import "blocks/twFollowButtons" }}
+{{- import "blocks/twModal" -}}
+
+{{- block twSocialMediaLinksLong(ctx) -}}
+  {* NOTE: attribution for Font Awesome icons required under CC BY 4.0 *}
+
+  <div class="flex flex-col gap-6">
+    {{- range ctx.Social -}}
+    <div class="flex items-center gap-4">
+      {{- if .Platform == "pawoo" -}}
+      <div class="min-w-6">
+        {{- raw: icon("mastodon") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {{- else if .Platform == "twitter" -}}
+      <div class="min-w-6">
+        {{- raw: icon("x_twitter") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {{- else if .Platform == "instagram" -}}
+      <div class="min-w-6">
+        {{- raw: icon("instagram") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {{- else if .Platform == "tumblr" -}}
+      <div class="min-w-6">
+        {{- raw: icon("tumblr") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {{- else if .Platform == "facebook" -}}
+      <div class="min-w-6">
+        {{- raw: icon("facebook") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {{- else if .Platform == "circlems" -}}
+      <div class="min-w-6">
+        {{- raw: icon("circlems-24") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {* non-standard entries, derived using webpageToSocialEntry() *}
+      {{- else if .Platform == "patreon" -}}
+      <div class="min-w-6">
+        {{- raw: icon("patreon") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener" rel="noopener">
+          {{- .URL -}}
+        </a>
+      </div>
+      {{- else if .Platform == "naver" -}}
+      <div class="min-w-6">
+        {{- raw: icon("naver-20") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {* fallback for non-matched entries, equivalent to rendering .Webpage *}
+      {{- else -}}
+      <div class="min-w-6">
+        <span class="material-symbols-rounded-24">language</span>
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium capitalize">{{- .Platform -}}</div>
+        <a href="{{- .URL -}}" class="blue-link" rel="noopener"> {{- .URL -}} </a>
+      </div>
+      {{- end -}}
+    </div>
+    {{- end -}}
+    <div class="flex items-center gap-4">
+      <div class="min-w-6">
+        {{- raw: icon("pixiv") -}}
+      </div>
+      <div class="flex flex-col text-sm gap-1">
+        <div class="font-medium">pixiv</div>
+        <a href="https://pixiv.net/u/{{- ctx.ID -}}" class="blue-link" rel="noopener">
+          https://pixiv.net/u/{{- ctx.ID -}}
+        </a>
+      </div>
+    </div>
+  </div>
+{{- end -}}
+
+{{- block body() }}
+
+{{- userID := CookieList["pixivfe-UserID"] -}}
+
+{{- visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] }}
+
+<div class="hidden">
+  <p>Home</p>
+  <p>Illustrations</p>
+  <p>Manga</p>
+  <p>Novels</p>
+  <p>Bookmarks</p>
+</div>
+
+<!-- Profile background image -->
+{{ if .User.BackgroundImage }}
+  {{- bgImage := .User.BackgroundImage -}}
+  {{- if .User.BackgroundImageOriginal -}}
+    {{ bgImage = .User.BackgroundImageOriginal -}}
+  {{- end -}}
+
+  <div class="relative h-48 w-full">
+    <a href="{{- bgImage -}}" class="group">
+      <div
+        class="h-full bg-cover bg-center -mx-4 -mt-6"
+        style="background-image: url({{- bgImage -}})">
+          <div class="h-full bg-black/40 group-hover:bg-black/30 transition"></div>
+      </div>
+      <div
+        class="absolute inset-2/4 size-fit hidden group-hover:block bg-black/80 -translate-x-2/4 -translate-y-full
+              text-nowrap text-white text-sm font-medium group-hover:starting:opacity-0 opacity-0 group-hover:opacity-100 transition-all transition-discrete px-3 py-1.5 rounded-full
+              {{ if visualEffectsEnabled == "true" }}backdrop-blur{{ end }}"
+      >
+        View full-size banner
+      </div>
+    </a>
+  </div>
+  {{ else }}
+  <div class="h-48 w-full">
+    <div class="h-full bg-cover bg-center -mx-4 -mt-6">
+        <div class="h-full bg-neutral-950"></div>
+    </div>
+  </div>
+{{ end }}
+
+<div class="flex flex-col w-full max-w-7xl gap-8 mx-auto">
+  <div class="flex flex-col sm:flex-row items-start gap-8 p-6">
+    <a href="{{ if .User.AvatarOriginal }}{{- .User.AvatarOriginal -}}{{ else }}{{- .User.Avatar -}}{{ end }}">
+      <img
+        src="{{- .User.Avatar -}}"
+        alt="User avatar"
+        class="size-32 min-w-32 rounded-full object-cover"
+      >
+    </a>
+
+    <div class="flex flex-col flex-wrap justify-start w-full gap-6">
+      <div class="flex flex-wrap items-baseline gap-4">
+        <a href="/users/{{ .User.ID }}">
+          <div class="text-4xl font-bold animated-underline">{{ .User.Name }}</div>
+        </a>
+
+        {{ if userID != .User.ID }}
+          <div class="hidden sm:block ms-auto">
+            {{ yield twFollowButtons(data=.User, style="filled") }}
+          </div>
+        {{ end }}
+      </div>
+
+      <div class="font-medium text-neutral-400 -mt-3">
+        <a href="/users/{{ .User.ID }}/following#" class="group animated-underline">
+          <span class="font-bold text-neutral-200">{{ prettyNumber(.User.Following) }}</span> following
+        </a>
+      </div>
+
+      <div class="text-sm text-neutral-400 -mt-4">
+        <span class="font-semibold">{{ prettyNumber(.User.MyPixiv) }}</span> MyPixiv
+      </div>
+
+      <!-- User bio -->
+      <button popovertarget="userProfile" class="tonal-button-neutral text-sm font-medium">
+        View details
+      </button>
+
+      {{- yield twModal(id="userProfile", title="Profile", widthClasses="") content -}}
+        <h2 class="font-bold -mb-1">Description</h2>
+        {{ if .User.CommentHTML }}
+          <div class="text-neutral-200 text-sm/6 description">
+            {{ raw(parsePixivRedirect(.User.CommentHTML)) }}
+          </div>
+          {{ else }}
+          <div class="text-neutral-500 text-sm italic">
+            No description added
+          </div>
+        {{ end }}
+
+        {{ if .User.Region }}
+          <div class="flex items-center text-sm gap-2">
+            <span class="material-symbols-rounded-24">pin_drop</span>
+            <div>
+              {{ if .User.Region.ParsedPrefecture }}
+                <span>
+                  {{ .User.Region.ParsedPrefecture }},
+                </span>
+              {{ end }}
+
+              {{ if .User.Region.Name }}
+                <span>
+                  {{ .User.Region.Name }}
+                </span>
+              {{ end }}
+
+              {*
+              {{ if .User.Region.Region }}
+                <span>
+                  {{ .User.Region.Region }}
+                </span>
+              {{ end }}
+              *}
+            </div>
+          </div>
+        {{ end }}
+
+        {* yet another 'effective fields' check *}
+        {{ effectivePersonalFields := 0 }}
+        {{ range .PersonalFields }}
+          {{ if .Value != "" }}
+            {{ effectivePersonalFields = effectivePersonalFields + 1 }}
+          {{ end }}
+        {{ end }}
+
+        {{ effectiveWorkspaceFields := 0 }}
+        {{ range .WorkspaceItems }}
+          {{ if .Value != "" }}
+            {{ effectiveWorkspaceFields = effectiveWorkspaceFields + 1 }}
+          {{ end }}
+        {{ end }}
+
+        <!-- Extended details (location, setup etc.) -->
+        {{ if effectivePersonalFields > 0 || effectiveWorkspaceFields > 0 }}
+          <hr class="border-neutral-800">
+
+          <h2 class="font-bold -mb-1">Details</h2>
+          {{ if effectivePersonalFields > 0 }}
+            <div class="flex flex-col w-full gap-4">
+              {{ range .PersonalFields }}
+                {{ if .Value != "" }}
+                  <div class="flex flex-col gap-1">
+                    <div class="text-xs text-neutral-400">
+                      {{ .Key }}
+                    </div>
+                    <div class="text-sm">
+                      {{ .Value }}
+                    </div>
+                  </div>
+                {{ end }}
+              {{ end }}
+            </div>
+          {{ end }}
+
+          {{ if .User.Workspace }}
+            <div class="flex flex-col w-full gap-4">
+              {{ range .WorkspaceItems }}
+                {{ if .Value != "" }}
+                  <div class="flex flex-col gap-1">
+                    <div class="text-xs text-neutral-400">
+                      {{ .Key }}
+                    </div>
+                    <div class="text-sm">
+                      {{ .Value }}
+                    </div>
+                  </div>
+                {{ end }}
+              {{ end }}
+            </div>
+          {{ end }}
+        {{ end }}
+
+        <hr class="border-neutral-800">
+
+        <h2 class="font-bold -mb-1">Socials</h2>
+
+        {{- yield twSocialMediaLinksLong(ctx=.User) }}
+      {{- end -}}
+
+      <div class="block sm:hidden">
+        {{ yield twFollowButtons(data=.User, style="filled") }}
+      </div>
+    </div>
+  </div>
+
+  <div id="checkpoint" class="flex flex-col w-full gap-6 scroll-mt-20 mx-auto">
+    <!-- Navigation -->
+    <div class="w-full lg:w-10/12 mx-auto">
+      {* Using an empty fragment identifier so that htmx preserves the page position *}
+      <!-- {{- baseURL := "/users/" + .User.ID + "/" }}
+      {{- paths := slice(
+                        "" + "#",
+                        "illustrations" + "#",
+                        "manga" + "#",
+                        "novels" + "#",
+                        "bookmarks" + "#"
+                        ) }}
+      {{- names := slice(
+                        "Home",
+                        "Illustrations",
+                        "Manga",
+                        "Novels",
+                        "Bookmarks"
+                        ) }}
+      {{- icons := slice(
+                        `<span class="material-symbols-rounded-24">home</span>`,
+                        `<span class="material-symbols-rounded-24">image</span>`,
+                        `<span class="material-symbols-rounded-24">manga</span>`,
+                        `<span class="material-symbols-rounded-24">book</span>`,
+                        `<span class="material-symbols-rounded-24">bookmark</span>`,
+                        ) }}
+      {{- categoryCounts := slice(
+                                  1,
+                                  .User.Categories.illustrations.WorkCount,
+                                  .User.Categories.manga.WorkCount,
+                                  .User.Categories.novels.WorkCount,
+                                  .User.Categories.bookmarks.WorkCount
+                                  ) }} -->
+      {{- yield twTabNavAlt(baseURL=baseURL, paths=paths, names=names, icons=icons, categoryCounts=categoryCounts, activeState=.Category.Value + "#") }}
+
+      {*
+      NOTE: these filters technically work but are disabled due to issues with pagination and work counts
+
+      {{- Mode := isset(Queries.mode) ? Queries.mode : "all" }}
+      {{- url := replaceQuery(.Queries, "mode", "") }}
+      {{- path := slice("all", "safe") }}
+      {{- name := slice("All", "Safe")}}
+      {{- yield UnderlineNav(baseURL=url, paths=path, names=name, activeState=Mode)}}
+      <div class="hidden">
+        <p>All</p>
+        <p>Safe</p>
+      </div>
+      *}
+    </div>
+
+    <div class="h-[1px] bg-neutral-800 -mt-6"></div>
+
+    <!-- User content -->
+
+    <!-- Home category (all works) -->
+    {{- if .Category.Value == "" || .Category.Value == "artworks" }}
+      {* Initialize a flag to track the first rendered group *}
+      {{- isFirstGroup := true }}
+
+      <!-- Illustrations -->
+      {{ if len(.User.Categories.illustrations.IllustWorks) != 0 }}
+        {{- if not isFirstGroup }}
+          <div class="h-[1px] bg-neutral-800"></div>
+        {{- end }}
+
+        <!-- Header with work count -->
+        <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+          <div class="text-lg font-semibold">
+            Illustrations
+          </div>
+          <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+            {{ prettyNumber(.User.Categories.illustrations.WorkCount) }}
+          </div>
+        </div>
+
+        {{ include "fragments/twCategoryFrequentTags" .User.Categories.illustrations.FrequentTags }}
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {{- include "fragments/twSmall-tn" .User.Categories.illustrations.IllustWorks }}
+        </div>
+
+        {* TODO: use a better check than this *}
+        {{ if len(.User.Categories.illustrations.IllustWorks) > 29 }}
+          <a href="{{ .User.ID + "/illustrations" + "?page=2#checkpoint" }}" class="filled-button font-medium gap-2 mx-auto">
+            <span class="material-symbols-rounded-20">add</span>
+            View more
+          </a>
+        {{- end }}
+
+        {* After rendering Illustrations, set isFirstGroup to false *}
+        {{- isFirstGroup = false }}
+      {{- end }}
+
+      <!-- Manga -->
+      {{ if len(.User.Categories.manga.IllustWorks) != 0 }}
+        {{- if not isFirstGroup }}
+          <div class="h-[1px] bg-neutral-800"></div>
+        {{- end }}
+
+        <!-- Header with work count -->
+        <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+          <div class="text-lg font-semibold">
+            Manga
+          </div>
+          <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+            {{ prettyNumber(.User.Categories.manga.WorkCount) }}
+          </div>
+        </div>
+
+        {{ include "fragments/twCategoryFrequentTags" .User.Categories.manga.FrequentTags }}
+
+        {{- if len(.User.Categories.manga.MangaSeries) != 0 }}
+          <div class="grid grid-flow-col auto-cols-max grid-rows-1 *:snap-start snap-x snap-mandatory overflow-x-scroll fade-right-sharp gap-4 pe-12 lg:pe-24 pb-4">
+            {{- range .User.Categories.manga.MangaSeries }}
+              {{- include "fragments/twMangaSeries-tn" .  }}
+            {{- end }}
+          </div>
+        {{- end }}
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {{- include "fragments/twSmall-tn" .User.Categories.manga.IllustWorks }}
+        </div>
+
+        {{ if len(.User.Categories.manga.IllustWorks) > 29 }}
+          <a href="{{ .User.ID + "/manga" + "?page=2#checkpoint" }}" class="filled-button font-medium gap-2 mx-auto">
+            <span class="material-symbols-rounded-20">add</span>
+            View more
+          </a>
+        {{- end }}
+
+        {{- isFirstGroup = false }}
+      {{- end }}
+
+      <!-- Novels -->
+      {{ if len(.User.Categories.novels.NovelWorks) != 0 }}
+        {{- if not isFirstGroup }}
+          <div class="h-[1px] bg-neutral-800"></div>
+        {{- end }}
+
+        <!-- Header with work count -->
+        <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+          <div class="text-lg font-semibold">
+            Novels
+          </div>
+          <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+            {{ prettyNumber(.User.Categories.novels.WorkCount) }}
+          </div>
+        </div>
+
+        {{ include "fragments/twCategoryFrequentTags" .User.Categories.novels.FrequentTags }}
+
+        {{- if len(.User.Categories.novels.NovelSeries) != 0 }}
+          <div class="grid grid-flow-col auto-cols-max grid-rows-1 *:snap-start snap-x snap-mandatory overflow-x-scroll fade-right-sharp gap-4 pe-12 lg:pe-24 pb-4">
+            {{- range .User.Categories.novels.NovelSeries }}
+              {{- include "fragments/twNovelSeries-tn" .  }}
+            {{- end }}
+          </div>
+        {{- end }}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-12">
+          {{- range i := .User.Categories.novels.NovelWorks }}
+            {{- if i != 0 -}}
+              {{- if i % 2 == 0 -}}
+                <hr class="hidden lg:block col-span-2 border-neutral-800">
+              {{- end -}}
+              <hr class="block lg:hidden col-span-1 border-neutral-800">
+            {{- end -}}
+            <div class="col-span-1">
+              {{- include "fragments/twNovel-tn" . }}
+            </div>
+          {{- end }}
+        </div>
+
+        {{ if len(.User.Categories.novels.NovelWorks) > 29 }}
+          <a href="{{ .User.ID + "/novels" + "?page=2#checkpoint" }}" class="filled-button font-medium gap-2 mx-auto">
+            <span class="material-symbols-rounded-20">add</span>
+            View more
+          </a>
+        {{- end }}
+
+        {{- isFirstGroup = false }}
+      {{- end }}
+
+    {{- end }}
+
+    <!-- Illustrations category -->
+    {{- if .Category.Value == "illustrations" }}
+      <!-- Header with work count -->
+      <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+        <div class="text-lg font-semibold">
+          Illustrations
+        </div>
+        <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+          {{ prettyNumber(.User.Categories.illustrations.WorkCount) }}
+        </div>
+      </div>
+
+      {{ include "fragments/twCategoryFrequentTags" .User.Categories.illustrations.FrequentTags }}
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {{- include "fragments/twSmall-tn" .User.Categories.illustrations.IllustWorks }}
+      </div>
+    {{- end }}
+
+    <!-- Manga category -->
+    {{- if .Category.Value == "manga" }}
+      <!-- Header with work count -->
+      <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+        <div class="text-lg font-semibold">
+          Manga
+        </div>
+        <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+          {{ prettyNumber(.User.Categories.manga.WorkCount) }}
+        </div>
+      </div>
+
+      {{ include "fragments/twCategoryFrequentTags" .User.Categories.manga.FrequentTags }}
+
+      {{- if len(.User.Categories.manga.MangaSeries) != 0 }}
+        <div class="grid grid-flow-col auto-cols-max grid-rows-1 *:snap-start snap-x snap-mandatory overflow-x-scroll fade-right-sharp gap-4 pe-12 lg:pe-24 pb-4">
+          {{- range .User.Categories.manga.MangaSeries }}
+            {{- include "fragments/twMangaSeries-tn" .  }}
+          {{- end }}
+        </div>
+      {{- end }}
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {{- include "fragments/twSmall-tn" .User.Categories.manga.IllustWorks }}
+      </div>
+    {{- end }}
+
+    <!-- Novels category -->
+    {{- if .Category.Value == "novels" }}
+      <!-- Header with work count -->
+      <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+        <div class="text-lg font-semibold">
+          Novels
+        </div>
+        <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+          {{ prettyNumber(.User.Categories.novels.WorkCount) }}
+        </div>
+      </div>
+
+      {{ include "fragments/twCategoryFrequentTags" .User.Categories.novels.FrequentTags }}
+
+      {{- if len(.User.Categories.novels.NovelSeries) != 0 }}
+        <div class="grid grid-flow-col auto-cols-max grid-rows-1 *:snap-start snap-x snap-mandatory overflow-x-scroll fade-right-sharp gap-4 pe-12 lg:pe-24 pb-4">
+          {{- range .User.Categories.novels.NovelSeries }}
+            {{- include "fragments/twNovelSeries-tn" .  }}
+          {{- end }}
+        </div>
+      {{- end }}
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-12">
+        {{- range i := .User.Categories.novels.NovelWorks }}
+          {{- if i != 0 -}}
+            {{- if i % 2 == 0 -}}
+              <hr class="hidden lg:block col-span-2 border-neutral-800">
+            {{- end -}}
+            <hr class="block lg:hidden col-span-1 border-neutral-800">
+          {{- end -}}
+          <div class="col-span-1">
+            {{- include "fragments/twNovel-tn" . }}
+          </div>
+        {{- end }}
+      </div>
+
+    {{- end }}
+
+    <!-- Bookmarks category -->
+    {{- if .Category.Value == "bookmarks" }}
+      <!-- Header with work count -->
+      <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+        <div class="text-lg font-semibold">
+          Bookmarks
+        </div>
+        <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+          {{ prettyNumber(.User.Categories.bookmarks.WorkCount) }}
+        </div>
+      </div>
+
+      {{ if userID == .User.ID }}
+        {{- Mode := isset(Queries.mode) ? Queries.mode : "show" }}
+        {{- url := replaceQuery(.Queries, "mode", "") }}
+        {{- path := slice("show", "hide") }}
+        {{- name := slice("Public", "Private") -}}
+        {{- fragment := "#" -}}
+        {{- yield twPillNav(baseURL=url, paths=path, names=name, fragment=fragment, activeState=Mode)}}
+      {{ end }}
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {{- include "fragments/twSmall-tn" .User.Categories.bookmarks.IllustWorks }}
+      </div>
+    {{- end }}
+
+    <!-- Following category -->
+    {{- if .Category.Value == "following" }}
+      <!-- Header with work count -->
+      <div class="flex w-fit max-w-full items-baseline border-b-4 border-b-pixivfe-400 space-x-2 pb-2 pe-12">
+        <div class="text-lg font-semibold">
+          Following
+        </div>
+        <div class="text-sm font-bold bg-neutral-700/50 rounded px-2 py-1">
+          {{ prettyNumber(.User.Categories.following.WorkCount) }}
+        </div>
+      </div>
+
+      {{ if userID == .User.ID }}
+        {{- Mode := isset(Queries.mode) ? Queries.mode : "show" -}}
+        {{- url := replaceQuery(.Queries, "mode", "") -}}
+        {{- path := slice("show", "hide") -}}
+        {{- name := slice("Public", "Private") -}}
+        {{- fragment := "#" -}}
+        {{- yield twPillNav(baseURL=url, paths=path, names=name, fragment=fragment, activeState=Mode) -}}
+      {{ end }}
+
+      <div class="flex flex-col gap-6">
+        {{ range .User.Categories.following.Users }}
+          {{- include "fragments/twUser-tn" . -}}
+        {{ end }}
+      </div>
+    {{- end }}
+  </div>
+
+  <!-- Pagination -->
+  {* TODO: figure out how to 'paginate' the home tab correctly; htmx for swapping in categories? *}
+  {{- if .Category.Value == "illustrations" || .Category.Value == "manga" || .Category.Value == "novels" || .Category.Value == "bookmarks" || .Category.Value == "following" || .Category.Value == "followers" }}
+    {{- url := unfinishedQuery(.Queries, "page") -}}
+    {{- paginationData := createPaginator(url, "#checkpoint", .Page, .Category.PageLimit, 0, 5) }}
+    {{- yield twPagination(data=paginationData) }}
+  {{- end }}
+</div>
+{{- end }}

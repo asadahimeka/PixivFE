@@ -1,0 +1,58 @@
+{* generic modal *}
+
+{{- block twModal(id, title, widthClasses) -}}
+
+{* set default widthClasses *}
+{{- if widthClasses == "" -}}
+  {{- widthClasses = "w-full max-w-11/12 md:max-w-156" }}
+{{- end -}}
+
+<div
+  popover
+  id="{{- id -}}"
+  tabindex="-1"
+  class="modal-popover pointer-events-none open:pointer-events-auto fixed inset-2/4 -translate-x-2/4 -translate-y-2/4
+        opacity-0 starting:open:opacity-0 open:opacity-100 scale-95 starting:open:scale-95 open:scale-100 transition-all transition-discrete
+        open:block {{ widthClasses }} h-fit bg-neutral-900 border border-neutral-700 rounded-lg drop-shadow-lg z-30"
+  {* The following is a focus trap implementation *}
+  hx-on:keydown="
+      if(event.key === 'Tab') {
+        const focusableElements = this.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex=\'-1\'])');
+        if(focusableElements.length === 0) return;
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        if(event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if(!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        } else if(document.activeElement === this) {
+          // If the modal itself has focus and user tabs, focus the first element
+          event.preventDefault();
+          firstElement.focus();
+        }
+      }
+    "
+>
+  <!-- Header: title and close button -->
+  <div class="flex items-center justify-between w-full gap-4 px-6 py-4 border-b border-neutral-700">
+    <h2 class="text-lg font-medium line-clamp-1">
+      {{- title -}}
+    </h2>
+
+    <button
+      popovertarget="{{- id -}}"
+      popovertargetaction="hide"
+      class="flex items-center justify-center size-8 cursor-pointer text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700 active:scale-95 transition rounded-full p-1 -me-1"
+    >
+      <span class="material-symbols-rounded-24">close</span>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-col max-h-[80vh] overflow-y-auto fade-bottom-sharp gap-4 p-6 pt-4 pb-12">
+    {{- yield content -}}
+  </div>
+</div>
+{{- end -}}

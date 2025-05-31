@@ -1,0 +1,180 @@
+package pages
+
+import "codeberg.org/pixivfe/pixivfe/server/template/commondata"
+
+// AboutData holds data specific to the about page.
+type AboutData struct {
+	Title          string
+	Time           string
+	Version        string
+	ImageProxy     string
+	AcceptLanguage string
+}
+
+templ About(cd commondata.PageCommonData, pageData AboutData) {
+	<div class="flex flex-col w-full max-w-3xl text-neutral-300 text-sm/6 gap-2">
+		<h2 class="text-xl font-medium text-neutral-100">
+			About PixivFE
+		</h2>
+		// TODO: Integrate the following into the about page content:
+		// 1. Technical advantages
+		// 	- High-resolution thumbnails
+		// 		- Uses next-gen WebP format with /c/1200x1200_90_webp URLs
+		// 		- Optimized loading with modern compression
+		// 	- Progressive enhancement philosophy
+		// 		- CSS-first implementations where possible
+		// 			- Modal dialogs using native popover API + CSS
+		// 		- Graceful degradation features
+		// 			- HTMX for enhanced UX preserves scroll position
+		// 			- Full functionality without JavaScript
+		// 2. Accessibility
+		// 	- WCAG-compliant contrast ratios
+		// 		- Minimum AA compliance for all text
+		// 		- AAA compliance for critical text elements
+		// 	- Clear visual hierarchy
+		// 		- Intentional emphasis degradation
+		// 		- Consistent information architecture
+		// 3. Cross-platform support
+		// 	- Responsive mobile experience
+		// 		- Proper layout reflowing
+		// 		- Touch-friendly interactions
+		<p>
+			PixivFE is an alternative frontend for <a href="https://en.wikipedia.org/wiki/pixiv" class="text-link text-neutral-200 hover:text-neutral-100">pixiv</a>, allowing you to enjoy artwork without unnecessary distractions or restrictions.
+		</p>
+		<p>
+			This is an open-source project. Join us on Matrix if you have any
+			questions or want to chat about PixivFE at
+			<a
+				href="https://matrix.to/#/#pixivfe:4d2.org"
+				class="text-link text-neutral-200 hover:text-neutral-100"
+			>
+				#pixivfe:4d2.org
+			</a>.
+		</p>
+		<h3 class="text-base font-bold text-neutral-100 mt-4">Why use it?</h3>
+		<ul class="list-outside list-disc space-y-1 ps-4">
+			<li>
+				PixivFE lets you browse pixiv anonymously with all restrictions removed.
+				No pixiv account is needed to access content.
+			</li>
+			<li>
+				PixivFE prevents direct interaction with pixiv and its third-party
+				services/analyzers. All processing occurs server-side, leaving only
+				PixivFE client-side. No more Google Analytics tracking for every action!
+			</li>
+			<li>
+				PixivFE offers a lightweight, modern, feature-rich interface that
+				minimizes browsing disruptions - unlike pixiv's original frontend.
+				JavaScript isn't even required!
+			</li>
+			<li>
+				PixivFE is free software with fully open-source code and transparent
+				development. Anyone can contribute, modify, or use it.
+			</li>
+		</ul>
+		<p>
+			PixivFE prioritizes accessibility, privacy, and freedom. If you value
+			these principles, try PixivFE now - or better yet, host it locally!
+		</p>
+		<h3 class="text-base font-bold text-neutral-100 mt-4">How does it work?</h3>
+		<p>
+			PixivFE retrieves content through pixiv's official APIs and displays it
+			through our independent interface. When using public instances without an
+			account, you remain completely anonymous as all requests are handled
+			server-side. Even when connected to an account, pixiv only sees standard
+			account activity without cookie/JavaScript tracking.
+		</p>
+		<h3 class="text-base font-bold text-neutral-100 mt-4">
+			How can I make it my own?
+		</h3>
+		<p>
+			Concerned about public instance logs? You can
+			<a
+				href="https://pixivfe-docs.pages.dev/hosting/hosting-pixivfe/"
+				class="text-link text-neutral-200 hover:text-neutral-100"
+			>
+				self-host your own instance
+			</a>
+			for personal use.
+		</p>
+		<p>
+			If you can help others access art freely while protecting privacy,
+			consider adding your instance to our
+			<a
+				href="https://pixivfe-docs.pages.dev/instance-list/"
+				class="text-link text-neutral-200 hover:text-neutral-100"
+			>
+				public instances list
+			</a>!
+		</p>
+		<h3 class="text-base font-bold text-neutral-100 mt-4">
+			Instance details
+		</h3>
+		<table class="block border-collapse whitespace-nowrap overflow-x-auto">
+			<thead class="border-b border-neutral-700 *:p-4 text-neutral-400 font-medium">
+				<tr>
+					<td class="p-4">Property</td>
+					<td class="p-4">Value</td>
+					<td class="p-4">Description</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="border-b border-neutral-700 *:p-4">
+					<td class="font-medium">Revision</td>
+					<td class="p-4">
+						if cd.RepoURL != "" && cd.RevisionHash != "" {
+							<a href={ templ.SafeURL(cd.RepoURL + "/commit/" + cd.RevisionHash) } class="contents">
+								<div class="text-link text-neutral-200 hover:text-neutral-100">
+									if cd.Revision != "" {
+										{ cd.Revision }
+									} else {
+										unknown
+									}
+								</div>
+							</a>
+						} else {
+							<div class="text-neutral-200">
+								if cd.Revision != "" {
+									{ cd.Revision }
+								} else {
+									unknown
+								}
+							</div>
+						}
+					</td>
+					<td class="whitespace-normal">
+						Specific revision of PixivFE source code in use
+					</td>
+				</tr>
+				<tr class="border-b border-neutral-700 *:p-4">
+					<td class="font-medium">Server start time (UTC)</td>
+					<td>{ pageData.Time }</td>
+					<td class="whitespace-normal">
+						Date and time when this instance was last started
+					</td>
+				</tr>
+				<tr class="border-b border-neutral-700 *:p-4">
+					<td class="font-medium">Default image proxy</td>
+					<td>{ pageData.ImageProxy }</td>
+					<td class="whitespace-normal">
+						Image proxy server used to retrieve images from i.pximg.net
+					</td>
+				</tr>
+				<tr class="border-b border-neutral-700 *:p-4">
+					<td class="font-medium">Accept-Language header</td>
+					<td>{ pageData.AcceptLanguage }</td>
+					<td class="whitespace-normal">
+						Preferred natural language and locale when making requests to the pixiv API
+					</td>
+				</tr>
+				<tr class="*:p-4">
+					<td class="font-medium">Release</td>
+					<td>{ pageData.Version }</td>
+					<td class="whitespace-normal">
+						Release of PixivFE in use
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+}

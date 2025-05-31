@@ -1,0 +1,67 @@
+# -- PixivFE configuration (via configuration file)
+# Refer to https://pixivfe-docs.pages.dev/configuration-options/ for more information
+
+basic:
+  # host: "localhost"
+  # port: "8282"
+  # unixSocket: ""
+  # timeZone: "Etc/UTC"
+  # -- This field uses the value of your pixiv account's PHPSESSID cookie
+  # ref: https://pixivfe-docs.pages.dev/hosting/api-authentication/
+  token:
+    - 123456_arstdhnei
+
+contentProxies:
+  # imageProxy: "https://pximg.example.com"
+  # staticProxy: "https://pximg-static.example.com"
+  # ugoiraProxy: "https://ugoira.example.com"
+
+tokenManager:
+  # tokenLoadBalancing: "round-robin"
+  # tokenMaxRetries: 5
+  # tokenBaseTimeout: 1000ms
+  # tokenMaxBackoffTime: 32000ms
+
+cache:
+  # cacheEnabled: false
+  # cacheSize: 100
+  # cacheTTL: 60m
+
+httpCache:
+  # cacheControlMaxAge: 30s
+  # cacheControlStaleWhileRevalidate: 60s
+
+request:
+  # acceptLanguage: "en-US,en;q=0.5"
+
+response:
+  # earlyHintsResponsesEnabled: false
+  # requestLimit: 0
+
+feature:
+  # popularSearchEnabled: false
+
+instance:
+  # repoUrl: "https://codeberg.org/PixivFE/PixivFE"
+
+limiter:
+  # enabled: false
+  # passList: []
+  # blockList: []
+  # checkHeaders: false
+  # detectionMethod: ""
+  # pingHMAC: ""
+  # filterLocal: false
+  # ipv4Prefix: 24
+  # ipv6Prefix: 48
+  # turnstileSitekey: ""
+  # turnstileSecretKey: ""
+
+log:
+  # logLevel: "info"
+  # logOutputs: []
+  # logFormat: "console"
+
+development:
+  # inDevelopment: false
+  # responseSaveLocation: "/tmp/pixivfe/responses"

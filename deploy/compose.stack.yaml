@@ -1,0 +1,69 @@
+# -- compose.stack.yaml
+#
+# This Docker Compose file places the Caddy reverse proxy in front of PixivFE.
+#
+# To run:
+#   docker compose -f compose.stack.yaml up --build
+#
+# To reload Caddy configuration without downtime:
+#   docker exec -w /etc/caddy caddy caddy reload
+#
+# To access pixivfe:
+#   Visit https://caddy.localhost/ in your browser and
+#   accept any security warnings shown (Caddy uses self-signed certs by default).
+
+services:
+  caddy:
+    container_name: caddy
+    image: caddy:2.9.1-alpine
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443/tcp
+      - 443:443/udp
+    networks:
+      internal: {}
+    volumes:
+      - type: bind
+        source: ./Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+      - caddy_data:/data
+      - caddy_config:/config
+
+  pixivfe:
+    container_name: pixivfe
+    hostname: pixivfe
+    # -- If you want the latest updates from the v3 branch,
+    # specify the `next` tag instead of `latest`
+    image: registry.gitlab.com/pixivfe/pixivfe:latest
+    build:
+      context: ../.
+      dockerfile: Dockerfile
+    init: true
+    networks:
+      internal: {}
+    env_file:
+      - path: .env
+        required: false
+        # -- In case the compose.yaml is being called from the project root
+      - path: ../.env
+        required: false
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    read_only: true
+    user: 10001:10001
+    security_opt:
+      - no-new-privileges:true
+
+# Named volumes for persistent data
+volumes:
+  caddy_data: {}
+  caddy_config: {}
+
+# Network configuration
+# Required for internal communication between the web server and PixivFE.
+networks:
+  internal:
+    driver: bridge

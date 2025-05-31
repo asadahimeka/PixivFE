@@ -1,0 +1,118 @@
+.ci-config: &ci-config
+  - .gitlab-ci.yml
+
+.docs-paths: &docs-paths
+  - docs/**/*
+  - mkdocs.yml
+  - Pipfile
+
+include:
+  # ref: https://docs.gitlab.com/user/application_security/sast/
+  - template: Security/SAST.gitlab-ci.yml
+  # ref: https://docs.gitlab.com/user/application_security/container_scanning/
+  # - template: Jobs/Container-Scanning.gitlab-ci.yml
+
+stages:
+  - code-analysis
+  - container-build
+  - test
+  - publish
+  - documentation
+
+# code-analysis jobs
+# Static Application Security Testing (SAST) scan
+sast:
+  stage: code-analysis
+  variables:
+    SAST_EXCLUDED_PATHS: "assets/js, docs, spec, test, tests, tmp"
+
+# Lint Dockerfile
+hadolint-dockerfile:
+  image: hadolint/hadolint:latest-alpine
+  stage: code-analysis
+  script:
+    - hadolint Dockerfile
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "v3" && $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: *ci-config
+      when: always
+    - if: $CI_COMMIT_REF_NAME == "v3" && $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: *docs-paths
+      when: never
+    - if: $CI_COMMIT_REF_NAME == "v3"
+      when: always
+    - when: never
+
+# container-build jobs
+# Build container image - only builds and pushes the base reference slug
+ko-build:
+  stage: container-build
+  image: golang:1.24.3-alpine3.21
+  script:
+    - echo https://dl-cdn.alpinelinux.org/alpine/edge/testing/ >> /etc/apk/repositories
+    - apk update
+    - apk add ko git docker-cli # git is needed for commit date and short hash
+    # Prepare REVISION for ldflags
+    # ref: build.sh
+    - export GIT_COMMIT_DATE=$(git show -s --format=%cd --date=format:"%Y.%m.%d" "$CI_COMMIT_SHA")
+    - export GIT_COMMIT_HASH=$(git rev-parse --short "$CI_COMMIT_SHA")
+    - export REVISION="${GIT_COMMIT_DATE}-${GIT_COMMIT_HASH}"
+    - echo "Building with REVISION=${REVISION}"
+    # Login to Docker registry
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - export KO_DOCKER_REPO=$CI_REGISTRY_IMAGE
+    - export KO_TAGS="next,next-${CI_COMMIT_SHA:0:12}"
+    - |
+      if [[ "$CI_COMMIT_TAG" ]]; then
+        export KO_TAGS="$KO_TAGS,$CI_COMMIT_TAG,latest"
+      fi
+    # Build and push with ko
+    - ko build . --bare --platform all --tags "$KO_TAGS"
+
+# documentation jobs
+# Build documentation
+documentation-build:
+  stage: documentation
+  image: python:3.12-bookworm
+  before_script: pip install -r docs/requirements.txt
+  script: mkdocs build
+  artifacts:
+    paths:
+      - public/
+  rules:
+    # Run if .gitlab-ci.yml changed on v3, AND commit message DOES NOT contain [skip docs]
+    - if: $CI_COMMIT_REF_NAME == "v3" && $CI_COMMIT_MESSAGE !~ /\[skip docs\]/
+      changes: *ci-config
+      when: always
+    # Run if actual documentation files (*docs-paths) changed on v3 (regardless of commit message flag)
+    - if: $CI_COMMIT_REF_NAME == "v3"
+      changes: *docs-paths
+      when: always
+    # Default to never run if none of the above conditions are met
+    - when: never
+
+# Publish documentation
+#
+# The following environment variables are required
+# - CLOUDFLARE_ACCOUNT_ID
+# - CLOUDFLARE_API_TOKEN
+# - CF_ZONE_ID
+documentation-publish:
+  stage: documentation
+  image: node:23-bookworm
+  needs:
+    - documentation-build
+  script:
+    - npm install wrangler --location=global
+    - npx wrangler pages deploy public --project-name=pixivfe-docs
+  rules:
+    # Run if .gitlab-ci.yml changed on v3, AND commit message DOES NOT contain [skip docs]
+    - if: $CI_COMMIT_REF_NAME == "v3" && $CI_COMMIT_MESSAGE !~ /\[skip docs\]/
+      changes: *ci-config
+      when: always
+    # Run if actual documentation files (*docs-paths) changed on v3 (regardless of commit message flag)
+    - if: $CI_COMMIT_REF_NAME == "v3"
+      changes: *docs-paths
+      when: always
+    # Default to never run if none of the above conditions are met
+    - when: never

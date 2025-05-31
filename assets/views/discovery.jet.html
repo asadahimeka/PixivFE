@@ -1,0 +1,71 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twTabNavAlt" }}
+{{- import "blocks/twPillNav" }}
+{{ import "blocks/twArtworkPlaceholders" }}
+{{- block body() }}
+
+<!-- Prefetch links -->
+<link rel="prefetch" href="/discovery?mode=r18">
+
+<div class="flex flex-col w-full max-w-7xl gap-8">
+  {{- Type := "discovery" }}
+  {{- paths := slice("discovery", "/discovery/novel", "/discovery/users") }}
+  {{- names := slice("Artworks", "Novels", "Users")}}
+  {{- icons := slice(`<span class="material-symbols-rounded-24">image</span>`, `<span class="material-symbols-rounded-24">book</span>`, `<span class="material-symbols-rounded-24">person</span>`)}}
+  {{- categoryCounts := slice(1, 1, 1) }}
+  {{- yield twTabNavAlt(baseURL="", paths=paths, names=names, icons=icons, categoryCounts=categoryCounts, activeState=Type)}}
+  <div class="h-[1px] bg-neutral-800 -mt-8"></div>
+
+  <div class="flex flex-row items-center gap-4">
+    {{- Mode := isset(Queries.mode) ? Queries.mode : "safe" -}}
+    {{- url := replaceQuery(.Queries, "mode", "") -}}
+    {{- path := slice("all", "safe", "r18") -}}
+    {{- name := slice("All", "Safe", "R-18") -}}
+    {{- fragment := "" -}}
+    {{- yield twPillNav(baseURL=url, paths=path, names=name, activeState=Mode) -}}
+
+    <form method="post">
+      <input type="hidden" name="reset" value="on" />
+
+      <button
+        type="submit"
+        class="border border-neutral-700 text-neutral-200
+          flex items-center w-fit cursor-pointer hover:text-neutral-900 hover:bg-neutral-300 active:scale-95 text-sm font-medium rounded-full px-6 py-1.5 transition"
+      >
+          Reset
+      </button>
+    </form>
+  </div>
+
+  <!-- Content Area -->
+  {{- if .RequiresAsyncLoad }}
+    <div
+      id="async-content-placeholder"
+      class="htmx-swapped-out"
+      hx-get="/api/v1/discovery?type=artwork&mode={{- Mode -}}"
+      hx-trigger="load"
+      hx-target="this"
+      hx-swap="outerHTML swap:100ms settle:200ms show:none"
+    >
+      <!-- Loading skeleton -->
+      <div
+        id="loading-skeleton"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-pulse"
+      >
+        {{ yield twArtworkPlaceholders(count=60) }}
+      </div>
+    </div>
+    {{- else }}
+    {{ include "partials/discoveryArtworkPartial" . }}
+  {{- end }}
+
+  <noscript>
+    <form method="post">
+      <button type="submit" class="filled-button font-medium gap-2 mx-auto">
+        <span class="material-symbols-rounded-20">refresh</span>
+        Refresh
+      </button>
+    </form>
+  </noscript>
+</div>
+{{- end }}

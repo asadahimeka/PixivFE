@@ -1,0 +1,17 @@
+{*
+this template is just to achieve a mosaic layout via master1200 thumbnails on the ranking page proper; do not use something that simply takes ranking data
+*}
+
+{{- AiType := isset(.AiType) ? .AiType : 0}}
+
+{{- if !(AiType == 2 && hideAi) }}
+  {{- range . }}
+    <div class="flex flex-col h-fit gap-2
+                {{ if .Width > .Height }}col-span-2{{ else }}col-span-1{{ end }}"
+    >
+      {{ include "twThumbnail-dt" . }}
+      {{ include "twThumbnail-tt" . }}
+      {{ include "twThumbnail-at" . }}
+    </div>
+  {{ end }}
+{{ end }}

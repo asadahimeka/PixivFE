@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>{* <?xml-stylesheet href="/feed.xsl" type="text/xsl"?> *}
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>{{ BaseURL }}/users/{{ .User.ID }}/{{ .Category }}</id>
+  <link rel="alternate" href="{{ BaseURL }}/users/{{ .User.ID }}/{{ .Category }}"/>
+  <link rel="self" href="{{ CurrentPath }}"/>
+  <link rel="first" href="{{ BaseURL }}/users/{{ .User.ID }}/{{ .Category }}.atom.xml?page=1"/>
+  <link rel="last" href="{{ BaseURL }}/users/{{ .User.ID }}/{{ .Category }}.atom.xml?page={{ .PageLimit }}"/>
+  {{- if .Page - 1 >= 1 }}
+  <link rel="previous" href="{{ BaseURL }}/users/{{ .User.ID }}/{{ .Category }}.atom.xml?page={{ .Page - 1 }}"/>
+  {{- end }}
+  {{- if .Page + 1 <= .PageLimit }}
+  <link rel="next" href="{{ BaseURL }}/users/{{ .User.ID }}/{{ .Category }}.atom.xml?page={{ .Page + 1 }}"/>
+  {{- end }}
+  <updated>{{ .Updated }}</updated>
+  <title>{{ .Title }}</title>
+  <author>
+    <name>{{ .User.Name }}</name>
+    <uri>{{ BaseURL }}/users/{{ .User.ID }}/</uri>
+  </author>
+
+  {{- range .User.Artworks }}
+  <entry>
+    <id>{{ BaseURL }}/artworks/{{ .ID }}/</id>
+    <link rel="alternate" href="{{ BaseURL }}/artworks/{{ .ID }}/"/>
+    <title>{{ .Title }}</title>
+    <author>
+      <name>{{ .UserName }}</name>
+      <uri>{{ BaseURL }}/users/{{ .UserID }}/</uri>
+    </author>
+    <content type="xhtml" xml:base="{{ BaseURL }}">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        <div><img src="{{ .Thumbnail }}"></img></div>
+        <div><a href="{{ BaseURL }}/users/{{ .UserID }}/">{{ .UserName }}</a></div>
+        <div>Pages: {{ .Pages }}</div>
+        <div>XRestrict: {{ .XRestrict }}</div>
+        <div>AiType: {{ .AiType }}</div>
+        <div>Bookmarked: {{ .Bookmarked }}</div>
+        <div>IllustType: {{ .IllustType }}</div>
+      </div>
+    </content>
+  </entry>
+  {{- end }}
+</feed>

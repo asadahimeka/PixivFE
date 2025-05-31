@@ -1,0 +1,50 @@
+{{ relativeTimeData_CreateDate := relativeTime(.CreateDate) }}
+{{ relativeTimeData_UpdateDate := relativeTime(.UpdateDate) }}
+
+<div class="w-[80vw] max-w-120 h-full rounded-t-lg rounded-b-lg">
+  <!-- Thumbnail -->
+  <a href="/users/{{ .UserID }}/series/{{ .ID }}">
+    <img src="{{ .Thumbnail }}" class="object-cover w-full h-60 rounded-t-lg fade-bottom-soft" alt="{{ .Title }}" />
+  </a>
+  <div class="flex flex-col">
+    <!-- Title -->
+    <div class="flex flex-col bg-neutral-800 w-full border-b border-pixivfe-400 gap-2 p-4">
+      <a href="/users/{{ .UserID }}/series/{{ .ID }}">
+        <div class="w-fit text-lg font-semibold animated-underline line-clamp-1">{{- .Title -}}</div>
+      </a>
+      <div class="flex items-center text-sm text-neutral-400 fill-neutral-400 gap-1">
+        <span class="material-symbols-rounded-16">collections_bookmark</span>
+        <span class="text-neutral-300 font-semibold">{{ .Total }}</span> {{ if .Total == 1 }}chapter{{- else -}}chapters{{ end }}
+      </div>
+    </div>
+
+    <div class="flex bg-neutral-800/50 rounded-b-lg gap-4 p-4 py-6">
+      <div class="flex flex-col flex-wrap items-start text-xs gap-3">
+        <div class="flex items-center font-medium text-nowrap gap-2" title="{{ naturalTime: .UpdateDate }}">
+          <div class="flex items-center gap-1 min-w-18">
+            <span class="material-symbols-rounded-20">history</span>
+            Updated
+          </div>
+          <div>
+            {{- relativeTimeData_UpdateDate.Value }} {{ relativeTimeData_UpdateDate.Description }} {{ if relativeTimeData_UpdateDate.Time }} {{ relativeTimeData_UpdateDate.Time }}{{ end -}}
+          </div>
+        </div>
+        <div class="flex items-center text-neutral-400 fill-neutral-400 text-nowrap gap-2" title="{{ naturalTime: .CreateDate }}">
+          <div class="flex items-center gap-1 min-w-18">
+            <span class="material-symbols-rounded-20">today</span>
+            Created
+          </div>
+          <div>
+            {{- relativeTimeData_CreateDate.Value }} {{ relativeTimeData_CreateDate.Description }} {{ if relativeTimeData_CreateDate.Time }} {{ relativeTimeData_CreateDate.Time }}{{ end -}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Read from the beginning button -->
+      <a href="/artworks/{{ .FirstIllustID }}" class="outlined-button h-fit self-end text-sm font-semibold gap-1 ms-auto">
+        <span class="material-symbols-rounded-20">book_5</span>
+        Read
+      </a>
+    </div>
+  </div>
+</div>

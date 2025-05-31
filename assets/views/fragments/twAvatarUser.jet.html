@@ -1,0 +1,28 @@
+{{ import "../blocks/twFollowButtons" }}
+
+<div class="flex items-center gap-4">
+  <div class="flex items-center gap-3">
+    <a href="/users/{{ .ID }}">
+      <img
+        src="{{ .Avatar }}"
+        alt="{{ .Name }}"
+        class="aspect-square object-cover rounded-full size-10 min-w-10 avatar-outline-glow"
+      />
+    </a>
+    <div class="flex flex-col">
+      <a href="/users/{{ .ID }}" class="w-fit">
+        <div
+          class="text-lg font-bold text-neutral-200 hover:text-neutral-100 line-clamp-1 animated-underline"
+        >
+          {{- .Name -}}
+        </div>
+      </a>
+      <div
+        class="text-neutral-300 text-sm"
+      >
+        {{ prettyNumber(.Following) }} following
+      </div>
+    </div>
+  </div>
+  {{ yield twFollowButtons(data=., style="filled") }}
+</div>

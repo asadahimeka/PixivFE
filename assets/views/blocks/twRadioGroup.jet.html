@@ -1,0 +1,28 @@
+{{- block twRadioGroup(name, values, labels, icons, activeState="") -}}
+<div class="flex flex-col gap-6">
+  {{- range i, value := values -}}
+    <div class="flex items-center gap-3">
+      <input
+        type="radio"
+        id="{{ name }}_{{ value }}"
+        name="{{ name }}"
+        value="{{ value }}"
+        class="relative size-4 min-w-4 appearance-none rounded-full border border-neutral-700 bg-neutral-800
+        before:absolute before:inset-[3px] before:rounded-full before:bg-white
+        not-checked:before:hidden
+        checked:border-sky-600 checked:bg-sky-600
+        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600
+        disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400
+        forced-colors:appearance-auto forced-colors:before:hidden"
+        {{ activeState == value ? "checked" : "" }}
+      />
+      <label
+        for="{{ name }}_{{ value }}"
+        class="block text-sm/6 font-medium text-neutral-100"
+      >
+        {{ labels[i] }}
+      </label>
+    </div>
+  {{- end -}}
+</div>
+{{- end -}}

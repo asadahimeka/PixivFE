@@ -1,0 +1,62 @@
+<div class="flex flex-col rounded-lg w-full bg-neutral-800 gap-6 p-5 -mt-2">
+  <!-- Metadata -->
+  <div class="flex flex-wrap text-sm fill-neutral-400 gap-2">
+    <div class="flex items-center col-span-1 gap-1.5">
+      <div><span class="font-semibold">{{- prettyNumber(.Illust.Views) -}}</span> <span class="text-neutral-200">views</span></div>
+    </div>
+    <div class="text-neutral-200 select-none">&bull;</div>
+    <div class="flex items-center col-span-1 gap-1.5" title="{{ naturalTime: .Illust.Date }}">
+      <div><span class="font-semibold">{{- relativeTimeData.Value -}}</span> <span class="text-neutral-200">{{- relativeTimeData.Description -}}</span> {{ if relativeTimeData.Time }}<span class="font-semibold">{{- relativeTimeData.Time -}}</span>{{- end -}}</div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  {{ if .Illust.Description }}
+    {{ if len (parsePixivRedirect(.Illust.Description)) <= 1000 }}
+      <div class="description text-wrap wrap-anywhere text-neutral-300 text-base/7">
+        {{ raw(parsePixivRedirect(.Illust.Description)) }}
+      </div>
+      {{ else }}
+      <details class="group/details text-base/7">
+        <summary class="group/summary flex w-fit font-medium text-blue-400 hover:text-blue-300 cursor-pointer select-none">
+          <span class="inline group-open/details:hidden">
+            Read description <span class="text-sm font-normal text-neutral-400 group-hover/summary:text-neutral-300">({{ prettyNumber(len (parsePixivRedirect(.Illust.Description))) }} characters)</span>
+          </span>
+          <span class="hidden group-open/details:inline">
+            Hide description
+          </span>
+        </summary>
+        <div class="description text-wrap wrap-anywhere text-neutral-300 group-open/details:opacity-100 opacity-0 transition mt-2">
+          {{ raw(parsePixivRedirect(.Illust.Description)) }}
+        </div>
+      </details>
+    {{ end }}
+    {{ else }}
+    <div class="text-neutral-400 italic">No description added</div>
+  {{ end }}
+
+  <hr class="border-neutral-700">
+
+  <!-- Tags -->
+  <div class="flex flex-wrap items-baseline gap-2">
+    {{- if .Illust.AiType == 2 -}}
+    <div class="badge-warning">AI-generated</div>
+    {{- end -}}
+    {{- range .Illust.Tags.Tags -}}
+      <!-- Early block to catch the R-18 tag -->
+      {{- if isEmphasize(.Name) -}}
+      <div class="badge-danger">{{ .Name -}}</div>
+      {{- end -}}
+    {{- end -}}
+    {{- range .Illust.Tags.Tags -}}
+      {{- if isEmphasize(.Name) -}}
+      <!-- Intentionally empty to avoid duplication -->
+      {{- else -}}
+      <div class="flex flex-wrap items-baseline gap-x-1">
+        <a href="/tags/{{ escapeString(.Name) -}}" class="hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 font-medium animated-underline-alt">#{{ .Name -}}</a>
+        {{- if .TagTranslations.En -}}<span class="text-neutral-300 text-sm">({{ .TagTranslations.En -}})</span>{{- end -}}
+      </div>
+      {{- end -}}
+    {{- end -}}
+  </div>
+</div>

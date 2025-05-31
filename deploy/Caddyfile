@@ -1,0 +1,23 @@
+{
+  # General options
+  http_port 80
+  https_port 443
+
+  # Logging configuration
+  log {
+    output stdout
+    format console
+  }
+}
+
+# Main server block for caddy.localhost
+caddy.localhost {
+  # Use Caddy's automatic HTTPS with internal CA
+  tls internal
+
+  # Enable encoding, prefer zstd
+  encode zstd gzip
+
+  # Reverse proxy configuration
+  reverse_proxy pixivfe:8282
+}

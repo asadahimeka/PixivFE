@@ -1,0 +1,55 @@
+{* user menu popover *}
+<div
+  popover
+  id="userMenu"
+  class="peer pointer-events-none open:pointer-events-auto
+        opacity-0 starting:open:opacity-0 open:opacity-100 scale-95 starting:open:scale-95 open:scale-100 origin-top-right transition-all transition-discrete
+        open:flex flex-col h-fit w-72 bg-neutral-800 rounded-lg drop-shadow-lg mt-14 ms-auto me-4 z-30"
+>
+  <div class="flex bg-neutral-700/40 gap-4 p-4">
+    <a href="/self">
+      <img src="{{ userAvatar }}" alt="{{ username }} avatar" class="size-12 min-w-12 rounded-full avatar-outline-glow" />
+    </a>
+    <div class="flex flex-col gap-1">
+      <a href="/self">
+        <div class="w-fit text-xl font-semibold text-neutral-200 hover:text-neutral-50 line-clamp-1 animated-underline">{{ username }}</div>
+      </a>
+      <div class="text-xs text-neutral-400"><span class="font-medium">User ID:</span> {{ userID }}</div>
+    </div>
+  </div>
+  <ul class="flex flex-col w-full text-sm py-3 px-2 gap-1">
+    <li>
+      <a href="/self/bookmarks" class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 px-4 py-3">
+        <span class="material-symbols-rounded-20">favorite</span>
+        Bookmarks
+      </a>
+    </li>
+    <li>
+      <a href="/self/followingWorks" class="flex items-center w-full hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 px-4 py-3">
+        <span class="material-symbols-rounded-20">article_person</span>
+        Latest by followed users
+      </a>
+    </li>
+    <li>
+      <a href="/self/followingUsers" class="flex items-center w-full hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 px-4 py-3">
+        <span class="material-symbols-rounded-20">group</span>
+        Followed users
+      </a>
+    </li>
+    <li>
+      <a href="/settings" class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 px-4 py-3">
+        {* NOTE: actually a fill icon version *}
+        <span class="material-symbols-rounded-fill-20">settings</span>
+        Settings
+      </a>
+    </li>
+    <li>
+      <form action="/settings/logout" method="post">
+        <button type="submit" class="flex items-center w-full cursor-pointer hover:bg-red-500/10 rounded-lg text-red-300 fill-red-300 transition gap-2 px-4 py-3">
+          <span class="material-symbols-rounded-20">logout</span>
+          Log out
+        </button>
+      </form>
+    </li>
+  </ul>
+</div>

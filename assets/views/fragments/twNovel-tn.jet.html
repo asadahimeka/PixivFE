@@ -1,0 +1,120 @@
+{{- relativeTimeData := relativeTime(.CreateDate) -}}
+
+<div class="grid grid-cols-12 gap-6">
+  <div class="col-span-6 col-start-4 md:col-span-4 md:col-start-1">
+    <a href="/novel/{{ .ID }}">
+      <img src="{{ .CoverURL }}" alt="{{ .Title }}" class="w-full aspect-[4x3] object-cover outline-glow rounded mb-auto" loading="lazy" />
+    </a>
+  </div>
+
+  <div class="flex flex-col col-span-12 md:col-span-8 gap-6">
+    <!-- Series name -->
+    {{- if .SeriesID }}
+    <a
+      href="/novel/series/{{ .SeriesID }}"
+      title="{{ .SeriesTitle }}"
+      class="group w-fit -mb-4"
+    >
+      <div class="flex items-center group-hover:text-neutral-300 group-hover:fill-neutral-300 text-neutral-400 fill-neutral-400 gap-1">
+        <span class="material-symbols-rounded-20">collections_bookmark</span>
+        <div class="animated-underline line-clamp-1">
+          {{ .SeriesTitle }}
+        </div>
+      </div>
+    </a>
+    {{- end }}
+
+    <!-- Novel title -->
+    <a
+      href="/novel/{{ .ID }}"
+      title="{{ .Title }}"
+      class="w-fit"
+    >
+      <div class="text-lg font-bold animated-underline line-clamp-2 md:line-clamp-1">
+        {{ .Title }}
+      </div>
+    </a>
+
+    <!-- Author info -->
+    <div class="flex items-center gap-2 -mt-3">
+      <a href="/users/{{ .UserID }}">
+        <img
+          src="{{ .UserAvatar }}"
+          alt="{{ .UserName }}"
+          class="aspect-square object-cover rounded-full size-6 max-h-6 max-w-6 avatar-outline-glow"
+          loading="lazy"
+        />
+      </a>
+      <a
+        href="/users/{{ .UserID }}"
+        class="flex w-fit text-neutral-300 animated-underline line-clamp-1"
+      >
+        {{ .UserName }}
+      </a>
+    </div>
+
+    <div class="w-4/12 h-[4px] bg-pixivfe-400 -mt-2"></div>
+
+    <!-- Description -->
+    {{ if .Description }}
+    <div class="flex flex-col border border-neutral-700 bg-neutral-800/10 rounded-lg gap-3 p-4">
+      <p class="description text-white line-clamp-4 leading-relaxed tracking-wider font-serif">
+        {{ raw: parsePixivRedirect(.Description) }}
+      </p>
+    </div>
+    {{ end }}
+
+    <!-- Tags -->
+    {* NOTE: mostly the same styling as on the artwork page, except smaller text size (text-sm and text-xs) *}
+    <div class="flex flex-wrap items-baseline text-sm fill-neutral-400 gap-2">
+      {{- if .AiType == 2 -}}
+      <div class="badge-warning">AI-generated</div>
+      {{- end -}}
+      {{- range .Tags -}}
+        <!-- Early block to catch the R-18 tag -->
+        {{- if isEmphasize(.) -}}
+        <div class="badge-danger">{{ . -}}</div>
+        {{- end -}}
+      {{- end -}}
+      {{- if .IsOriginal }}
+      <div class="badge-primary">Original</div>
+      {{- end }}
+      {{- if .Genre != "0" }}
+      <div class="flex border border-neutral-500 bg-neutral-500/10 text-white text-xs font-semibold rounded-lg px-2 py-1">{{ getNovelGenre(.Genre) }}</div>
+      {{- end }}
+      {{- range .Tags -}}
+        {{- if isEmphasize(.) -}}
+        <!-- Intentionally empty to avoid duplication -->
+        {{- else -}}
+        <div class="flex flex-wrap items-baseline gap-x-1">
+          <a href="/tags/{{ escapeString(.) -}}" class="hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 font-medium animated-underline-alt">#{{ . -}}</a>
+        </div>
+        {{- end -}}
+      {{- end -}}
+    </div>
+
+    <!-- Metadata -->
+    <div class="grid grid-flow-col auto-cols-max grid-rows-2 text-sm text-neutral-400 gap-5">
+      <div class="flex items-center col-span-1 gap-1.5">
+        <span class="material-symbols-rounded-20">favorite</span>
+        {{- if .Bookmarks == 0 -}}
+          <div><span class="font-semibold text-neutral-200">&#8212;</span></div>
+        {{- else -}}
+          <div><span class="font-semibold text-neutral-200">{{- prettyNumber(.Bookmarks) -}}</span> <span class="text-neutral-200">bookmarks</span></div>
+        {{- end }}
+      </div>
+      <div class="flex items-center col-span-1 gap-1.5">
+        <span class="material-symbols-rounded-20">subject</span>
+        <div><span class="font-semibold text-neutral-200">{{ prettyNumber(.WordCount) }}</span> <span class="text-neutral-200">words</span></div>
+      </div>
+      <div class="flex items-center col-span-1 gap-1.5">
+        <span class="material-symbols-rounded-20">schedule</span>
+        <div><span class="font-semibold text-neutral-200">{{ floor(.ReadingTime / 60) }}</span> <span class="text-neutral-200">min</span></div>
+      </div>
+      <div class="flex items-center col-span-1 gap-1.5" title="{{ naturalTime(.CreateDate) }}">
+        <span class="material-symbols-rounded-20">today</span>
+        <div><span class="font-semibold text-neutral-200">{{- relativeTimeData.Value -}}</span> <span class="text-neutral-200">{{- relativeTimeData.Description -}}</span> {{ if relativeTimeData.Time }}<span class="font-semibold text-neutral-200">{{- relativeTimeData.Time -}}</span>{{- end -}}</div>
+      </div>
+    </div>
+  </div>
+</div>

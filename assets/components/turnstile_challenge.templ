@@ -1,0 +1,114 @@
+// Copyright 2023 - 2025, VnPower and the PixivFE contributors
+// SPDX-License-Identifier: AGPL-3.0-only
+
+package components
+
+// TurnstileNoAction will replace #turnstile-challenge-area after a success message is rendered
+// upon successful verification or if a valid ping cookie already exists.
+// It's an empty div with the same ID, effectively clearing the challenge.
+templ TurnstileNoAction() {
+	<div id="turnstile-challenge-area"></div>
+}
+
+// TurnstileChallenge renders the Turnstile challenge area, including loading, error, and success states.
+// Parameters:
+// - sitekey: Cloudflare Turnstile site key.
+// - messages: A slice of strings. The first is the main message, subsequent ones are sub-messages.
+// - isError: Boolean indicating if the current state is an error state.
+// - isSuccess: Boolean indicating if the current state is a success state.
+templ TurnstileChallenge(sitekey string, messages []string, isError bool, isSuccess bool) {
+	{{ isVerifying := !isError && !isSuccess }}
+	<div
+		id="turnstile-challenge-area"
+		class={ templ.Classes(
+			"relative z-50",
+			templ.KV("[.htmx-swapping]:opacity-0 duration-300 ease-in opacity-100 transition-opacity delay-3000", isSuccess),
+		) }
+		if isSuccess {
+			hx-get="/limiter/turnstile/clear"
+			hx-trigger="load"
+			hx-swap="outerHTML swap:3300ms show:none"
+			hx-target="this"
+			hx-push-url="false"
+			hx-indicator="this"
+		}
+	>
+		<div
+			id="turnstile-toast"
+			class="fixed bottom-4 right-4 rounded size-fit max-w-11/12 w-fit h-fit bg-neutral-800 border border-neutral-600 z-500 transition-all duration-300 p-3 px-4 gap-2 flex items-start ease-out opacity-100 starting:translate-y-full translate-y-0 starting:opacity-0 starting:blur-sm blur-0"
+		>
+			// Icons
+			switch {
+				case isVerifying:
+					<div
+						id="turnstile-spinner"
+						class="animate-spin rounded-full size-5 border-4 border-s-white border-white/20 shrink-0"
+					></div>
+				case isError:
+					<div
+						id="turnstile-error-icon"
+						class="size-5 text-red-300 shrink-0"
+					>
+						<span class="material-symbols-rounded-20">error</span>
+					</div>
+				case isSuccess:
+					<div
+						id="turnstile-success-icon"
+						class="size-5 text-green-300 shrink-0"
+					>
+						<span class="material-symbols-rounded-20">check</span>
+					</div>
+			}
+			// Content
+			<div id="turnstile-content" class="flex flex-col gap-2">
+				if len(messages) > 0 {
+					<div
+						id="turnstile-main-message"
+						class={ templ.Classes(
+							"text-sm/5",
+							templ.KV("text-red-300", isError),
+							templ.KV("text-green-300", isSuccess && !isError),
+						) }
+					>{ messages[0] }</div>
+				}
+				if len(messages) > 1 {
+					for _, subMessage := range messages[1:] {
+						<div class="text-xs text-neutral-300">{ subMessage }</div>
+					}
+				}
+				if isVerifying {
+					<form
+						id="turnstile-verify-form"
+						class="hidden"
+						hx-post="/limiter/turnstile/verify"
+						hx-target="#turnstile-challenge-area"
+						hx-swap="outerHTML show:none"
+						hx-push-url="false"
+						hx-indicator="this"
+					>
+						// Placeholder for explicit Turnstile rendering.
+						// ID is crucial for `turnstile.render()`.
+						// Data attributes are for configuration, read by turnstile-stuff.js.
+						<div
+							id="turnstile-widget-container"
+							data-sitekey={ sitekey }
+							data-size="flexible"
+							data-appearance="interaction-only"
+							data-theme="auto"
+						></div>
+						// Turnstile automatically adds a hidden input (default name 'cf-turnstile-response')
+						// inside the form when `response-field: true` (default) for `turnstile.render()`.
+					</form>
+
+					// Load custom Turnstile logic.
+					<script src="/js/turnstile-stuff.js" defer></script>
+
+					// Load Cloudflare Turnstile API script.
+					// `render=explicit` disables automatic rendering.
+					// `onload=onloadTurnstileCallback` calls our JS function when API is ready.
+					<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onloadTurnstileCallback" async defer></script>
+				}
+			</div>
+		</div>
+	</div>
+}

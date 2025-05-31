@@ -1,0 +1,94 @@
+{{- import "../blocks/twImageDisplay" }}
+
+{{ visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] }}
+
+{*
+Always show the first image as a small preview.
+If there is a single image, the user can simply click on it to view a larger version if desired.
+Otherwise, the lightbox will show a gallery of the multiple images.
+*}
+{{ asPreview := true }}
+{{ tagTemp := .Tags.Tags }}
+
+<div class="flex flex-col w-full bg-neutral-950 rounded-lg gap-4 mx-auto">
+  {{- if .IllustType == 2 }}
+      <video class="rounded h-160 w-auto mx-auto" autoplay controls disablepictureinpicture loop muted playsinline poster="{{ .Images[0].Large }}" src="{{ .Images[0].Video }}" height="{{- .Images[0].Height }}" width="{{- .Images[0].Width }}">
+        Unable to load ugoira.
+      </video>
+    {{ else }}
+      {{- range index := .Images[:1] }}
+      {* TODO: We could pre-calculate the effects here to avoid repetition *}
+      {{ yield twImageDisplay(data=., tags=tagTemp, asPreview=asPreview) }}
+    {{- end }}
+
+    {* reset the asPreview local variable to false as we've already shown the first image that could have been a preview *}
+    {{ asPreview := false }}
+
+    {{- if len(.Images) > 1 }}
+      <input type="checkbox" class="peer hidden" id="imageExpand">
+      <label
+        for="imageExpand"
+        class="group filled-button font-medium mx-auto mb-4"
+      >
+        {{ if .IllustType == 1 }}
+          <div class="not-group-peer-checked:flex not-group-peer-checked:items-center not-group-peer-checked:gap-2 group-peer-checked:hidden">
+            <span class="material-symbols-rounded-20">book_5</span>
+            <div>Read <span class="font-bold">{{ len(.Images) }}</span> pages</div>
+          </div>
+          <div class="not-group-peer-checked:hidden group-peer-checked:flex group-peer-checked:items-center group-peer-checked:gap-2">
+            <span class="material-symbols-rounded-20">hide_image</span>
+            Collapse images
+          </div>
+          {{ else }}
+          <div class="not-group-peer-checked:flex not-group-peer-checked:items-center not-group-peer-checked:gap-2 group-peer-checked:hidden">
+            <span class="material-symbols-rounded-20">photo_library</span>
+            <div>View <span class="font-bold">{{ len(.Images) }}</span> images</div>
+          </div>
+          <div class="not-group-peer-checked:hidden group-peer-checked:flex group-peer-checked:items-center group-peer-checked:gap-2">
+            <span class="material-symbols-rounded-20">hide_image</span>
+            Collapse images
+          </div>
+        {{ end }}
+      </label>
+      <label
+        for="imageExpand"
+        id="imageExpandBackground"
+        class="fixed left-0 top-0 -z-1 w-full h-full bg-neutral-950/0 peer-checked:bg-neutral-950/90 peer-checked:z-20 transition
+              {{ if visualEffectsEnabled == "true" }}backdrop-blur-0 peer-checked:backdrop-blur{{ end }}"
+      >
+      </label>
+      <label
+        id="imageExpandContainer"
+        for="imageExpand"
+        class="modal-popover pointer-events-none peer-checked:pointer-events-auto
+              opacity-0 starting:peer-checked:opacity-0 peer-checked:opacity-100 transition-all transition-discrete
+              group fixed top-0 left-0 w-full h-screen overflow-y-auto peer-checked:z-20 p-6"
+      >
+        <div class="fixed top-6 right-6 flex flex-col w-fit gap-2 z-30">
+          <span
+            class="material-symbols-rounded-20
+                  peer cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-neutral-100 active:scale-95 transition rounded-full p-2"
+          >
+            close
+          </span>
+          {* NOTE: using absolute positioning to avoid blocking scroll, and only displaying the tooltip for manga *}
+          {{ if .IllustType == 1}}
+            <div class="absolute -bottom-6 right-0 w-128 peer-hover:opacity-100 opacity-0 text-xs font-medium text-neutral-400 text-end transition select-none">
+              Don't worry, you'll return to where you left off.
+            </div>
+          {{ end }}
+        </div>
+
+        <div class="flex flex-col max-w-7xl gap-y-4 m-auto">
+          {{- range index := .Images[:] }}
+            {{ yield twImageDisplay(data=., tags=tagTemp, asPreview=asPreview) }}
+          {{- end }}
+          <div class="filled-button font-medium mx-auto gap-2">
+            <span class="material-symbols-rounded-24">close</span>
+            Close
+          </div>
+        </div>
+      </label>
+    {{- end }}
+  {{- end }}
+</div>

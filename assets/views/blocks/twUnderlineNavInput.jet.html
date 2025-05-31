@@ -1,0 +1,63 @@
+{*
+Creates an underlined tab navigation bar using hidden radio inputs for state management.
+
+Supports a `showtab` query parameter to pre-select a specific tab.
+
+Parameters:
+- ids: Array of unique identifiers for each tab
+- names: Array of display names for each tab
+
+Example usage: `hidden group-has-[input#cat-nav-account:checked]/body:flex`
+
+Important: Do NOT use snake_case (like "my_tab") for ids as Tailwind will convert underscores to spaces in selector syntax.
+*}
+
+{{- block twUnderlineNavInput(ids, names, nodefault=false) -}}
+
+{{- defaultCheckedIndex := 0 -}}
+{{- if isset(Queries) && isset(Queries.showtab) -}}
+  {{- range j, id := ids -}}
+    {{- if Queries.showtab == id -}}
+      {{- defaultCheckedIndex = j -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if nodefault -}}
+{{- defaultCheckedIndex = -999 -}}
+{{- end -}}
+
+<div id="category-nav" class="text-sm border-neutral-700 border-b">
+  <div class="grid grid-flow-col auto-cols-min justify-items-start overflow-x-auto gap-2 -mb-[1px]">
+    {{- range i, k := ids -}}
+      {* wrapper div so that peer classes are correctly scoped to each input/label combination *}
+      <div>
+        <input
+          id="{{- ids[i] -}}"
+          class="peer hidden"
+          type="radio"
+          name="cat_nav"
+          {{ if i == defaultCheckedIndex }}checked{{ end }}
+        />
+        {* NOTE: lack of hover: styling is intentional *}
+        <div
+          class="select-none pb-1
+                border-transparent border-b-3 peer-checked:border-pixivfe-400
+                font-medium peer-checked:font-semibold
+                text-neutral-200 [&_.material-symbols-rounded-20]:text-neutral-400
+                peer-checked:text-neutral-100 peer-checked:[&_.material-symbols-rounded-20]:text-neutral-300"
+        >
+          <label
+            for="{{- ids[i] -}}"
+            class="cursor-pointer flex items-center
+                hover:bg-neutral-700 rounded-lg px-3 py-2 w-max gap-2 transition"
+          >
+            {* wrapping with raw() for icon support *}
+            {{- raw(names[i]) -}}
+          </label>
+        </div>
+      </div>
+    {{- end -}}
+  </div>
+</div>
+{{- end -}}

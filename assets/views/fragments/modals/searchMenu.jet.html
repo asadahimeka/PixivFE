@@ -1,0 +1,55 @@
+{* search bar modal *}
+<div
+  popover
+  id="searchMenu"
+  class="modal-popover pointer-events-none open:pointer-events-auto top-1/4 start-2/4 -translate-x-2/4 -translate-y-2/4
+        opacity-0 starting:open:opacity-0 open:opacity-100 scale-95 starting:open:scale-95 open:scale-100 transition-all transition-discrete
+        open:flex h-fit min-w-80 w-11/12 max-w-120 bg-neutral-900 border border-neutral-700 rounded-lg drop-shadow-lg z-30"
+>
+  <div
+    class="flex flex-col w-full gap-6 p-4"
+  >
+    <form action="/tags" method="post" autocomplete="off">
+      <div class="group relative flex items-center gap-4">
+        <span
+          class="material-symbols-rounded-20
+                absolute start-2 text-neutral-500 group-has-[input:focus]:text-neutral-400 z-1"
+        >
+            search
+          </span>
+        <input
+          type="search"
+          class="form-control w-full !px-8"
+          id="name"
+          name="name"
+          required
+          autofocus
+          placeholder="Search artworks"
+          aria-label="Search"
+        />
+        <!-- <input
+          class="w-full bg-neutral-800 focus:bg-neutral-700 placeholder:text-neutral-500 focus:placeholder:text-neutral-400 rounded-lg text-sm font-medium px-8 py-2"
+          id="search"
+          type="search"
+          name="name"
+          required
+          autofocus
+          placeholder="Search works"
+          aria-label="Search"
+        /> -->
+        <button type="submit" class="filled-button text-sm font-medium gap-2">
+          <span class="material-symbols-rounded-20">arrow_forward</span>Go
+        </button>
+      </div>
+    </form>
+
+    <div class="text-xs text-neutral-400 space-y-1 -mt-3">
+      <div>
+        Delimit multiple keywords using spaces.
+      </div>
+      <div>
+        <span class="font-medium">Example:</span> <code class="bg-neutral-950">東方project チルノ</code>
+      </div>
+    </div>
+  </div>
+</div>

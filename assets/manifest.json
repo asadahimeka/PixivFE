@@ -1,0 +1,12 @@
+{
+  "name": "PixivFE",
+  "icons": [
+    {
+      "src": "/img/favicon.svg",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "prefer_related_applications": false
+}

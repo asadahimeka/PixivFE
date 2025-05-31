@@ -1,0 +1,56 @@
+{* template to render data specific to manga series *}
+
+{*
+TODO: inefficiency regarding hx-headers here:
+      we don't know how many pages the series nav artworks have, so
+      we're forced to fetch images by hardcoding "Artwork-Pages": "2"
+*}
+
+{* NOTE: a lot of customisation away from the standard .outlined-button and .filled-button classes here *}
+<div class="grid grid-flow-col grid-rows-2 sm:grid-rows-1 auto-cols-fr gap-4 *:!w-full mx-auto -my-2">
+  {{ if .Illust.SeriesNavData.Prev }}
+    <a
+      href="/artworks/{{ .Illust.SeriesNavData.Prev.ID }}"
+      class="outlined-button justify-between text-sm font-medium gap-4"
+      hx-headers='{ "Artwork-ID": "{{- .Illust.SeriesNavData.Prev.ID -}}", "Artwork-User-ID": "{{- .Illust.UserID -}}", "Artwork-IllustType": "{{- .Illust.IllustType -}}", "Artwork-Width": "{{- .Illust.Width -}}", "Artwork-Height": "{{- .Illust.Height -}}", "Artwork-Pages": "2" }'
+    >
+      <span class="material-symbols-rounded-20 bg-white text-black rounded-full">arrow_back</span>
+
+      <div class="line-clamp-1 space-x-2 *:align-baseline mx-auto">
+        <span class="font-semibold text-neutral-400">{{ ordinalNumeral(.Illust.SeriesNavData.Prev.Order) }}</span><span class="font-semibold">{{ .Illust.SeriesNavData.Prev.Title }}</span>
+      </div>
+    </a>
+  {{ end }}
+  {{ if .Illust.SeriesNavData.Next }}
+    <a
+      href="/artworks/{{ .Illust.SeriesNavData.Next.ID }}"
+      class="outlined-button justify-between text-sm font-medium gap-4"
+      hx-headers='{ "Artwork-ID": "{{- .Illust.SeriesNavData.Next.ID -}}", "Artwork-User-ID": "{{- .Illust.UserID -}}", "Artwork-IllustType": "{{- .Illust.IllustType -}}", "Artwork-Width": "{{- .Illust.Width -}}", "Artwork-Height": "{{- .Illust.Height -}}", "Artwork-Pages": "2" }'
+    >
+      <div class="line-clamp-1 space-x-2 *:align-baseline mx-auto">
+        <span class="font-semibold text-neutral-400">{{ ordinalNumeral(.Illust.SeriesNavData.Next.Order) }}</span><span class="font-semibold">{{ .Illust.SeriesNavData.Next.Title }}</span>
+      </div>
+
+      <span class="material-symbols-rounded-20 bg-white text-black rounded-full">arrow_forward</span>
+    </a>
+    {{ else }}
+    <button
+      disabled
+      class="outlined-button-disabled justify-center text-neutral-500 text-sm font-medium mx-auto"
+      title="Not posted yet"
+    >
+      {{ nextPlaceholder := .Illust.SeriesNavData.Prev.Order + 2 }}
+      <div class="line-clamp-1 space-x-2">
+        <span class="font-semibold">{{ ordinalNumeral(nextPlaceholder) }}</span>
+        <span class="text-neutral-500">Not posted yet</span>
+      </div>
+    </button>
+  {{ end }}
+</div>
+
+<a href="/users/{{ .Illust.UserID }}/series/{{ .Illust.SeriesNavData.SeriesID }}" class="group w-fit -mb-6">
+  <div class="flex items-center font-medium text-neutral-400 group-hover:text-neutral-300 gap-1 animated-underline">
+    <span class="material-symbols-rounded-20">collections_bookmark</span>
+    <span class="font-semibold">{{ ordinalNumeral(.Illust.SeriesNavData.Order) }}</span> of {{ .Illust.SeriesNavData.Title }}
+  </div>
+</a>

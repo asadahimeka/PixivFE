@@ -1,0 +1,30 @@
+<form
+  action="/self/addBookmark/{{- .ID -}}"
+  method="post"
+  hx-target="this"
+  hx-target-4*="body"
+  hx-swap="outerHTML show:none"
+  hx-push-url="false"
+  hx-indicator="this"
+  hx-headers='{ "Quick-Action": "true" }'
+  class="contents"
+>
+  <input type="hidden" name="artwork_id" value="{{ .ID }}">
+  <input
+    type="hidden"
+    name="return_path"
+    value='{{ if HtmxCurrentPath != "" }} {{- HtmxCurrentPath -}} {{ else }} {{- CurrentPath -}} {{ end }}'
+  >
+
+  <button
+    type="submit"
+    class="flex flex-col gap-2 absolute bottom-2 right-2 justify-center items-center transition rounded-full p-2 z-3 cursor-pointer select-none
+          group-hover/imageWrapper:opacity-100 xl:opacity-50
+          hover:bg-black/90 bg-black/80
+          active:scale-90"
+  >
+    <span class="material-symbols-rounded-20">
+      favorite
+    </span>
+  </button>
+</form>

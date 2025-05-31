@@ -1,0 +1,15 @@
+{*
+Renders the number of artwork placeholders specified by the count parameter.
+
+`for range x` doesnt work, need to use this weird ints() syntax instead.
+
+ref: https://github.com/CloudyKit/jet/issues/163
+*}
+
+{{- block twArtworkPlaceholders(count) -}}
+
+{{ range ints(0,count) }}
+  <div class="aspect-square bg-neutral-800 rounded"></div>
+{{ end }}
+
+{{- end -}}

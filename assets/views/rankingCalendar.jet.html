@@ -1,0 +1,244 @@
+{{- extends "layout/twDefault" -}}
+{{- import "blocks/twUnderlineNav" -}}
+{{- import "blocks/twSelect" -}}
+{{- import "blocks/twModal" -}}
+
+{{- block twRankingCalendarNav(ctx) -}}
+  <div class="flex flex-col gap-8">
+    <div
+      class="flex items-end justify-center sm:justify-between h-fit"
+      aria-label="Date navigation"
+    >
+      <div class="flex justify-start min-w-32">
+        <a
+          href="{{- url -}}{{- ctx.MonthAfter.Link -}}#"
+          class="hidden sm:flex"
+          {{- ctx.MonthAfter.Link == "false" ? " aria-disabled=\"true\"" : "" -}}
+        >
+          <div class="filled-icon-button text-sm font-medium gap-2 !pe-4">
+            <span class="material-symbols-rounded-20">arrow_back</span>
+            <span class="hidden sm:inline">{{- ctx.MonthAfter.MonthLiteral -}}</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-2 -me-12">
+        <div class="flex flex-col items-center">
+          <h1 class="text-lg text-neutral-400 font-medium">{{- ctx.Year -}}</h1>
+          <div class="text-3xl font-bold">{{- ctx.ThisMonth.MonthLiteral -}}</div>
+        </div>
+        <button
+          popovertarget="rankingCalendarOptions"
+          class="group flex items-center justify-center cursor-pointer hover:bg-neutral-800 rounded-full size-10 transition"
+        >
+          <span class="material-symbols-rounded-24">tune</span>
+        </button>
+
+        {{- yield twModal(id="rankingCalendarOptions", title="Options", widthClasses="w-full max-w-11/12 md:max-w-96") content -}}
+          <form action="/rankingCalendar" method="get">
+            <div class="flex flex-col h-fit gap-6">
+              <h3 class="text-neutral-300 text-sm font-medium">
+                Filter by
+              </h3>
+
+              <div class="flex justify-start gap-16 -mt-4">
+                {{- name := "mode" }}
+                {{- values := slice(
+                                  "START_OPTGROUP",
+                                  "daily",
+                                  "weekly",
+                                  "monthly",
+                                  "rookie",
+                                  "START_OPTGROUP",
+                                  "daily_r18",
+                                  "weekly_r18",
+                                  "r18g",
+                                  "START_OPTGROUP",
+                                  "original",
+                                  "daily_ai",
+                                  "male",
+                                  "female",
+                                  "START_OPTGROUP",
+                                  "daily_r18_ai",
+                                  "male_r18",
+                                  "female_r18"
+                                  ) }}
+                {{- labels := slice(
+                                  "Time frame",
+                                  "Daily",
+                                  "Weekly",
+                                  "Monthly",
+                                  "Rookie",
+                                  "Time frame (R-18)",
+                                  "Daily (R-18)",
+                                  "Weekly (R-18)",
+                                  "Weekly (R-18G)",
+                                  "Specialized",
+                                  "Original",
+                                  "AI-generated",
+                                  "Popular among males",
+                                  "Popular among females",
+                                  "Specialized (R-18)",
+                                  "AI-generated (R-18)",
+                                  "Popular among males (R-18)",
+                                  "Popular among females (R-18)"
+                                  ) }}
+                {{- yield twSelect(name=name, values=values, labels=labels, activeState=Mode) }}
+              </div>
+
+              <p class="text-xs text-neutral-400 text-nowrap -mt-4">
+                Works are ranked using a sliding window.
+              </p>
+
+              <h3 class="text-neutral-300 text-sm font-medium">
+                Date
+              </h3>
+
+              <div class="flex items-center gap-3 -mt-4">
+                <input
+                  id="date"
+                  name="date"
+                  type="date"
+                  value="{{- .Year }}-{{- .ThisMonth.MonthPadded -}}-01"
+                  min="2007-09"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="flex items-center justify-between gap-8">
+                <a href="/rankingCalendar" type="button" class="flex items-center w-fit cursor-pointer hover:bg-red-500/10 rounded-full text-red-300 fill-red-300 transition gap-2 px-3 py-2">
+                  <span class="material-symbols-rounded-20">reset_wrench</span>
+                  Reset
+                </a>
+                <button
+                  type="submit"
+                  class="filled-button font-medium gap-2"
+                >
+                  <span class="material-symbols-rounded-20">arrow_forward</span>
+                  Go
+                </button>
+              </div>
+            </div>
+          </form>
+        {{- end -}}
+      </div>
+
+      <div class="flex justify-end min-w-32">
+        <a
+          href="{{- url -}}{{- ctx.MonthBefore.Link -}}#"
+          class="hidden sm:flex"
+          {{- ctx.MonthBefore.Link == "false" ? " aria-disabled=\"true\"" : "" -}}
+        >
+          <div class="filled-icon-button text-sm font-medium gap-2 !ps-4">
+            <span class="hidden sm:inline">{{- ctx.MonthBefore.MonthLiteral -}}</span>
+            <span class="material-symbols-rounded-20">arrow_forward</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="flex sm:hidden items-center justify-between">
+      <div class="flex justify-start min-w-32">
+        <a
+          href="{{- url -}}{{- ctx.MonthAfter.Link -}}#"
+          {{- ctx.MonthAfter.Link == "false" ? " aria-disabled=\"true\"" : "" -}}
+        >
+          <div class="filled-icon-button text-sm font-medium gap-2 !pe-4">
+            <span class="material-symbols-rounded-20">arrow_back</span>
+            <span class="inline">Next</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex justify-end min-w-32">
+        <a
+          href="{{- url -}}{{- ctx.MonthBefore.Link -}}#"
+          {{- ctx.MonthBefore.Link == "false" ? " aria-disabled=\"true\"" : "" -}}
+        >
+          <div class="filled-icon-button text-sm font-medium gap-2 !ps-4">
+            <span class="inline">Prev</span>
+            <span class="material-symbols-rounded-20">arrow_forward</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+{{- end -}}
+
+{{- block body() -}}
+
+{{- Mode := isset(Queries.mode) ? Queries.mode : "daily" -}}
+
+<!-- Prefetch links -->
+{{- url := "/rankingCalendar?mode=" + .Mode + "&date=" -}}
+<link rel="prefetch" href="{{- url -}}{{- .MonthAfter.Link -}}" />
+<link rel="prefetch" href="{{- url -}}{{- .MonthBefore.Link -}}" />
+
+<div class="hidden">
+  <p>Daily</p>
+  <p>Weekly</p>
+  <p>Monthly</p>
+  <p>Rookie</p>
+  <p>Daily (R-18)</p>
+  <p>Weekly (R-18)</p>
+  <p>Weekly (R-18G)</p>
+  <p>Original</p>
+  <p>Popular among males</p>
+  <p>Popular among females</p>
+  <p>Popular among males (R-18)</p>
+  <p>Popular among females (R-18)</p>
+</div>
+
+<div class="flex flex-col w-full max-w-7xl gap-8">
+  <!-- Navigation and title -->
+  <div id="checkpoint" class="scroll-mt-20">
+    {{- yield twRankingCalendarNav(ctx=.) -}}
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-7 gap-[1px] bg-neutral-800 border border-neutral-800 rounded -mt-2">
+    {* Days of week header *}
+    {{- range _, dayName := slice("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat") -}}
+      <div class="col-span-1 hidden xl:block text-center text-lg font-medium text-neutral-200 py-2
+                  {{ if dayName == "Sat" }} border-0 last:me-0 {{ else }} border-e border-neutral-900 -me-[1px] {{ end }}"
+      >
+        {{- dayName -}}
+      </div>
+    {{- end -}}
+
+    {* Calendar days *}
+    {{- range _, day := .Calendar -}}
+      {{- if day.DayNumber > 0 -}}
+        <div class="col-span-1 size-full max-w-48 min-h-48 bg-neutral-900 p-4">
+          {{- if day.ImageURL -}}
+            {* Thumbnail calculations *}
+            {{- thumbnail := day.Thumbnails.Webp_1200 ? day.Thumbnails.Webp_1200 : day.ImageURL -}}
+            {{- size := day.Thumbnails.Webp_1200 ? "1200px" : "360px" -}}
+
+            <a
+              href="/ranking?date={{- day.DateString -}}&mode={{- Mode -}}"
+              class="group/image flex active:scale-95 transition relative"
+            >
+              <img
+                src="{{- thumbnail -}}"
+                width="{{- size -}}"
+                height="{{- size -}}"
+                class="aspect-square object-cover rounded group-outline-glow"
+              />
+              <div class="absolute top-0 start-0 font-medium text-white bg-black/80 rounded-tl rounded-br px-2 py-1 p-2">
+                {{- ordinalNumeral(day.DayNumber) -}}
+              </div>
+            </a>
+          {{- else -}}
+            <div class="grid place-items-center size-full text-lg font-medium text-neutral-400">
+              {{- ordinalNumeral(day.DayNumber) -}}
+            </div>
+        {{- end -}}
+        </div>
+      {{- else -}}
+        <div class="col-span-1 bg-neutral-900 hidden xl:block">
+        </div>
+      {{- end -}}
+    {{- end -}}
+  </div>
+</div>
+{{- end -}}

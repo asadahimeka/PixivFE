@@ -1,0 +1,60 @@
+{* footer *}
+
+<footer class="bg-neutral-900 border-t border-neutral-700 px-4">
+  <div class="h-full max-w-7xl py-8 mx-auto">
+    <div
+      class="flex flex-col sm:flex-row justify-start sm:justify-between sm:items-end gap-8"
+    >
+      <div class="flex flex-col gap-2">
+        <div class="text-2xl font-medium">
+          <a href="/" class="animated-underline">PixivFE</a>
+        </div>
+        <div class="text-xs text-neutral-400">
+          An open-source alternative frontend for pixiv that doesn't suck.
+        </div>
+        <div class="text-xs font-medium text-neutral-400">
+          Not developed, created, or distributed by pixiv.
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4">
+        <a href="https://htmx.org/" rel="noopener">
+          <img
+            class="w-48 sm:self-end"
+            src="/img/createdwith.jpeg"
+            width="680"
+            height="168"
+            loading="lazy"
+          />
+        </a>
+
+        <!-- <div class="flex flex-col gap-2">
+          {* The terms for using the Go logo are actually quite restrictive, and
+          only in word mark (plain text) form is it allowed to be used without
+          permission (ref: https://go.dev/brand) Tailwind Labs, on the other
+          hand, are more permissive and only prohibits implying an official
+          connection or endorsement with them (ref:
+          https://tailwindcss.com/brand) *}
+          <div class="text-xs text-neutral-400 text-start sm:text-end">
+            Built with
+            <a
+              href="https://go.dev/"
+              rel="noopener"
+              class="font-medium hover:underline hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400"
+              >Go</a
+            >
+            and
+          </div>
+
+          <a
+            href="https://tailwindcss.com/"
+            rel="noopener"
+            class="sm:self-end"
+          >
+            {{ raw: icon("tailwind", "w-28") }}
+          </a>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,69 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twTabNavAlt" }}
+{{- import "blocks/twPillNav" }}
+{{- block body() }}
+
+<!-- Prefetch links -->
+<link rel="prefetch" href="/discovery/novel?mode=r18">
+
+<div class="flex flex-col w-full max-w-7xl gap-8">
+  {{- Type := "/discovery/novel" }}
+  {{- paths := slice("/discovery", "/discovery/novel", "/discovery/users") }}
+  {{- names := slice("Artworks", "Novels", "Users")}}
+  {{- icons := slice(`<span class="material-symbols-rounded-24">image</span>`, `<span class="material-symbols-rounded-24">book</span>`, `<span class="material-symbols-rounded-24">person</span>`)}}
+  {{- categoryCounts := slice(1, 1, 1) }}
+  {{- yield twTabNavAlt(baseURL="", paths=paths, names=names, icons=icons, categoryCounts=categoryCounts, activeState=Type)}}
+
+  <div class="h-[1px] bg-neutral-800 -mt-8"></div>
+
+  <div class="flex flex-row items-center gap-4">
+    {{- Mode := isset(Queries.mode) ? Queries.mode : "safe" -}}
+    {{- url := replaceQuery(.Queries, "mode", "") -}}
+    {{- path := slice("all", "safe", "r18") -}}
+    {{- name := slice("All", "Safe", "R-18") -}}
+    {{- fragment := "" -}}
+    {{- yield twPillNav(baseURL=url, paths=path, names=name, activeState=Mode) -}}
+
+    <form method="post">
+      <input type="hidden" name="reset" value="on" />
+
+      <button
+        type="submit"
+        class="border border-neutral-700 text-neutral-200
+          flex items-center w-fit cursor-pointer hover:text-neutral-900 hover:bg-neutral-300 active:scale-95 text-sm font-medium rounded-full px-6 py-1.5 transition"
+      >
+          Reset
+      </button>
+    </form>
+  </div>
+
+  <!-- Main content -->
+  <div id="content" class="htmx-added-fade-in">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-12">
+      {{- range i := .Novels }}
+        {{- if i != 0 -}}
+          {{- if i % 2 == 0 -}}
+            <hr class="hidden lg:block col-span-2 border-neutral-800">
+          {{- end -}}
+          <hr class="block lg:hidden col-span-1 border-neutral-800">
+        {{- end -}}
+        <div class="col-span-1">
+          {{- include "fragments/twNovel-tn" . }}
+        </div>
+      {{- end }}
+    </div>
+
+    <!-- Infinite scroll trigger -->
+    {{ include "fragments/twInfiniteScroll" . }}
+  </div>
+
+  <noscript>
+    <form method="post">
+      <button type="submit" class="filled-button font-medium gap-2 mx-auto">
+        <span class="material-symbols-rounded-20">refresh</span>
+        Refresh
+      </button>
+    </form>
+  </noscript>
+</div>
+{{- end }}

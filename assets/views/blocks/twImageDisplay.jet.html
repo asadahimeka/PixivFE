@@ -1,0 +1,138 @@
+{*
+NOTE: Setting *max* height for whatever reason causes the browser to *not* reserve the required space
+      for the image, causing massive layout shift once the image loads in
+
+      `object-fit: contain;` only affects the image size *visually* and *does not* affect the actual bounding box in the DOM
+      This means that the parent anchor element will stretch horizontally past where the image actually appears onscreen
+      if the <img> element was in any way limited in max-height
+
+      `object-fit: contain;` is a complete noob trap and I fail to understand why it functions this way
+
+      ref: https://drafts.csswg.org/css-images/#valdef-object-fit-contain
+
+      As such, setting height as a function of width is probably the least worst out of these options and appears to
+      be what pixiv themselves went with
+
+      ---
+
+      Revisiting this template months later, we now effectively preload the preview/first image for all navigations to
+      the artwork page, so we can set max-height on the images *mostly* fine
+
+      Imperfect dimension data in routes/artwork means some layout shift for images subsequent to the first in the lightbox
+      is unavoidable during the initial page response for a `Fast-Request`
+
+      However, once the htmx request to ArtworkPartial completes, everything is fine since we have actual API data
+
+      ---
+
+      WebKit browsers have specific handling issues with image aspect ratios:
+      - Using `size-full max-h-160` causes horizontal stretching when max-height is reached
+      - Using `w-auto h-full` causes horizontal squishing when space is insufficient
+      - `object-contain` preserves ratio visually but doesn't fix the anchor's clickable area
+        nor the image background color, per CSS spec
+
+      Our solution of `size-auto max-w-full max-h-*` works because `size-auto` allows the image to maintain
+      its intrinsic aspect ratio, while max-height caps vertical size and max-width prevents overflow
+*}
+
+{{- block twImageDisplay(data, asPreview) -}}
+
+{{- seasonalEffectsDisabled := CookieList["pixivfe-SeasonalEffectsDisabled"] }}
+
+{{- if data.Width != 0 && data.Height != 0  -}}
+  {*
+  If part of a manga, display at original resolution.
+  Increase max-h if not acting as a preview (i.e. more than one image present and being displayed in the lightbox).
+  *}
+  {{- if data.IllustType == 1  -}}
+    <a
+      href="{{- .Original -}}"
+      id="{{ index + 1  -}}"
+      class="group/image mx-auto relative"
+      hx-boost="false"
+    >
+      <img
+        {*
+        .Original will be empty if this is part of an initial page responss for a `Fast-Request`
+        (i.e. *before* we have access to illust.Urls.Original and cannot be certain that we have a valid URL for .Original).
+
+        If so, load .MasterWebp_1200 instead.
+        *}
+        src='{{- if .Original != "" && !asPreview -}} {{- .Original -}} {{- else -}} {{- .MasterWebp_1200 -}} {{- end -}}'
+        alt="Page {{ index + 1 -}}"
+        class="rounded size-auto max-w-full
+              {{ if asPreview }} max-h-160 {{ else }} max-h-320 {{ end }}"
+        width="{{- data.Width -}}"
+        height="{{- data.Height -}}"
+        data-as_preview="{{ asPreview }}"
+        data-is_manga="{{ data.IllustType == 1 }}"
+        data-is_landscape="{{ data.Width > data.Height }}"
+        {{ if index + 1 == 1 }}fetchpriority="high" decoding="async"{{ end }}
+      />
+     	{{- range tags -}}
+	{{- effects := getSpecialEffects(.Name) -}}
+
+     	{{- if seasonalEffectsDisabled != "true" && effects != "" -}}
+        <img src="{{- effects -}}" class="z-2 size-full !bg-transparent absolute inset-0" />
+       	{{- end -}}
+     	{{- end -}}
+    </a>
+    {*
+    Otherwise, use .MasterWebp_1200 for the image src and don't increase max-h in the lightbox.
+    No special handling for images in landscape orientation either.
+    *}
+    {{- else -}}
+    <a
+      href="{{- .Original -}}"
+      id="{{ index + 1 -}}"
+      class="group/image mx-auto relative"
+      hx-boost="false"
+    >
+      <img
+        src="{{- .MasterWebp_1200 -}}"
+        alt="Page {{ index + 1 -}}"
+        class="rounded size-auto max-w-full
+              {{ if asPreview }} max-h-160 {{ end }}"
+        width="{{- data.Width -}}"
+        height="{{- data.Height -}}"
+        data-as_preview="{{ asPreview }}"
+        data-is_manga="{{ data.IllustType == 1 }}"
+        data-is_landscape="{{ data.Width > data.Height }}"
+        {{ if index + 1 == 1 }}fetchpriority="high" decoding="async"{{ end }}
+      />
+   	{{- range tags -}}
+     	{{- effects := getSpecialEffects(.Name) -}}
+
+     	{{- if seasonalEffectsDisabled != "true" && effects != "" -}}
+        <img src="{{- effects -}}" class="z-2 size-full !bg-transparent absolute inset-0" />
+     	{{- end -}}
+   	{{- end -}}
+    </a>
+  {{- end -}}
+  {* Fallback for images that do not have dimension data *}
+  {{- else -}}
+    <a
+      href="{{- .Original -}}"
+      id="{{ index + 1  -}}"
+      class="group/image mx-auto relative"
+      hx-boost="false"
+    >
+      <img
+        src="{{- .MasterWebp_1200 -}}"
+        alt="Page {{ index + 1 -}}"
+        class="rounded"
+        width="{{- data.Width -}}"
+        height="{{- data.Height -}}"
+        {{ if index + 1 == 1 }}fetchpriority="high" decoding="async"{{ end }}
+      />
+     	{{- range tags -}}
+       	{{- effects := getSpecialEffects(.Name) -}}
+
+     	{{- if seasonalEffectsDisabled != "true" && effects != "" -}}
+          <img src="{{- effects -}}" class="z-2 size-full !bg-transparent absolute inset-0" />
+       	{{- end -}}
+     	{{- end -}}
+    </a>
+{{- end -}}
+
+{{- end -}}

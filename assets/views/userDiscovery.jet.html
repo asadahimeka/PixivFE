@@ -1,0 +1,36 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twTabNavAlt" }}
+{{- block body() }}
+
+<div class="flex flex-col w-full max-w-5xl gap-8"> {* max-w-5xl to improve scannability on large screens *}
+  {{- Type := "/discovery/users" }}
+  {{- paths := slice("/discovery", "/discovery/novel", "/discovery/users") }}
+  {{- names := slice("Artworks", "Novels", "Users")}}
+  {{- icons := slice(`<span class="material-symbols-rounded-24">image</span>`, `<span class="material-symbols-rounded-24">book</span>`, `<span class="material-symbols-rounded-24">person</span>`)}}
+  {{- categoryCounts := slice(1, 1, 1) }}
+  {{- yield twTabNavAlt(baseURL="", paths=paths, names=names, icons=icons, categoryCounts=categoryCounts, activeState=Type)}}
+
+  <div class="h-[1px] bg-neutral-800 -mt-8"></div>
+
+  <!-- Main content -->
+  <div id="content" class="htmx-added-fade-in">
+    <div class="flex flex-col gap-y-8">
+      {{- range .Users }}
+        {{- include "fragments/twUser-tn" }}
+      {{- end }}
+    </div>
+
+    <!-- Infinite scroll trigger -->
+    {{ include "fragments/twInfiniteScroll" . }}
+  </div>
+
+  <noscript>
+    <form method="post">
+      <button type="submit" class="filled-button font-medium gap-2 mx-auto">
+        <span class="material-symbols-rounded-20">refresh</span>
+        Refresh
+      </button>
+    </form>
+  </noscript>
+</div>
+{{- end }}

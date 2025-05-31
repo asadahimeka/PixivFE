@@ -1,0 +1,64 @@
+{* navbar *}
+
+<nav
+  class="fixed top-0 flex items-center justify-between h-14 w-full px-4 mx-auto bg-neutral-900 border-b border-neutral-700 z-10"
+>
+  <div class="flex items-center gap-2">
+    <button
+      popovertarget="sidebar"
+      class="flex items-center justify-center size-8 hover:bg-neutral-700 active:scale-95 transition rounded cursor-pointer text-neutral-300 hover:text-neutral-100"
+    >
+      <span class="material-symbols-rounded-24">
+        menu
+      </span>
+    </button>
+
+    <!-- Navbar content -->
+    <!-- Title -->
+    {{ if logoStyle == "" || logoStyle == "standard" }}
+    <a href="/" class="text-xl font-medium animated-underline">PixivFE</a>
+    {{ else if logoStyle == "alternative" }}
+    <a href="/" class="size-8">
+      <img src="/img/logo-alt.gif" alt="PixivFE icon" class="size-full" />
+    </a>
+    {{- end }}
+  </div>
+
+  <div class="flex items-center gap-4">
+    <button
+      popovertarget="searchMenu"
+      class="flex items-center justify-center size-8 hover:bg-neutral-700 active:scale-95 transition rounded cursor-pointer text-neutral-300 hover:text-neutral-100 p-1"
+    >
+      <span class="material-symbols-rounded-24">
+        search
+      </span>
+    </button>
+
+    {{ if username != "" && userID != "" && userAvatar != "" }}
+    <div class="flex items-center gap-2">
+      <button
+        popovertarget="userMenu"
+        class="flex fill-neutral-400 hover:fill-neutral-300 cursor-pointer transition"
+      >
+        <img
+          src="{{ userAvatar }}"
+          alt="{{ username }} avatar"
+          class="w-8 rounded-full avatar-outline-glow"
+        />
+      </button>
+    </div>
+    {{ else }}
+    <a
+      href="/self/login?noAuthReturnPath={{ CurrentPath }}&loginReturnPath={{ CurrentPath }}"
+      class="group"
+    >
+      <div class="outlined-button text-sm font-medium gap-2">
+        <span class="material-symbols-rounded-20">
+          account_circle
+        </span>
+        Sign in
+      </div>
+    </a>
+    {{- end -}}
+  </div>
+</nav>

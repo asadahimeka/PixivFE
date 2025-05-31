@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {{ include "baseHead" }}
+
+    {{ title := "PixivFE" }}
+    {{- if isset(.Title) -}}
+    {{ title = .Title + " - PixivFE" }}
+    {{ end -}}
+    <title>{{ title }}</title>
+
+    <meta name="description" content="Read this on PixivFE" />
+
+    <meta content="summary_large_image" name="twitter:card" />
+
+    <meta property="og:title" content="{{ title }}" />
+    <meta property="og:site_name" content="PixivFE" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="{{ CurrentPath }}" />
+
+    {{ if isFirstPathPart (CurrentPath, "/artworks") }}
+      <link
+        rel="alternate"
+        type="application/json+oembed"
+        href="{{ BaseURL }}/oembed?type=photo&title={{ title }}&author_name={{ .MetaAuthor }}&author_url={{ BaseURL }}/users/{{ .MetaAuthorID }}&thumbnail_url={{ .MetaImage }}&thumbnail_width={{ .MetaImageWidth }}&thumbnail_height={{ .MetaImageHeight }}"
+      />
+      {{ else }}
+      <link
+        rel="alternate"
+        type="application/json+oembed"
+        href="{{ BaseURL }}/oembed?type=link&title={{ title }}"
+      />
+    {{- end -}}
+
+    {{ if isset(.MetaDescription) }}
+      <meta property="og:description" content="{{.MetaDescription}}" />
+    {{- end -}}
+
+    {{ if isset(.MetaImage) }}
+      <meta property="og:image" content="{{ .MetaImage }}" />
+    {{- end -}}
+
+    <link rel="manifest" href="/manifest.json">
+
+    {{- logoStyle := CookieList["pixivfe-LogoStyle"] -}}
+    {{- username := CookieList["pixivfe-Username"] -}}
+    {{- userID := CookieList["pixivfe-UserID"] -}}
+    {{- userAvatar := CookieList["pixivfe-UserAvatar"] -}}
+    {{ visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] }}
+  </head>
+
+  {* NOTE: add .open:pointer-events-auto to any .modal-popover element *}
+  <body
+    class="group/body bg-neutral-900 text-neutral-100 fill-neutral-100 touch-manipulation subpixel-antialiased font-sans scheme-only-dark
+    has-[#imageExpand:checked]:overflow-hidden
+    has-[div:popover-open]:overflow-hidden
+    has-[div:popover-open]:not-[div:popover-open]:pointer-events-none
+    starting:opacity-80 opacity-100 transition duration-200 ease-out
+    selection:bg-white selection:text-black"
+    hx-boost="true"
+    hx-indicator="#loading-indicator"
+    hx-ext="response-targets"
+  >
+    {* limiter inside the body tags so that page navigations refresh the link token *}
+    {{ include "limiter" }}
+    <div
+      id="loading-indicator"
+      class="fixed top-0 min-w-full h-1 z-999 duration-300 transition
+            bg-[80vw_auto]
+            animate-[rolling-something_1s_linear_infinite]"
+    >
+    </div>
+    {* NOTE: the ::backdrop pseudo-element doesn't seem to support transitions, so we use a generic viewport-sized div to animate a darkened backdrop instead *}
+    <div
+      id="modalPopoverBackground"
+      class='fixed left-0 top-0 -z-1 w-full h-full
+            transition-all transition-discrete duration-300
+            hidden
+            bg-black/0
+            group-has-[.modal-popover:popover-open]/body:block
+            group-has-[.modal-popover:popover-open]/body:starting:bg-black/0
+            group-has-[.modal-popover:popover-open]/body:bg-black/60
+            group-has-[.modal-popover:popover-open]/body:z-20
+
+            {{ if visualEffectsEnabled == "true" }}
+              backdrop-blur-none
+              group-has-[.modal-popover:popover-open]/body:starting:backdrop-blur-none
+              group-has-[.modal-popover:popover-open]/body:backdrop-blur-[1px]
+            {{ end }}'
+    >
+    </div>
+    {{ include "navbar" . }}
+
+    <main class="relative flex flex-col items-center min-h-screen px-4 py-20">
+      {{- yield body() }}
+    </main>
+
+    {{ include "footer" }}
+
+    <!-- End of main content -->
+    {{ include "modalIncludes" . }}
+
+    {* NOTE: this is a workaround for cookies having the `HttpOnly` attribute set *}
+    <div id="site-config" class="hidden">
+      <div id="artworkPreview">
+        {{- CookieList["pixivfe-ArtworkPreview"] -}}
+      </div>
+    </div>
+  </body>
+</html>

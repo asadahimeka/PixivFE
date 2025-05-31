@@ -1,0 +1,166 @@
+{{- extends "layout/twDefault" -}}
+
+{{- import "blocks/twPixivisionEntry" }}
+{{- import "blocks/twModal" -}}
+
+{{- block artwork_column(ctx) -}}
+  <div class="relative grid grid-rows-1 grid-cols-1 w-fit mx-auto">
+    <!-- Thumbnail -->
+    {{- range i, img := ctx.Images -}}
+      <a href="/artworks/{{- ctx.ID -}}" class="contents">
+        <img
+          src="{{- img -}}"
+          alt="{{- ctx.Title -}}"
+          class="col-start-1 row-start-1 max-h-256 object-cover rounded"
+        />
+      </a>
+    {{- end -}}
+
+    <!-- Overlay -->
+    <div class="col-start-1 row-start-1 self-end sticky bottom-2 flex items-start min-w-48 w-fit gap-3 rounded-lg bg-black/80 hover:bg-black/90 transition p-2 px-3 m-2">
+      <div class="text-sm/6 text-neutral-300">
+        {{- i + 1 -}}/{{- total -}}
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <a href="/artworks/{{- ctx.ID -}}" class="w-fit">
+          <div class="animated-underline line-clamp-1 font-bold text-neutral-100">
+            {{- ctx.Title -}}
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-2">
+          <a href="/users/{{- ctx.UserID -}}/">
+            <img
+              src="{{- ctx.Avatar -}}"
+              alt="{{- ctx.Username -}}"
+              class="aspect-square object-cover rounded-full size-5 min-w-5 avatar-outline-glow"
+            />
+          </a>
+
+          <a href="/users/{{- ctx.UserID -}}/">
+            <div class="animated-underline text-neutral-300 line-clamp-1">
+              {{- ctx.Username -}}
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{{- end -}}
+
+{{- block body() -}}
+
+{{- items := len(.Article.Items) -}}
+{{- mid := items / 2 -}}
+<div class="flex flex-col w-full gap-8 mx-auto">
+  <div class="relative rounded overflow-hidden -mt-6 -mx-4">
+    <img
+      src="{{- .Article.Thumbnail -}}"
+      alt="{{- .Article.Title -}}"
+      class="hidden md:block w-full h-156 object-cover"
+      width="400"
+      height="210"
+    />
+
+    <div class="md:absolute inset-0 z-1 flex items-center justify-center w-full h-full rounded-t bg-linear-to-b from-neutral-900/60 to-neutral-900 p-8">
+      <div class="flex flex-col w-full max-w-4xl gap-4">
+        <a href="/pixivision/c/{{- .Article.CategoryID -}}" class="w-fit">
+          <div class="badge-primary interactive w-fit">{{- .Article.Category -}}</div>
+        </a>
+
+        <h1 class="text-3xl font-bold -mt-2">{{- .Article.Title -}}</h1>
+
+        <!-- Publication date -->
+        <div class="text-sm/6 font-medium text-neutral-300 -mt-2">
+          {{- parseTimeCustomFormat(.Article.Date, "2 January 2006") -}}
+        </div>
+
+        <img
+          src="{{- .Article.Thumbnail -}}"
+          alt="{{- .Article.Title -}}"
+          class="block md:hidden rounded w-full h-full object-cover"
+          width="400"
+          height="210"
+        />
+
+        {{- range i, desc := .Article.Description -}}
+          {{- if desc != "" && i < 2 -}}
+            <p class="text-sm/6 text-neutral-300 first-of-type:mt-0 -mt-2">
+              {{- raw(desc) -}}
+            </p>
+          {{- end -}}
+        {{- end -}}
+
+        {{- if len(.Article.Description) > 2 -}}
+          {* adding a 1px border for legibility against thumbnail backgrounds *}
+          <button popovertarget="description" class="tonal-button-neutral text-sm font-medium !border-neutral-500 !border">
+            Read more
+          </button>
+
+          {{- yield twModal(id="description", title="Description", widthClasses="") content -}}
+            {{- range _, desc := .Article.Description -}}
+              {{- if desc != "" -}}
+              <p class="text-sm/6 text-neutral-300">
+                  {{- raw(desc) -}}
+                </p>
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- if len(.Article.Tags) > 0 -}}
+          <div class="flex flex-wrap items-center gap-2">
+            {{- range _, tag := .Article.Tags -}}
+              <a href="/pixivision/t/{{- tag.ID -}}">
+                <div class="blue-link text-sm">
+                  #{{- tag.Name -}}
+                </div>
+              </a>
+            {{- end -}}
+          </div>
+        {{- end -}}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 auto-rows-max w-full max-w-3xl gap-8 mx-auto">
+    {{- range i, ctx := .Article.Items -}}
+      {{- yield artwork_column(ctx=ctx, i=i, total=len(.Article.Items)) -}}
+    {{- end -}}
+  </div>
+
+  <!-- <hr class="my-16" /> -->
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl gap-8 mx-auto mt-16">
+    <div class="col-span-full text-2xl font-light text-neutral-300 -mb-4">
+      Newest articles tagged <a href="{{- .Article.NewestTaggedArticles.HeadingLink -}}" class="text-link text-neutral-200 hover:text-neutral-100 font-medium">#{{ lower(.Article.Tags[0].Name)}}</a>
+    </div>
+
+    {{- range .Article.NewestTaggedArticles.Articles -}}
+      {{- yield twPixivisionEntry(data=., extended=false) -}}
+    {{- end -}}
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl gap-8 mx-auto mt-4">
+    <div class="col-span-full text-2xl font-light text-neutral-300 -mb-4">
+      If you liked <a href="{{- .Article.PopularTaggedArticles.HeadingLink -}}" class="text-link text-neutral-200 hover:text-neutral-100 font-medium">#{{ lower(.Article.Tags[0].Name) }}</a>, you will also love...
+    </div>
+
+    {{- range .Article.PopularTaggedArticles.Articles -}}
+      {{- yield twPixivisionEntry(data=., extended=false) -}}
+    {{- end -}}
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl gap-8 mx-auto mt-4">
+    <div class="col-span-full text-2xl font-light text-neutral-300 -mb-4">
+      Newest articles tagged <a href="{{- .Article.NewestCategoryArticles.HeadingLink -}}" class="text-link text-neutral-200 hover:text-neutral-100 font-medium">#{{ lower(.Article.Category) }}</a>
+    </div>
+
+    {{- range .Article.NewestCategoryArticles.Articles -}}
+      {{- yield twPixivisionEntry(data=., extended=false) -}}
+    {{- end -}}
+  </div>
+</div>
+
+{{- end -}}

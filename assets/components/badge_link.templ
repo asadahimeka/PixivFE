@@ -1,0 +1,17 @@
+package components
+
+templ BadgeLink(id string, iconName string, basePath string) {
+	<a href={ templ.SafeURL(basePath + "/" + id) } class="contents">
+		<div
+			class="
+				inline-flex items-center gap-1 size-fit
+				bg-neutral-700 text-neutral-100
+				p-1 px-2 font-medium text-sm rounded-full
+				hover:bg-neutral-600 active:scale-95 transition
+			"
+		>
+			<span class="material-symbols-rounded-20">{ iconName }</span>
+			<span>{ id }</span>
+		</div>
+	</a>
+}

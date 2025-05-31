@@ -1,0 +1,158 @@
+{* sidebar *}
+
+{* add hx-swap="outerHTML" hx-target="main" hx-select="main" to persist the sidebar on page nav *}
+<div
+  popover
+  id="sidebar"
+  class="fixed modal-popover pointer-events-none open:pointer-events-auto opacity-0 starting:open:opacity-0 open:opacity-100 transition-all transition-discrete duration-200 starting:open:-translate-x-full -translate-x-full open:translate-x-0 open:flex flex-col left-0 top-0 w-8/12 max-w-76 h-full overflow-y-auto bg-neutral-900 z-30"
+>
+  <div
+    class="sticky top-0 flex items-center justify-between w-full bg-neutral-900 border-b border-b-neutral-700 gap-24 py-3 px-4 z-4"
+  >
+    <a href="/" class="flex w-fit text-xl font-medium animated-underline"
+      >PixivFE</a
+    >
+    <button
+      popovertarget="sidebar"
+      class="flex items-center justify-center size-8 cursor-pointer text-neutral-300 hover:text-neutral-100 hover:bg-neutral-700 active:scale-95 transition rounded-full p-1 -me-1"
+    >
+      <span class="material-symbols-rounded-24">close</span>
+    </button>
+  </div>
+
+  <ul class="flex flex-col h-fit gap-y-5 py-3 px-4">
+    <div class="flex flex-col gap-1">
+      <li>
+        <a
+          href="/discovery"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">explore</span>
+          Discovery
+        </a>
+      </li>
+      <li>
+        <a
+          href="/ranking"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">leaderboard</span>
+          Rankings
+        </a>
+      </li>
+      <li>
+        <a
+          href="/self/followingWorks?noAuthReturnPath={{ CurrentPath }}&loginReturnPath=/self/followingWorks"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">article_person</span>
+          Latest by followed users
+        </a>
+      </li>
+    </div>
+    <div class="flex flex-col gap-1">
+      <div class="text-sm font-semibold text-neutral-400 mb-1">Explore</div>
+      <li>
+        <a
+          href="/rankingCalendar"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">calendar_month</span>
+          Ranking calendar
+        </a>
+      </li>
+      <li>
+        <a
+          href="/newest"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          {* NOTE: old bootstrap icon, not material *}
+          {{ raw: icon("bc517db2e1d069b87fd23a98cf50e0c20d531229", "bi bi-stars") }}
+          Newest
+        </a>
+      </li>
+      <li>
+        <a
+          href="/pixivision"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">palette</span>
+          pixivision
+        </a>
+      </li>
+    </div>
+    <div class="flex flex-col gap-1">
+      <div class="text-sm font-semibold text-neutral-400 mb-1">You</div>
+      <li>
+        <a
+          href="/self?noAuthReturnPath={{ CurrentPath }}"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">account_circle</span>
+          Profile
+        </a>
+      </li>
+      <li>
+        <a
+          href="/self/bookmarks?noAuthReturnPath={{ CurrentPath }}"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">favorite</span>
+          Bookmarks
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="/self/followingUsers?noAuthReturnPath={{ CurrentPath }}"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">group</span>
+          Followed users
+        </a>
+      </li>
+      <li>
+        <a
+          href="/settings"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-fill-20">settings</span>
+          Settings
+        </a>
+      </li>
+    </div>
+    <div class="flex flex-col gap-1">
+      <div class="text-sm font-semibold text-neutral-400 mb-1">Info</div>
+      <li>
+        <a
+          href="/about"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">info</span>
+          About
+        </a>
+      </li>
+      <li>
+        <a
+          href="https://codeberg.org/PixivFE/PixivFE"
+          class="flex items-center hover:text-neutral-50 hover:fill-neutral-50 hover:bg-neutral-700 rounded-lg text-neutral-300 fill-neutral-300 transition gap-2 p-2 -mx-2"
+        >
+          <span class="material-symbols-rounded-20">code</span>
+          Source code
+        </a>
+      </li>
+    </div>
+  </ul>
+
+  {* intentionally lacks .sticky due to hiding the Info section on small devices *}
+  <div
+    class="flex flex-col gap-1 text-neutral-400 bg-neutral-900 border-t border-t-neutral-700 px-4 py-3 sm:p-4 mt-auto z-4"
+  >
+    <div class="text-neutral-400 text-xs">Revision</div>
+    <a href="{{- RepoURL -}}/commit/{{ RevisionHash }}" class="contents">
+      <div class="text-link text-neutral-300 hover:text-neutral-200 text-sm font-medium">
+        {{- if Revision != "" -}} {{- Revision -}} {{- else -}} unknown {{- end -}}
+      </div>
+    </a>
+  </div>
+</div>

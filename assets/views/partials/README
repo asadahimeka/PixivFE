@@ -1,0 +1,9 @@
+# htmx partials, a rough how-to guide
+
+1. Update relevant HTML to pass required data via hx-headers (biggest limitation at the moment, need to figure out how to pull data from PixivFE then store it client-side)
+2. Set up exported function in package core that will ingest this data, call the pixiv API, then give you the data you want
+3. Set up route handler in package route, build required params, then call the exported function in core
+4. Pass the fetched data to Data_{partial_name}Partial, creating a stub Jet template in this directory if needed (template.Render will search here)
+5. Update package router with a REST API endpoint
+6. Update HTML with htmx to hx-get the endpoint and swap it in
+7. profit

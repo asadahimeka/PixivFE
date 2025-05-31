@@ -1,0 +1,18 @@
+{{- block twTabNav(baseURL, paths, names, activeState="") -}}
+<div class="flex flex-col w-full">
+  <ul class="flex flex-row gap-4 relative z-1 -mb-[1px]">
+    {{- range i, k := paths -}}
+      <li>
+        <a class="
+            {{- activeState == k ? "active border border-b-0 border-neutral-700 bg-neutral-900" : "text-neutral-200" }}
+            flex items-center w-fit rounded-t-lg hover:text-neutral-900 hover:bg-neutral-300 active:scale-95 text-sm font-semibold px-4 py-2 transition"
+            {{ activeState == k ? `aria-current="page"` : "" }}
+            href="{{ baseURL }}{{k}}">
+            {{ names[i] }}
+        </a>
+      </li>
+    {{- end -}}
+  </ul>
+  <hr class="w-full border-neutral-700">
+</div>
+{{- end -}}

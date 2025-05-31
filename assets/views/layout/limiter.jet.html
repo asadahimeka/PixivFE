@@ -1,0 +1,40 @@
+{*
+limiter middleware resources
+
+inserted immediately after the opening <body> tag in templates
+*}
+
+{* try block for safety as this fragment is included in all routes *}
+{{ try }}
+  {{ if LimiterEnabled }}
+    {{ if DetectionMethod == LinkTokenDetectionMethod }}
+      <link rel="stylesheet" href="/limiter/{{ LinkToken }}.css" />
+      {{ else if DetectionMethod == TurnstileDetectionMethod }}
+      <!--
+      This div will GET /limiter/turnstile/action on page load.
+      The server will return HTML for either:
+        1. a populated #turnstile-challenge-area if no valid ping cookie
+        2. an empty #turnstile-challenge-area if a valid ping cookie exists
+
+      No hx-preserve attribute applied as this element needs to refresh on navigations
+      -->
+      <div
+        id="turnstile-action"
+        hx-get="/limiter/turnstile/action"
+        hx-trigger="load"
+        hx-target="#turnstile-challenge-area"
+        hx-swap="outerHTML show:none"
+        hx-push-url="false"
+        hx-indicator="this"
+      >
+      </div>
+
+      <div id="turnstile-challenge-area">
+        <!--
+        Turnstile challenge materials are swapped here by #turnstile-action's hx-get
+        and by the #turnstile-verify-form's hx-post (inside the rendered challenge)
+        -->
+      </div>
+    {{ end }}
+  {{ end }}
+{{ end }}

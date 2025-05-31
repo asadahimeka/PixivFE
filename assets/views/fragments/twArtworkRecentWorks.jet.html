@@ -1,0 +1,83 @@
+{{ totalWorks := len(.Illust.RecentWorks) }}
+{{ endIndex := (totalWorks > 4) ? 4 : totalWorks }}
+
+{{ shouldRenderAll := (totalWorks <= 4) ? true : false }}
+
+{{ initialWorks := .Illust.RecentWorks[:endIndex] }}
+{{ remainingWorks := .Illust.RecentWorks[endIndex:] }}
+
+{{ if len(.Illust.RecentWorks) > 0 }}
+  <div class="flex flex-col border-pixivfe-400 border-s-6 ps-4 pb-2 gap-2">
+    <div class="text-sm text-neutral-400">
+      Recent works by
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3">
+        <a href="/users/{{ .Illust.RecentWorks[0].UserID }}">
+          <img
+            src="{{ .Illust.RecentWorks[0].UserAvatar }}"
+            alt="{{ .Illust.RecentWorks[0].UserName }}"
+            class="aspect-square object-cover rounded-full size-10 min-w-10 avatar-outline-glow"
+          />
+        </a>
+        <div class="flex flex-col">
+          <a href="/users/{{ .Illust.RecentWorks[0].UserID }}" class="w-fit">
+            <div
+              class="text-2xl font-bold text-neutral-200 hover:text-neutral-100 line-clamp-1 animated-underline"
+            >
+              {{- .Illust.RecentWorks[0].UserName -}}
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{ if shouldRenderAll }}
+    {* if there are 4 or fewer recent works, just display all of them with a link to the user page *}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {{- include "twSmall-tn" .Illust.RecentWorks }}
+    </div>
+
+    <a
+      {{ if .Illust.RecentWorks[0].IllustType == 1 }}
+        href="/users/{{ .Illust.RecentWorks[0].UserID }}/manga#checkpoint"
+        {{ else }}
+        href="/users/{{ .Illust.RecentWorks[0].UserID }}/illustrations#checkpoint"
+      {{ end }}
+      class="flex filled-button font-medium mx-auto"
+    >
+      View all by {{ .Illust.RecentWorks[0].UserName }}
+    </a>
+    {{ else }}
+    {* otherwise, display 4 initially with a "View more" button *}
+
+    <input type="checkbox" id="show-all-recent" class="peer hidden">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {{- include "twSmall-tn" .Illust.RecentWorks[:endIndex] }}
+    </div>
+
+    <label for="show-all-recent" class="peer-checked:!hidden filled-button font-medium mx-auto">
+      View more
+    </label>
+
+    {* if the "View more" button is pressed, display the remainder recent works with a link to the user page *}
+    <div class="!hidden peer-checked:!grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 starting:opacity-0 opacity-100 transition duration-300">
+      {{- include "twSmall-tn" .Illust.RecentWorks[endIndex:] }}
+    </div>
+
+    <a
+      {{ if .Illust.RecentWorks[0].IllustType == 1 }}
+        href="/users/{{ .Illust.RecentWorks[0].UserID }}/manga#checkpoint"
+        {{ else }}
+        href="/users/{{ .Illust.RecentWorks[0].UserID }}/illustrations#checkpoint"
+      {{ end }}
+      class="!hidden peer-checked:!flex filled-button font-medium mx-auto"
+    >
+      View all by {{ .Illust.RecentWorks[0].UserName }}
+    </a>
+  {{ end }}
+{{ end }}

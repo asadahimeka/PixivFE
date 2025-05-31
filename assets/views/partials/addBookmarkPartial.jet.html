@@ -1,0 +1,85 @@
+{{- import "../blocks/twActionIndicator" }}
+
+{{ addBookmarkIndicatorID := "addBookmarkIndicatorID" }}
+
+<form
+  action="/self/addBookmark/{{ .Illust.ID }}"
+  method="post"
+  hx-target="this"
+  hx-target-4*="body"
+  hx-swap="outerHTML show:none"
+  hx-indicator="#actionIndicator-{{ addBookmarkIndicatorID }}"
+  hx-disabled-elt="#addBookmarkButton, #bookmarkPrivacyToggle"
+  hx-push-url="false"
+>
+  <div class="flex items-center group/addBookmarkButtonGroup">
+    <!-- Checkbox that will be submitted with the form -->
+    <input type="checkbox" id="bookmarkPrivacyInput" name="private" class="hidden">
+
+    <input
+      type="hidden"
+      id="bookmark_return_path"
+      name="return_path"
+      class="hidden"
+      value='{{ if HtmxCurrentPath != "" }} {{- HtmxCurrentPath -}} {{ else }} {{- CurrentPath -}} {{ end }}'
+    >
+
+    <input type="hidden" id="bookmark_count" name="bookmark_count" class="hidden" value="{{ .Illust.Bookmarks }}">
+
+    <button
+      id="addBookmarkButton"
+      type="submit"
+      class="
+        flex items-center w-fit rounded-s-full select-none cursor-pointer transition gap-2 py-2 px-3
+        text-sm font-medium
+        border border-neutral-600 text-neutral-200 fill-neutral-200
+        hover:border-neutral-500 hover:bg-neutral-700
+        active:bg-neutral-800 active:scale-95
+        disabled:text-neutral-500 disabled:fill-neutral-500 disabled:border-neutral-800 disabled:cursor-not-allowed
+        disabled:hover:border-neutral-800 disabled:hover:bg-transparent disabled:active:scale-100"
+    >
+      <span class="material-symbols-rounded-20">favorite</span>
+      <span class="inline">{{- prettyNumber(.Illust.Bookmarks) -}}</span>
+      {{- yield twActionIndicator(id=addBookmarkIndicatorID, theme="dark") -}}
+    </button>
+
+    {* nesting a label inside a button then using tailwind to style it based on the parent's disabled attribute is super cursed but it works (though theres a weird delay as hx-disabled-elt finds elements to disable) *}
+    <button
+      type="button"
+      id="bookmarkPrivacyToggle"
+      class="group/bookmarkPrivacyToggle"
+    >
+      <label
+        for="bookmarkPrivacyInput"
+        class="
+          -ms-[1px]
+          flex items-center w-fit rounded-e-full select-none cursor-pointer transition gap-2 py-2 px-3
+          text-sm font-medium
+          border border-neutral-600 text-neutral-200 fill-neutral-200
+          hover:border-neutral-500 hover:bg-neutral-700
+          active:bg-neutral-800 active:scale-95
+          group-disabled/bookmarkPrivacyToggle:text-neutral-500 group-disabled/bookmarkPrivacyToggle:fill-neutral-500
+          group-disabled/bookmarkPrivacyToggle:border-neutral-800 group-disabled/bookmarkPrivacyToggle:cursor-not-allowed
+          group-disabled/bookmarkPrivacyToggle:hover:border-neutral-800 group-disabled/bookmarkPrivacyToggle:hover:bg-transparent
+          group-disabled/bookmarkPrivacyToggle:active:scale-100
+        "
+      >
+        <!-- Public icon -->
+        <span
+          class="material-symbols-rounded-20
+                group-has-[input:checked]/addBookmarkButtonGroup:!hidden !inline"
+        >
+          visibility
+        </span>
+
+        <!-- Private icon -->
+        <span
+          class="material-symbols-rounded-20
+                group-has-[input:checked]/addBookmarkButtonGroup:!inline !hidden"
+        >
+          visibility_off
+        </span>
+      </label>
+    </button>
+  </div>
+</form>

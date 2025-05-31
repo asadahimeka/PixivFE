@@ -1,0 +1,45 @@
+package pages
+
+// ErrorData holds data specific to the error page.
+type ErrorData struct {
+	Title      string
+	Error      error
+	StatusCode int
+}
+
+templ Error(pageData ErrorData) {
+	<div class="flex flex-col justify-center h-fit max-w-212 text-sm gap-6">
+		<h1 class="text-2xl font-semibold">HTTP { pageData.StatusCode }</h1>
+		if pageData.StatusCode == 404 {
+			<p class="text-neutral-200">
+				The requested route does not exist on the server.
+			</p>
+		} else {
+			<p class="text-neutral-200">
+				The following error occured when trying to render this page:
+			</p>
+			<div
+				class="w-full bg-black border border-neutral-700 text-fuchsia-400 font-mono rounded-lg p-6 -mt-2"
+			>
+				{ pageData.Error.Error() }
+			</div>
+			<p class="text-neutral-400 font-medium text-xs -mt-3">
+				<span class="font-bold">Note:</span> this may be an error from either
+				PixivFE itself or the pixiv API.
+			</p>
+			// Admonition so that users are more likely to report issues
+			<div class="flex flex-col text-neutral-200 border-s-4 border-pixivfe-400 ps-4 py-2 gap-4">
+				<p class="font-bold text-neutral-100">Seeing this error repeatedly? (つ ◕︵◕ )つ</p>
+				<p>
+					<a
+						class="text-link text-neutral-100 hover:text-neutral-50"
+						href="https://codeberg.org/PixivFE/PixivFE/issues/new?template=.forgejo%2fissue_template%2fbug-report.yaml"
+						rel="noopener"
+						target="_blank"
+					>File a bug report on our Codeberg repository</a>
+					so that the developers can look into it!
+				</p>
+			</div>
+		}
+	</div>
+}

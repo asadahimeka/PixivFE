@@ -1,0 +1,14 @@
+{{- extends "layout/default" }}
+{{- block body() }}
+
+<!-- Prefetch links -->
+<link rel="prefetch" href="/users/{{ .Artworks[0].UserID }}">
+
+<div class="row justify-content-center g-4">
+{{- range .Artworks }}
+  <div class="col-12 col-md-9 mb-5">
+    {{- include "fragments/artwork" . }}
+  </div>
+{{- end }}
+</div>
+{{- end }}

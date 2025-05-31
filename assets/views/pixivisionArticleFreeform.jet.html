@@ -1,0 +1,18 @@
+{{- extends "layout/twDefault" -}}
+
+{{- block body() -}}
+
+<style>
+._feature-article-body__answer .answer {
+  display: flex;
+  gap: 0.75em;
+}
+
+.article-item {
+  margin-block: 1em;
+}
+</style>
+
+{{ raw(.Children) }}
+
+{{- end -}}

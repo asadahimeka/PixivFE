@@ -1,0 +1,15 @@
+{{- block twPillNav(baseURL, paths, names, fragment, activeState="") -}}
+<ul class="flex flex-row gap-2">
+  {{- range i, k := paths -}}
+    <li>
+      <a class="
+          {{- activeState == k ? "active bg-neutral-700" : "bg-neutral-800 text-neutral-200" }}
+          flex items-center w-fit hover:text-neutral-900 hover:bg-neutral-300 active:scale-95 text-sm font-medium rounded-full px-6 py-1.5 transition"
+          {{ activeState == k ? `aria-current="page"` : "" }}
+          href="{{- baseURL -}}{{- k -}}{{- if fragment -}}{{- fragment -}}{{- end -}}">
+          {{ names[i] }}
+      </a>
+    </li>
+  {{- end -}}
+</ul>
+{{- end -}}

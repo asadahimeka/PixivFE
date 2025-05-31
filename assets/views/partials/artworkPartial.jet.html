@@ -1,0 +1,56 @@
+{{ import "../blocks/twArtworkPlaceholders" }}
+
+<div
+  id="tw-artwork"
+  class="htmx-added-in flex flex-col gap-8"
+>
+  {{ relativeTimeData := relativeTime(.Illust.Date) }}
+
+  <!-- Image display -->
+  {{- include "../fragments/twArtworkDisplay" .Illust -}}
+
+  <!-- Manga series navigation and name -->
+  {{ if .Illust.SeriesNavData }}
+    {{- include "../fragments/twArtworkSeriesData" . -}}
+  {{ end }}
+
+  <!-- Title -->
+  {{- include "../fragments/twArtworkTitle" .Illust -}}
+
+  <!-- User info and interaction buttons -->
+  {{- include "../fragments/twArtworkHeaderActions" . -}}
+
+  <!-- Metadata, description, and tags -->
+  {{- include "../fragments/twArtworkInfo" . -}}
+
+  <!-- Recent works -->
+  {{ if IsHtmxRequest }}
+  <div
+    id="twArtworkRecentWorks"
+    class="htmx-swapped-out"
+    hx-get="/api/v1/recent?type=artwork&userid={{ .Illust.UserID }}&recentworkids={{- FormatWorkIDs(.Illust.RecentWorkIDs) -}}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML swap:100ms settle:200ms show:none"
+  >
+  </div>
+  {{ else }}
+    {{- include "../fragments/twArtworkRecentWorks" . -}}
+  {{ end }}
+
+  <!-- Related works -->
+  {{ if IsHtmxRequest }}
+    <div
+      id="twArtworkRelatedWorks"
+      class="htmx-swapped-out grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-pulse"
+      hx-get="/api/v1/related?type=artwork&id={{ .Illust.ID }}&limit=60"
+      hx-trigger="load"
+      hx-target="this"
+      hx-swap="outerHTML swap:100ms settle:200ms show:none"
+    >
+      {{ yield twArtworkPlaceholders(count=48) }}
+    </div>
+  {{ else }}
+    {{- include "../fragments/twArtworkRelatedWorks" . -}}
+  {{ end }}
+</div>

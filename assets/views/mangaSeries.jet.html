@@ -1,0 +1,146 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twPagination" }}
+{{- block body() }}
+
+{{ relativeTimeData_CreateDate := relativeTime(.MangaSeries.IllustSeries[0].CreateDate) }}
+{{ relativeTimeData_UpdateDate := relativeTime(.MangaSeries.IllustSeries[0].UpdateDate) }}
+
+{{ currentURL := "/users/" + .MangaSeries.Users[0].ID }}
+
+<!-- Prefetch links -->
+{*
+<link rel="prefetch" href="/users/{{ .MangaSeries.Users[0].ID }}/manga">
+*}
+
+<div class="grid grid-cols-10 w-full max-w-7xl gap-8">
+  {* NOTE: tried using sticky positioning on the following info element, but it just made the layout feel clunky, especially with the tags expanded *}
+  <div class="col-span-10 md:col-span-4 flex flex-col h-fit gap-6">
+    <!-- <h3 class="text-body-secondary mb-2">
+        Series of {{ .MangaSeries.IllustSeries[0].Total }} works
+    </h3> -->
+
+    <!-- Title -->
+    <div class="text-3xl font-bold">{{ .MangaSeries.IllustSeries[0].Title }}</div>
+
+    <div class="flex flex-wrap items-center justify-between -mt-2 gap-6">
+      {{ include "fragments/twAvatarUser" .MangaSeries.Users[0] }}
+
+      <div class="flex items-center gap-2">
+        <!-- Start reading button -->
+        <a href="/artworks/{{ .MangaSeries.IllustSeries[0].FirstIllustID }}" class="filled-button font-medium gap-2">
+          <span class="material-symbols-rounded-20">book_5</span>
+          Start reading
+        </a>
+
+        {*
+        View Pixiv original button
+        TODO: looks weird with the "Start reading" button also present; should be removed once we support adding to user's watchlist
+        <a href="https://pixiv.net/user/{{.MangaSeries.Users[0].ID}}/series/{{ .MangaSeries.Page.SeriesID }}" class="tonal-button-neutral text-sm font-medium min-h-10">
+          View on pixiv.net
+        </a>
+        *}
+      </div>
+    </div>
+
+    <div class="col-span-5 flex flex-col h-fit rounded-lg w-full border border-neutral-700 gap-6 p-5">
+      <!-- Metadata -->
+      <div class="flex items-center flex-wrap text-sm gap-4">
+        <div class="flex items-center font-medium text-nowrap gap-1" title="{{ naturalTime: .MangaSeries.IllustSeries[0].UpdateDate }}">
+          <span class="material-symbols-rounded-20">history</span>
+          {{- relativeTimeData_UpdateDate.Value }} {{ relativeTimeData_UpdateDate.Description }} {{ if relativeTimeData_UpdateDate.Time }} {{ relativeTimeData_UpdateDate.Time }}{{ end -}}
+        </div>
+        <div class="flex items-center text-neutral-400 fill-neutral-400 text-nowrap gap-1" title="{{ naturalTime: .MangaSeries.IllustSeries[0].CreateDate }}">
+          <span class="material-symbols-rounded-20">event</span>
+          {{- relativeTimeData_CreateDate.Value }} {{ relativeTimeData_CreateDate.Description }} {{ if relativeTimeData_CreateDate.Time }} {{ relativeTimeData_CreateDate.Time }}{{ end -}}
+        </div>
+      </div>
+
+      <!-- Description -->
+      {{ if .MangaSeries.IllustSeries[0].Caption }}
+        {{ if len (parsePixivRedirect(.MangaSeries.IllustSeries[0].Caption)) <= 1000 }}
+          <div class="description text-wrap break-words text-neutral-300 text-base/6">
+            {{ raw(parsePixivRedirect(.MangaSeries.IllustSeries[0].Caption)) }}
+          </div>
+          {{ else }}
+          <details class="group/details text-base/6">
+            <summary class="group/summary flex w-fit font-medium text-blue-400 hover:text-blue-300 cursor-pointer select-none">
+              <span class="inline group-open/details:hidden">
+                Read description <span class="text-sm font-normal text-neutral-400 group-hover/summary:text-neutral-300">({{ prettyNumber(len (parsePixivRedirect(.MangaSeries.IllustSeries[0].Caption))) }} characters)</span>
+              </span>
+              <span class="hidden group-open/details:inline">
+                Hide description
+              </span>
+            </summary>
+            <div class="description text-wrap break-words text-neutral-300 group-open/details:opacity-100 opacity-0 transition mt-2">
+              {{ raw(parsePixivRedirect(.MangaSeries.IllustSeries[0].Caption)) }}
+            </div>
+          </details>
+        {{ end }}
+        {{ else }}
+        <div class="text-neutral-400 italic">No description added</div>
+      {{ end }}
+
+      <hr class="border-neutral-800">
+
+      <!-- Tags -->
+      {{ totalTags := len(.MangaSeries.Tags) }}
+      {{ endIndex := (totalTags > 8) ? 8 : totalTags }}
+      {{ initialTags := .MangaSeries.Tags[:endIndex] }}
+      {{ remainingTags := .MangaSeries.Tags[endIndex:] }}
+      {{ tagCount := len(remainingTags) }}
+
+      <div class="flex flex-wrap items-baseline gap-2">
+        {{- range initialTags -}}
+          <div class="flex flex-wrap items-baseline gap-x-1">
+            <a href="/tags/{{ escapeString(.Name) -}}" class="hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 font-medium animated-underline-alt">#{{ .Name -}}</a>
+            {{- if .TagTranslations.En -}}<span class="text-neutral-300 text-sm">({{ .TagTranslations.En -}})</span>{{- end -}}
+          </div>
+        {{- end -}}
+      </div>
+
+      {{ if tagCount > 0 }}
+      <details class="group/details -mt-2">
+        <summary class="group/summary flex items-center w-fit font-medium text-blue-400 fill-blue-400 hover:bg-blue-500/25 rounded-full cursor-pointer select-none transition gap-2 ps-3 pe-4 py-2 -my-2 mx-auto">
+          <span class="material-symbols-rounded-20 group-open/details:rotate-180 transition">keyboard_arrow_down</span>
+          <span class="inline group-open/details:hidden">
+            View {{ prettyNumber(tagCount) }} more {{ if tagCount == 1 }}tag{{ else }}tags{{ end }}
+          </span>
+          <span class="hidden group-open/details:inline">
+            Hide {{ if tagCount == 1 }}tag{{ else }}tags{{ end }}
+          </span>
+        </summary>
+        <div class="flex flex-wrap items-baseline group-open/details:opacity-100 opacity-0 transition gap-2 mt-4">
+          {{- range remainingTags -}}
+            <div class="flex flex-wrap items-baseline gap-x-1">
+              <a href="/tags/{{ escapeString(.Name) -}}" class="hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 font-medium animated-underline-alt">#{{ .Name -}}</a>
+              {{- if .TagTranslations.En -}}<span class="text-neutral-300 text-sm">({{ .TagTranslations.En -}})</span>{{- end -}}
+            </div>
+          {{- end -}}
+        </div>
+      </details>
+      {{ end }}
+    </div>
+  </div>
+
+  <div id="checkpoint" class="col-span-10 md:col-span-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 h-fit gap-6 scroll-mt-20">
+      {{- range .MangaSeries.IllustSeries[0].List }}
+        <div class="flex flex-col h-fit col-span-1 gap-2">
+          {{ include "fragments/twThumbnail-dt" . }}
+          {{ include "fragments/twThumbnail-tt" . }}
+        </div>
+      {{- end }}
+
+      <!-- Pagination -->
+      <div class="col-span-2 sm:col-span-3 lg:col-span-4">
+        {{- url := currentURL + "/series/" + .MangaSeries.Page.SeriesID + "?page="}}
+        {{- paginationData := createPaginator(url, "#checkpoint", .Page, .PageLimit, 0, 5) }}
+        {{- yield twPagination(data=paginationData) }}
+      </div>
+  </div>
+
+
+  <!-- <div class="text-xl font-medium text-neutral-200">
+    <span class="font-bold text-neutral-100">{{ .MangaSeries.Page.Total }}</span> works in this series
+  </div> -->
+</div>
+{{- end }}

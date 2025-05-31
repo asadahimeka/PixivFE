@@ -1,0 +1,183 @@
+{*
+  This fragment (twThumbnail-dt.jet.html) templates in the artwork thumbnail
+*}
+{{- target := CookieList["pixivfe-ThumbnailToNewTab"] -}}
+{{- visibilityR18 := CookieList["pixivfe-VisibilityArtR18"] -}}
+{{- visibilityR18G := CookieList["pixivfe-VisibilityArtR18G"] -}}
+{{- visibilityAI := CookieList["pixivfe-VisibilityArtAI"] -}}
+{{- visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] -}}
+{{- AiType := isset(.AiType) ? .AiType : 0 -}}
+
+{* Initialize fields with fallback values *}
+{{- Pages := 1 -}}
+{{- illustType := 0 -}}
+{{- artistId := "" -}}
+
+{{- try -}}
+  {{- artistId = .UserID -}}
+  {{- Pages = .Pages -}}
+  {{- illustType = .IllustType -}}
+{{- catch -}}
+  {{- artistId = .AuthorDetails.UserID -}}
+  {{- Pages = .PageCount -}}
+  {{- illustType = .Type -}}
+{{- end -}}
+
+{* Set up variables for overlay and image *}
+{*
+we check whether we should apply censoring effects based on the artwork type
+and user preferences
+*}
+{{- showOverlay := false -}}
+{{- shouldApplyBlur := !visualEffectsEnabled || visualEffectsEnabled == "true" }}
+{{- overlayBgClass := "" -}}
+{{- loadReplacementImage := false -}}
+{{- aspectClass := "aspect-square" -}}
+{{- marginHack := "" -}}
+
+{* this logic block is wrapped in an HTML comment otherwise it breaks syntax highlighting in Zed *}
+<!--
+{{- if (.XRestrict == 1 && visibilityR18 == "censor") || (.XRestrict == 2 && visibilityR18G == "censor") -}}
+  {{- showOverlay = true -}}
+  {{- overlayBgClass = "bg-black/80 group-hover/image:bg-black/40" -}}
+  {{- loadReplacementImage = true -}}
+{{- else if AiType == 2 && visibilityAI == "censor" -}}
+  {{- showOverlay = true -}}
+  {{- overlayBgClass = "bg-black/80 group-hover/image:bg-black/40" -}}
+{{- end -}}
+-->
+
+{{- if !loadReplacementImage && isFirstPathPart(CurrentPath, "/ranking") && .Width > .Height -}}
+  {{- aspectClass = "aspect-2/1" -}}
+  {{- marginHack = "-mb-[0.775rem]" -}}
+{{- end -}}
+
+{* Empty div for the illust preview (it needs to wrap the anchor) *}
+<div>
+  {* we need to distinguish between an anchor hover and a quickBookmark hover *}
+  <div class="group/imageWrapper relative">
+    <a
+      id="artwork-wrapper-{{ .ID }}"
+      target="{{ target }}"
+      href="/artworks/{{ .ID }}"
+      class="group/image"
+      hx-headers='{ "Fast-Request": "true", "Artwork-ID": "{{- .ID -}}", "Artwork-User-ID": "{{- artistId -}}", "Artwork-Title": "{{- .Title -}}", "Artwork-IllustType": "{{- illustType -}}", "Artwork-Master-Webp-1200-Url": "{{- .Thumbnails.MasterWebp_1200 -}}", "Artwork-Original-Url": "{{- .Thumbnails.OriginalJPG -}}", "Artwork-Width": "{{- .Width -}}", "Artwork-Height": "{{- .Height -}}", "Artwork-Pages": "{{- Pages -}}" }'
+    >
+      <div
+        id="original-media-{{ .ID }}"
+        class="media-target relative flex overflow-hidden rounded group-active/image:scale-[0.975] group-outline-glow"
+      >
+        {*
+        Play button overlay for ugoira
+
+        FIXME: icon for censor overlay can overlap with this
+        *}
+        {{- if illustType == 2 -}}
+          <div class="flex absolute inset-2/4 -translate-x-1/2 -translate-y-1/2 justify-center items-center bg-black/75 group-hover/image:bg-black/50 group-hover/image:text-neutral-100/80 transition rounded-full p-7 z-1">
+            <span class="material-symbols-rounded-fill-48">
+              play_arrow
+            </span>
+          </div>
+        {{- end -}}
+
+        {* Censor overlay *}
+        {{- if showOverlay -}}
+          <div
+            class="flex flex-col items-center justify-center absolute size-full rounded inset-0 gap-2 z-2
+                  {{ overlayBgClass }}
+                  transition"
+          >
+            <span
+              class="material-symbols-rounded-48
+                    group-hover/image:opacity-0 opacity-100 text-neutral-400 transition-all"
+            >
+              visibility_off
+            </span>
+
+            {* Helper text that appears when the thumbnail is hovered over *}
+            {* NOTE: commented out as it clutters the thumbnail with the #quick-favorite element also visible *}
+            <!-- <div
+              class="flex items-center w-full gap-2 absolute start-0 bottom-0 rounded-b overflow-hidden bg-black/60 p-2
+                    opacity-0 group-hover/image:opacity-100
+                    group-hover/image:translate-y-0 translate-y-full
+                    {{ if shouldApplyBlur }}
+                      backdrop-blur-[1px]
+                      blur-[2px] group-hover/image:blur-none
+                    {{ end }}
+                    transition-all duration-200 ease-out"
+            >
+              <span class="material-symbols-rounded-20">
+                visibility_off
+              </span>
+
+              <div
+                class="text-xs font-medium"
+              >
+                Censored by preferences.
+              </div>
+            </div> -->
+          </div>
+        {{- end -}}
+
+        <div class="flex absolute w-full inset-0 justify-between p-2 z-3">
+          {* Top left badges *}
+          <div class="flex flex-col gap-y-1">
+            {{- if isset(.Rank) -}}
+              <div
+                class="flex w-fit text-xl font-bold rounded-tl rounded-br drop-shadow px-3 py-1.5 -ms-2 -mt-2
+                      {{ if .Rank == 1 -}}
+                        bg-amber-400/90 text-black
+                      {{- else if .Rank == 2 -}}
+                        bg-zinc-300/90 text-black
+                      {{- else if .Rank == 3 -}}
+                        bg-amber-800/90 text-white
+                      {{- else -}}
+                        bg-neutral-800/80 text-white
+                      {{- end -}}"
+              >
+                {{- .Rank -}}
+              </div>
+            {{- end -}}
+            {{- if .XRestrict != 0 -}}
+              <div class="flex size-fit bg-red-700 text-white text-xs font-bold rounded drop-shadow px-1 py-0.5">
+                {{- if .XRestrict == 1 -}} R-18 {{- else -}} R-18G {{- end -}}
+              </div>
+            {{- end -}}
+            {{- if AiType == 2 -}}
+              <div class="flex size-fit bg-yellow-500 text-black text-xs font-bold rounded drop-shadow px-1 py-0.5">
+                AI
+              </div>
+            {{- end -}}
+          </div>
+          {* Top right badges *}
+          {{- if Pages > 1 -}}
+            <div class="flex items-center size-fit bg-neutral-800 text-sm font-bold rounded drop-shadow gap-x-1 px-1 py-0.5">
+              <span class="material-symbols-rounded-20">
+                image
+              </span>
+              {{- Pages -}}
+            </div>
+          {{- end -}}
+        </div>
+
+        <img
+          src="{{- if loadReplacementImage -}} /img/nsfw.png {{- else -}} {{- if .Thumbnails.MasterWebp_1200 -}} {{ .Thumbnails.MasterWebp_1200 }} {{- else -}} {{ .Thumbnail }} {{- end -}} {{- end -}}"
+          alt="{{- .Title -}}"
+          width="{{- if .Thumbnails.MasterWebp_1200 -}} 1200px {{- else -}} 360px {{- end -}}"
+          height="{{- if .Thumbnails.MasterWebp_1200 -}} 1200px {{- else -}} 360px {{- end -}}"
+          loading="lazy"
+          class="size-full object-cover rounded {{ aspectClass }} {{ marginHack }}"
+        />
+      </div>
+    </a>
+
+    {* TouchArtwork doesn't return BookmarkData, and we shouldn't render this element if we lack data completely *}
+    {{- try -}}
+      {{- if .BookmarkData && LoggedIn -}}
+        {{- include "../partials/quickDeleteBookmarkPartial" . -}}
+        {{- else -}}
+        {{- include "../partials/quickAddBookmarkPartial" . -}}
+      {{- end -}}
+    {{- end -}}
+  </div>
+</div>

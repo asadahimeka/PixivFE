@@ -1,0 +1,20 @@
+{{- extends "layout/twDefault" -}}
+{{- import "blocks/twPixivisionEntry" }}
+{{- import "blocks/twPagination" -}}
+
+{{- block body() -}}
+
+<div class="flex flex-col w-full max-w-7xl gap-8 mx-auto">
+  <div id="checkpoint" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 scroll-mt-20">
+    {{- range .Data -}}
+      {{- yield twPixivisionEntry(data=., extended=true) -}}
+    {{- end -}}
+  </div>
+
+  <!-- Pagination -->
+  {{- url := "/pixivision?p=" -}}
+  {{- paginationData := createPaginator(url, "#checkpoint", .Page, -1, 1, 5) -}}
+  {{- yield twPagination(data=paginationData) -}}
+</div>
+
+{{- end -}}

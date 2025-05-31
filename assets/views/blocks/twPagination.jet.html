@@ -1,0 +1,171 @@
+{{- block twPagination(data) }}
+
+{{ try }}
+  <nav aria-label="Pagination">
+    <!-- Prefetch links -->
+    {{ if len(data.Pages) > 0 }}
+      {{ if data.HasPrevious }}
+        <link rel="prefetch" href="{{- data.PreviousURL -}}">
+      {{ end }}
+
+      {{ if data.Pages[0].Number > 1 }}
+        <link rel="prefetch" href="{{- data.FirstURL -}}">
+      {{ end }}
+
+      {{ if data.HasPrevious }}
+        <link rel="prefetch" href="{{- data.PreviousURL -}}">
+      {{ end }}
+
+      {{ if data.HasMaxPage }}
+        {{ if data.LastPage < data.MaxPage }}
+          <link rel="prefetch" href="{{- data.LastURL -}}">
+        {{ end }}
+      {{ end }}
+
+      {{ if data.HasNext }}
+        <link rel="prefetch" href="{{- data.NextURL -}}">
+      {{ end }}
+    {{ end }}
+
+    <div class="flex flex-col items-center content-center gap-6">
+      {{ if len(data.Pages) > 0 }}
+        <!-- Dropdown -->
+        <!-- <div class="js-required dropup mb-3">
+          <button class="custom-btn-neutral-700 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Go to Page
+          </button>
+          <ul class="dropdown-menu bg-neutral-700 drop-shadow-lg border border-1 border-neutral-600">
+            {{ range data.DropdownPages }}
+              {{ if .Number == data.CurrentPage }}
+                <li><a class="dropdown-item bg-neutral-500 active" href="{{ .URL }}">{{ .Number }}</a></li>
+              {{ else }}
+                <li><a class="dropdown-item" href="{{ .URL }}">{{ .Number }}</a></li>
+              {{ end }}
+            {{ end }}
+          </ul>
+        </div> -->
+
+        <!-- Page numbers -->
+        <div class="flex flex-row items-center gap-2">
+          <!-- Previous page button -->
+          {{ if data.HasPrevious }}
+            <a href="{{ data.PreviousURL }}">
+              <div class="filled-button justify-center text-sm font-medium min-w-15 min-h-10 me-2">
+                Prev
+              </div>
+            </a>
+          {{ else }}
+            <button
+              disabled
+              class="outlined-button justify-center font-medium text-sm text-neutral-500 min-w-15 min-h-10 me-2"
+              title="No previous page exists."
+            >
+              Prev
+            </button>
+          {{ end }}
+
+          <!-- First page and ellipsis (if needed) -->
+          {{ if data.Pages[0].Number > 1 }}
+            <a href="{{ data.FirstURL }}">
+              <div class="tonal-button-neutral justify-center text-sm font-medium min-w-10 min-h-10">
+                1
+              </div>
+            </a>
+            {{ if data.Pages[0].Number > 2 }}
+            <div class="text-neutral-700 select-none">&hellip;</div>
+            {{ end }}
+          {{ end }}
+
+          <!-- Page numbers -->
+          {{ range data.Pages }}
+            {{ if .Number == data.CurrentPage }}
+              <button>
+                <div class="bg-neutral-700 text-neutral-100 flex items-center justify-center text-sm font-bold rounded-full min-w-10 min-h-10">
+                  {{ .Number }}
+                </div>
+              </button>
+            {{ else }}
+              <a href="{{ .URL }}">
+                <div class="bg-neutral-800 text-neutral-200 flex items-center justify-center hover:text-neutral-900 hover:bg-neutral-300 active:scale-95 text-sm font-medium rounded-full min-w-10 min-h-10 transition">
+                  {{ .Number }}
+                </div>
+              </a>
+            {{ end }}
+          {{ end }}
+
+          <!-- Last page and ellipsis (if needed) -->
+          {{ if data.HasMaxPage }}
+            {{ if data.LastPage < data.MaxPage }}
+              {{ if data.LastPage < data.MaxPage - 1 }}
+                <div class="text-neutral-700 select-none">&hellip;</div>
+              {{ end }}
+              <a href="{{ data.LastURL }}">
+                <div class="tonal-button-neutral justify-center text-sm font-medium min-w-10 min-h-10">
+                  {{ data.MaxPage  }}
+                </div>
+              </a>
+            {{ end }}
+          {{ end }}
+
+          <!-- Next page button -->
+          {{ if data.HasNext }}
+            <a href="{{ data.NextURL }}">
+              <div class="filled-button justify-center text-sm font-medium min-w-15 min-h-10 ms-2">
+                Next
+              </div>
+            </a>
+          {{ else }}
+            <button
+              disabled
+              class="outlined-button justify-center font-medium text-sm text-neutral-500 min-w-15 min-h-10 ms-2"
+              title="No next page exists."
+            >
+              Next
+            </button>
+          {{ end }}
+        </div>
+
+        <!-- Page selector -->
+        <form action="" method="GET" class="flex items-center gap-3">
+          <!-- <label for="page" class="text-neutral-400 font-medium text-sm">Go to page:</label> -->
+          <input type="number"
+                  id="page"
+                  name="page"
+                min="1"
+                {{- if data.HasMaxPage }}
+                max="{{ data.MaxPage }}"
+                {{- else }}
+                max=""
+                {{- end }}
+                  placeholder="{{ data.CurrentPage }}"
+                  required
+                  class="bg-neutral-800/25 border border-neutral-700 rounded text-neutral-200 placeholder:text-neutral-600 px-2 py-1"
+          >
+          <button type="submit"
+                  class="flex items-center w-fit select-none rounded-full border-1 border-neutral-600 cursor-pointer hover:border-neutral-500 hover:bg-neutral-700 active:bg-neutral-800 active:shadow-inner active:scale-95 transition text-neutral-300 font-medium hover:text-neutral-50 px-4 py-1"
+          >
+            Go
+          </button>
+        </form>
+      {{ else }}
+      <div class="flex flex-col items-center w-full border border-dashed border-neutral-500 text-center text-neutral-400 fill-neutral-400 rounded p-6 gap-2">
+        <span class="material-symbols-rounded-20">indeterminate_question_box</span>
+        <span class="text-sm">No items to display.</span>
+      </div>
+      {{ end }}
+    </div>
+  </nav>
+  {{ catch err }}
+    <div class="flex w-11/12 max-w-160 bg-yellow-500/10 border border-yellow-500 text-yellow-100 fill-yellow-100 rounded-lg gap-4 p-6 mx-auto">
+      <span class="material-symbols-rounded-24">info</span>
+      <div class="flex flex-col gap-4">
+        <div class="font-medium">
+          The following error occurred when attempting to render pagination:
+        </div>
+        <div class="text-fuchsia-400 border border-neutral-700 text-sm font-mono bg-black rounded p-4">
+          {{- err.Error() -}}
+        </div>
+      </div>
+    </div>
+  {{ end }}
+{{- end }}

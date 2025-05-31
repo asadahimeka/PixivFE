@@ -1,0 +1,58 @@
+<div class="row">
+  <div class="col-4 col-md-3">
+    <a href="/novel/{{ .ID }}" class="text-decoration-none">
+      <div class="ratio ratio-3x4">
+        <div class="thumbnail-wrapper rounded overflow-hidden">
+          <img src="{{ .CoverURL }}" alt="{{ .Title }}" class="img-fluid object-fit-cover w-100 h-100" loading="lazy" />
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-8 col-md-9">
+    <!-- Novel title -->
+    <!-- NOTE: using an h4 element here breaks the underline animation for some reason -->
+    <span class="fs-6 fw-bold text-truncate">
+      <a href="/novel/{{ .ID }}" class="text-body text-decoration-none">#{{ .Series.ContentOrder }}&nbsp;{{- .Title }}</a>
+    </span>
+
+    <!-- Word count and reading time -->
+    <p class="card-text text-muted small mb-2">
+      <span>{{ .CharacterCount }} character(s)</span>&nbsp;<span>{{ floor: .ReadingTime / 60 }} mins</span>
+    </p>
+
+    <!-- Tags -->
+    <div class="d-flex flex-wrap align-items-center mb-2">
+      {{- if .AiType == 2 }}
+      <span class="badge bg-warning text-dark me-2 mb-2">AI-generated</span>
+      {{- end }}
+      {{- range .Tags }}
+        {* NOTE: early block to catch the R-18 tag *}
+        {{- if isEmphasize(.) }}
+        <span class="badge bg-danger me-2 mb-2">{{ . }}</span>
+        {{- end }}
+      {{- end }}
+      {{- if .IsOriginal }}
+      <span class="badge bg-primary me-2 mb-2">Original</span>
+      {{- end }}
+      {{- range .Tags }}
+        {{- if isEmphasize(.) }}
+        {* Intentionally empty to not render anything to avoid duplication *}
+        {{- else }}
+        <span class="badge fw-normal text-muted me-2 mb-2 p-0 text-wrap text-break text-start">
+          <a href="/tags/{{ escapeString(.) }}" class="text-decoration-none text-wrap text-break">#{{ . }}</a>
+        </span>
+        {{- end }}
+      {{- end }}
+    </div>
+
+    <!-- Metadata (bookmarks and creation date) -->
+    <div class="d-flex justify-content-start align-items-center">
+      <span class="text-body-secondary small me-3">
+        <i class="bi bi-heart-fill me-2"></i>{{ .Bookmarks }}
+      </span>
+      <span class="text-body-secondary small">
+        <i class="bi bi-calendar me-2"></i>{{ parseTime: .Brief.CreateDate }}
+      </span>
+    </div>
+  </div>
+</div>

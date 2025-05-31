@@ -1,0 +1,43 @@
+{*
+  This fragment (twThumbnail-at.jet.html) templates in the artist's avatar and name
+*}
+{{- target := CookieList["pixivfe-ThumbnailToNewTab"] -}}
+
+{* Initialize artist details *}
+{* These variables need to be initialized outside of the try/catch block (but can be freely assigned a new value inside it) *}
+{{- artistId := "" -}}
+{{- artistAvatar := "" -}}
+{{- artistName := "" -}}
+
+{{- try -}}
+  {{- artistId = .UserID -}}
+  {{- artistAvatar = .UserAvatar -}}
+  {{- artistName = .UserName -}}
+{{- catch -}}
+  {{- artistId = .AuthorDetails.UserID -}}
+  {{- artistName = .AuthorDetails.UserName -}}
+  {{- artistAvatar = "" -}}
+{{- end -}}
+
+<div class="flex items-center gap-1.5 -mt-0.5">
+  {{- if artistAvatar != "" -}}
+    <a href="/users/{{- artistId -}}">
+      <img
+        src="{{- artistAvatar -}}"
+        alt="{{- artistName -}}"
+        class="aspect-square object-cover rounded-full size-6 max-h-6 max-w-6 avatar-outline-glow-sm"
+        width="24px"
+        height="24px"
+        loading="lazy"
+      />
+    </a>
+  {{- end -}}
+  <a
+    href="/users/{{- artistId -}}"
+    title="{{- artistName -}}"
+  >
+    <div class="animated-underline line-clamp-1 w-fit text-neutral-400">
+    {{- artistName -}}
+    </div>
+  </a>
+</div>

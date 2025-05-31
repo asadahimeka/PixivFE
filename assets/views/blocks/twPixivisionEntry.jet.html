@@ -1,0 +1,67 @@
+{* The `extended` parameter controls whether to attempt rendering category and tags *}
+
+{{- block twPixivisionEntry(data, extended, nocategory) }}
+<div class="flex flex-col justify-start gap-2">
+  <!-- Thumbnail -->
+  <a href="/pixivision/a/{{- data.ID -}}" class="group/image">
+    <div class="overflow-hidden rounded group-active/image:scale-[0.975] group-outline-glow">
+      {* pixivision article thumbnails always have 1200x630 dimensions, so hardcoding attributes is possible *}
+      <img
+        src="{{- data.Thumbnail -}}"
+        alt="{{- data.Title -}}"
+        width="1200"
+        height="630"
+        class="rounded
+      not-motion-reduce:group-hover/image:scale-[1.025] duration-300
+      aspect-40/21 object-cover"
+      />
+    </div>
+  </a>
+
+  <!-- Title -->
+  <a href="/pixivision/a/{{- data.ID -}}" class="contents">
+    {* applying line-clamp-1 so that secondary info will always align horizontally across multiple items *}
+    <div class="text-link-alt line-clamp-1">
+      {{- data.Title -}}
+    </div>
+  </a>
+
+  <!-- Publication date -->
+  {* NOTE: try block as Date is not available for related articles *}
+  {{ try }}
+    <p class="text-xs text-neutral-400 -mt-1">
+      {{- parseTimeCustomFormat(data.Date, "2 January 2006") -}}
+    </p>
+  {{ end }}
+
+  <!-- Category and tags -->
+  {{- if extended -}}
+    <div class="flex flex-wrap items-center gap-2 mt-1">
+      {{- if !nocategory -}}
+        {{- categoryBg := "blue" -}}
+        {{- c := data.Category -}}
+        {{- parsedCategory := pixivisionCategoryID(data.Category) -}}
+        {{- categoryType := parsedCategory.Type -}}
+        {{- categoryID := parsedCategory.ID -}}
+
+        <a href="/pixivision/c/{{- categoryID -}}" class="contents">
+          <div class="badge-primary interactive">{{- data.Category -}}</div>
+        </a>
+      {{ end }}
+
+      {* TODO: cleanly prevent tags from wrapping onto a new line *}
+      {{- range _, tag := data.Tags -}}
+        {{- if isEmphasize(tag.Name) -}}
+          {* Intentionally empty to avoid duplication *}
+        {{- else -}}
+          <a href="/pixivision/t/{{- tag.ID -}}" class="contents">
+            <div class="blue-link text-sm">
+              #{{- tag.Name -}}
+            </div>
+          </a>
+        {{- end -}}
+      {{- end -}}
+    </div>
+  {{- end -}}
+</div>
+{{- end -}}

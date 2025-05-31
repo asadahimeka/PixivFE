@@ -1,0 +1,666 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twUnderlineNav" }}
+{{- import "blocks/twSelect" }}
+{{- import "blocks/twPagination" }}
+{{- import "blocks/twPillNav" }}
+{{- import "blocks/twModal" -}}
+
+{{- block body() }}
+
+<div class="hidden">
+  <p>Artworks</p>
+  <p>Illustrations</p>
+  <p>Manga</p>
+  <p>All</p>
+  <p>Portrait</p>
+  <p>Square</p>
+  <p>Landscape</p>
+  <p>Newest</p>
+  <p>Oldest</p>
+  <p>All</p>
+  <p>Safe</p>
+  <p>R-18</p>
+  <p>None</p>
+  <p>Exact (tags)</p>
+  <p>Partial (tags)</p>
+  <p>Title/Caption</p>
+</div>
+
+<div class="flex flex-col w-full gap-8">
+  <!-- Tag header -->
+  <div class="relative overflow-hidden -mx-4 -mt-6">
+    <img
+      src="{{- if .Tag.CoverArtwork.Thumbnails.Webp_1200 -}} {{- .Tag.CoverArtwork.Thumbnails.Webp_1200 -}} {{- else -}} {{- .Tag.Metadata.Image -}} {{- end -}}"
+      alt=""
+      class="absolute inset-0 w-full h-full object-cover -z-10"
+      loading="lazy"
+    />
+
+    <!-- Content overlay structure remains largely the same -->
+    <!-- The padding (esp. pt-48) and content inside this div effectively define the height of the parent relative container -->
+    <div class="flex justify-start items-end size-full bg-linear-to-b from-neutral-900/40 to-neutral-900 gap-1 p-8 pb-12 z-10 pt-48">
+      <div class="flex items-start w-full max-w-7xl gap-1 mx-auto">
+        <div class="text-4xl sm:text-6xl font-bold">
+          #
+        </div>
+        <div class="flex flex-col items-start w-full gap-6">
+          <h2 class="text-4xl sm:text-6xl font-bold">{{ .SearchQuery }}</h2>
+          <h3 class="text-lg text-neutral-300 font-medium -mt-4">{{ .Tag.Metadata.Name }}</h3>
+          <div class="text-neutral-200 -mt-3">
+            <span class="font-semibold">{{ prettyNumber(.Data.Total) }}</span> <span class="font-medium">{{- if Queries.category == "users" -}} users {{- else -}} works {{- end }}</span>
+          </div>
+
+          <div class="flex flex-col justify-between w-full gap-6">
+            <div class="flex flex-col gap-1">
+              {{- if .Tag.Metadata.Detail }}
+                <p class="text-sm/6 text-neutral-300">
+                  {{ .Tag.Metadata.Detail }}
+                </p>
+              {{ end }}
+
+              <a
+                href="https://dic.pixiv.net/a/{{ .Tag.Name }}"
+                target="_blank"
+                class="w-fit"
+              >
+                <div class="blue-link text-xs">
+                  More on pixpedia <span class="material-symbols-rounded-16">open_in_new</span>
+                </div>
+              </a>
+            </div>
+
+            {{ if .Tag.Metadata.ID != "" }}
+              <a
+                href="/artworks/{{ .Tag.Metadata.ID }}"
+                class="group w-fit self-end"
+              >
+                <div class="flex items-center text-neutral-200 group-hover:text-neutral-100 fill-neutral-200 group-hover:fill-neutral-100 gap-1">
+                  <div
+                    class="text-sm font-medium decoration-blue-400 underline decoration-1 group-hover:decoration-2 underline-offset-3 transition"
+                  >
+                    <span class="italic">{{ .Tag.CoverArtwork.Title }}</span> by {{ .Tag.CoverArtwork.UserName }}
+                  </div>
+                </div>
+              </a>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {* Related tags *}
+  <div class="w-full max-w-7xl mx-auto">
+    {{ include "fragments/twCategoryFrequentTags" .Data.RelatedTags }}
+  </div>
+
+  <div class="flex flex-col w-full max-w-7xl gap-8 mx-auto">
+    <!-- Popular artworks -->
+    {{- if (len(.Data.Popular.Permanent) + len(.Data.Popular.Recent) != 0) && .Page == 1 }}
+      <div class="flex flex-col w-full gap-8">
+        <input type="checkbox" id="show-popular" class="peer hidden">
+        <div class="peer-checked:hidden flex flex-col gap-6">
+          <div class="flex items-center justify-between text-neutral-100 gap-2">
+            <div class="flex flex-col border-amber-400 border-s-6 ps-4 pb-2">
+              <div class="text-sm text-neutral-400 starting:text-white transition duration-500 ease-out">
+                All time
+              </div>
+              <h3 class="text-xl font-medium">
+                Popular artworks
+              </h3>
+            </div>
+
+            {{- if len(.Data.Popular.Recent) != 0 }}
+              <label for="show-popular" class="tonal-button-neutral text-sm font-medium">
+                Show recent
+              </label>
+            {{- end }}
+          </div>
+
+          {{- if len(.Data.Popular.Permanent) != 0 }}
+            <div
+              class="grid grid-rows-1 grid-flow-col *:w-48 *:sm:w-96 *:snap-start *:scroll-ms-2 snap-x snap-mandatory overflow-x-auto gap-6 ps-2 pt-2 pb-6 pe-48 -mt-2 -ms-2 -mb-6
+                    starting:opacity-0 opacity-100 transition"
+            >
+              {{- include "fragments/twSmall-tn" .Data.Popular.Permanent }}
+            </div>
+          {{- end }}
+        </div>
+
+        <div class="hidden peer-checked:flex flex-col gap-6">
+          <div class="flex items-center justify-between text-neutral-100 gap-2">
+            <div class="flex flex-col border-amber-400 border-s-6 ps-4 pb-2">
+              <div class="text-sm text-neutral-400 starting:text-white transition duration-500 ease-out">
+                Recent
+              </div>
+              <h3 class="text-xl font-medium">
+                Popular artworks
+              </h3>
+            </div>
+
+            {{- if len(.Data.Popular.Permanent) != 0 }}
+              <label for="show-popular" class="tonal-button-neutral text-sm font-medium">
+                Show all time
+              </label>
+            {{- end }}
+          </div>
+
+          {{- if len(.Data.Popular.Recent) != 0 }}
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6
+                    starting:opacity-0 opacity-100 transition"
+            >
+              {{- include "fragments/twSmall-tn" .Data.Popular.Recent }}
+            </div>
+          {{- end }}
+        </div>
+      </div>
+    {{- end }}
+
+    <!-- Categories -->
+    <div id="checkpoint" class="border-neutral-800 border-b-2 *:-mb-[2px] scroll-mt-20">
+      <!-- {{- _Category := isset(.Queries.category) ? .Queries.category : "artworks" }}
+      {{- URL := unfinishedQuery(.QueriesC, "category") }}
+      {{- path := slice("artworks#", "illustrations#", "manga#", "novels#", "users#") }}
+      {{- name := slice("Overall", "Illustrations", "Manga", "Novels", "Users") }}
+      {{- icons := slice(
+                        `<span class="material-symbols-rounded-20">home</span>`,
+                        `<span class="material-symbols-rounded-20">image</span>`,
+                        `<span class="material-symbols-rounded-20">manga</span>`,
+                        `<span class="material-symbols-rounded-20">book</span>`,
+                        `<span class="material-symbols-rounded-20">person</span>`,
+                        ) }} -->
+      {{- yield twUnderlineNav(baseURL=URL, paths=path, names=name, activeState=.ActiveCategory + "#") }}
+    </div>
+
+    <!-- Main works -->
+    <div class="flex items-center justify-between gap-4 -mt-2">
+      {{- _Mode := isset(.Queries.mode) ? .Queries.mode : "safe" }}
+      {{- URL := unfinishedQuery(.QueriesC, "mode") }}
+      {{- path := slice("all" + "#", "safe" + "#", "r18" + "#") }}
+      {{- name := slice("All", "Safe", "R-18") }}
+      {{- icons := slice("", "", "") }}
+      {{- yield twPillNav(baseURL=URL, paths=path, names=name, activeState=.ActiveMode + "#") }}
+
+      <button
+        popovertarget="tagOptions"
+        class="flex items-center cursor-pointer text-neutral-200 fill-neutral-200 hover:text-neutral-100 hover:fill-neutral-100 font-medium hover:bg-neutral-700 active:scale-95 rounded-lg px-3 py-2 gap-2 transition"
+      >
+        <span class="material-symbols-rounded-20">tune</span>
+        <span class="hidden sm:inline">Search options</span>
+      </button>
+
+      {{- yield twModal(id="tagOptions", title="Options", widthClasses="") content -}}
+        <form
+          action="/tags"
+          method="get"
+          hx-swap="show:none"
+        >
+          <div class="flex flex-col xl:flex-row gap-8">
+            <div class="flex flex-col h-fit min-w-60 gap-6">
+              <label for="name" class="text-sm text-neutral-100 font-medium -mb-4">
+                Keywords
+              </label>
+              <input
+                type="text"
+                class="form-control w-full"
+                id="name"
+                name="name"
+                value="{{ .SearchQuery }}"
+              />
+              <div class="text-xs text-neutral-400 space-y-1 -mt-4">
+                <div>
+                  Delimit multiple keywords using spaces.
+                </div>
+                <div>
+                  <span class="font-medium">Example:</span> <code class="bg-neutral-950">東方project チルノ</code>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 -mb-4">
+                <label for="order" class="text-sm text-neutral-100 font-medium">
+                  Search order
+                </label>
+                {{- if .PopularSearchEnabled == true }}
+                  <button
+                    type="button"
+                    popovertarget="popularSearchInfo"
+                    class="size-4 text-neutral-300 hover:text-neutral-200 active:text-neutral-100 transition cursor-pointer"
+                  >
+                    <span class="material-symbols-rounded-16">info</span>
+                  </button>
+                {{- end -}}
+              </div>
+              {{- if .PopularSearchEnabled -}}
+                {{ name := "order" -}}
+                {{ values := slice("date_d", "date", "popular") -}}
+                {{ labels := slice("Newest", "Oldest", "Popular") -}}
+                {{- yield twSelect(name=name, values=values, labels=labels, activeState=.ActiveOrder) -}}
+                <div
+                  popover
+                  id="popularSearchInfo"
+                  class="modal-popover pointer-events-none open:pointer-events-auto top-2/4 start-2/4 -translate-x-2/4 -translate-y-2/4
+                        opacity-0 starting:open:opacity-0 open:opacity-100 scale-95 starting:open:scale-95 open:scale-100 transition-all transition-discrete
+                        open:flex flex-col sm:flex-row gap-6 group-open/details:opacity-100 overflow-hidden
+                        w-11/12 max-w-120 bg-neutral-900 border border-neutral-700 p-6 rounded-lg text-sm/6
+                        starting:backdrop:bg-black/0 backdrop:bg-black/60 text-neutral-300 drop-shadow-2xl"
+                >
+                  <span class="material-symbols-rounded-24 h-fit rounded-full bg-white text-black p-2">info</span>
+
+                  <div class="flex flex-col gap-4">
+                    <div>
+                      The <span class="font-bold text-neutral-100">Popular</span> search order uses <code>users入り</code> bookmark count tags to show the most popular works, but is limited to one page and specific milestones.
+                    </div>
+                    <div>
+                      If no results appear, the tag likely lacks bookmark data.
+                    </div>
+                    <div class="font-medium text-neutral-100">
+                      Try broader tags like <code>#アイマス</code> instead of <code>#アイドルマスターシャイニーカラーズ</code> for better results.
+                    </div>
+                  </div>
+                </div>
+                {{- else -}}
+                  {{ name := "order" }}
+                  {{ values := slice("date_d", "date") }}
+                  {{ labels := slice("Newest", "Oldest") }}
+                  {{- yield twSelect(name=name, values=values, labels=labels, activeState=.ActiveOrder) }}
+              {{- end -}}
+
+              <label for="ratio" class="text-sm text-neutral-100 font-medium -mb-4">
+                Aspect ratio
+              </label>
+              {{ name := "ratio" }}
+              {{ values := slice("", "-0.5", "0", "0.5") }}
+              {{ labels := slice("Any", "Portrait", "Square", "Landscape") }}
+              {{- yield twSelect(name=name, values=values, labels=labels, activeState=.ActiveOrder) }}
+
+              <label for="smode" class="text-sm text-neutral-100 font-medium -mb-4">
+                Search mode
+              </label>
+              {{ name := "smode" }}
+              {{ values := slice("s_tag", "s_tag_full", "s_tc") }}
+              {{ labels := slice("Partial (tags)", "Exact (tags)", "Title/Caption") }}
+              {{- yield twSelect(name=name, values=values, labels=labels, activeState=.ActiveSearchMode) }}
+            </div>
+
+            <div class="flex flex-col h-fit gap-6 text-nowrap">
+              <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+                <div class="col-span-1 flex flex-col gap-6">
+                  <label for="wlt" class="text-sm text-neutral-100 font-medium -mb-4">
+                    Minimum width (px)
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control w-full"
+                    id="wlt"
+                    name="wlt"
+                    placeholder="1024"
+                    value="{{ .QueriesC.Query["Wlt"] }}"
+                  />
+                </div>
+
+                <div class="col-span-1 flex flex-col gap-6">
+                  <label for="wgt" class="text-sm text-neutral-100 font-medium -mb-4">
+                    Maximum width (px)
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control w-full"
+                    id="wgt"
+                    name="wgt"
+                    placeholder="2048"
+                    value="{{ .QueriesC.Query["Wgt"] }}"
+                  />
+                </div>
+
+                <div class="col-span-1 flex flex-col gap-6">
+                  <label for="hlt" class="text-sm text-neutral-100 font-medium -mb-4">
+                    Minimum height (px)
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control w-full"
+                    id="hlt"
+                    name="hlt"
+                    placeholder="512"
+                    value="{{ .QueriesC.Query["Hlt"] }}"
+                  />
+                </div>
+
+                <div class="col-span-1 flex flex-col gap-6">
+                  <label for="hgt" class="text-sm text-neutral-100 font-medium -mb-4">
+                    Maximum height (px)
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control w-full"
+                    id="hgt"
+                    name="hgt"
+                    placeholder="1024"
+                    value="{{ .QueriesC.Query["Hgt"] }}"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row gap-4">
+                <div class="col-span-1 flex flex-col gap-6">
+                  <label for="ecd" class="text-sm text-neutral-100 font-medium -mb-4">
+                    Posted before
+                  </label>
+                  <input
+                    type="date"
+                    class="form-control w-full"
+                    id="ecd"
+                    name="ecd"
+                    value="{{ .QueriesC.Query["Ecd"] }}"
+                  />
+                </div>
+
+                <div class="col-span-1 flex flex-col gap-6">
+                  <label for="scd" class="text-sm text-neutral-100 font-medium -mb-4">
+                    Posted after
+                  </label>
+                  <input
+                    type="date"
+                    class="form-control w-full"
+                    id="scd"
+                    name="scd"
+                    value="{{ .QueriesC.Query["Scd"] }}"
+                  />
+                </div>
+              </div>
+
+              <label for="tool" class="text-sm text-neutral-100 font-medium -mb-4">
+                Creation tool
+              </label>
+
+              <!--
+              {{- name := "tool" }}
+              {{- labels := slice(
+                                  "All creation tools",
+                                  "Raster/paint software",
+                                  "SAI",
+                                  "Photoshop",
+                                  "CLIP STUDIO PAINT",
+                                  "IllustStudio",
+                                  "ComicStudio",
+                                  "Pixia",
+                                  "AzPainter2",
+                                  "Painter",
+                                  "GIMP",
+                                  "FireAlpaca",
+                                  "AzPainter",
+                                  "CGillust",
+                                  "MS_Paint",
+                                  "PictBear",
+                                  "openCanvas",
+                                  "PaintShopPro",
+                                  "EDGE",
+                                  "AzDrawing",
+                                  "SketchBookPro",
+                                  "PhotoStudio",
+                                  "Paintgraphic",
+                                  "MediBang Paint",
+                                  "NekoPaint",
+                                  "ArtRage",
+                                  "AzDrawing2",
+                                  "ibisPaint",
+                                  "GraphicsGale",
+                                  "Krita",
+                                  "4thPaint",
+                                  "ComiLabo",
+                                  "Pixelmator",
+                                  "Procreate",
+                                  "PicturePublisher",
+                                  "dotpict",
+                                  "Aseprite",
+                                  "Pastela",
+                                  "Vector software",
+                                  "Illustrator",
+                                  "Inkscape",
+                                  "Fireworks",
+                                  "Expression",
+                                  "Animation/motion",
+                                  "Live2D",
+                                  "AfterEffects",
+                                  "e-mote",
+                                  "RETAS STUDIO",
+                                  "Online/web tools",
+                                  "Oekaki BBS",
+                                  "Oekaki Chat",
+                                  "Tegaki Blog",
+                                  "drawr",
+                                  "pixiv Sketch",
+                                  "kokuban.in",
+                                  "Processing",
+                                  "General 3D modeling",
+                                  "Blender",
+                                  "Maya",
+                                  "3dsMax",
+                                  "CINEMA4D",
+                                  "XSI",
+                                  "modo",
+                                  "Lightwave3D",
+                                  "Character/figure 3D",
+                                  "Poser",
+                                  "DAZ Studio",
+                                  "VRoid Studio",
+                                  "Comi Po!",
+                                  "Digital sculpting",
+                                  "ZBrush",
+                                  "Sculptris",
+                                  "3D-Coat",
+                                  "3D environment/other",
+                                  "Vue",
+                                  "VistaPro",
+                                  "Bryce",
+                                  "STRATA",
+                                  "SketchUp",
+                                  "Metasequoia",
+                                  "Shade",
+                                  "CARRARA",
+                                  "Hexagon King",
+                                  "AnimationMaster",
+                                  "Sunny3D",
+                                  "Paint 3D",
+                                  "Traditional dry media",
+                                  "Mechanical pencil",
+                                  "Pencil",
+                                  "Colored pencil",
+                                  "Pastels",
+                                  "Crayon",
+                                  "Coupy pencil",
+                                  "Traditional wet media",
+                                  "Watercolors",
+                                  "Paint",
+                                  "Acrylic paint",
+                                  "Oil paint",
+                                  "Gansai",
+                                  "Traditional pen & marker",
+                                  "Ballpoint pen",
+                                  "Thin marker",
+                                  "Copic marker",
+                                  "Dip pen",
+                                  "Calligraphy pen",
+                                  "Felt-tip pen",
+                                  "Magic marker",
+                                  "Watercolor brush",
+                                  "Brush",
+                                  "Fountain pen",
+                                  "Airbrush",
+                                  "Color ink",
+                                  "mdiapp"
+                                  ) }}
+              {{- values := slice(
+                                  "",
+                                  "START_OPTGROUP",
+                                  "SAI",
+                                  "Photoshop",
+                                  "CLIP STUDIO PAINT",
+                                  "IllustStudio",
+                                  "ComicStudio",
+                                  "Pixia",
+                                  "AzPainter2",
+                                  "Painter",
+                                  "GIMP",
+                                  "FireAlpaca",
+                                  "AzPainter",
+                                  "CGillust",
+                                  "MS_Paint",
+                                  "PictBear",
+                                  "openCanvas",
+                                  "PaintShopPro",
+                                  "EDGE",
+                                  "AzDrawing",
+                                  "SketchBookPro",
+                                  "PhotoStudio",
+                                  "Paintgraphic",
+                                  "MediBang Paint",
+                                  "NekoPaint",
+                                  "ArtRage",
+                                  "AzDrawing2",
+                                  "ibisPaint",
+                                  "GraphicsGale",
+                                  "Krita",
+                                  "4thPaint",
+                                  "ComiLabo",
+                                  "Pixelmator",
+                                  "Procreate",
+                                  "PicturePublisher",
+                                  "dotpict",
+                                  "Aseprite",
+                                  "Pastela",
+                                  "START_OPTGROUP",
+                                  "Illustrator",
+                                  "Inkscape",
+                                  "Fireworks",
+                                  "Expression",
+                                  "START_OPTGROUP",
+                                  "Live2D",
+                                  "AfterEffects",
+                                  "e-mote",
+                                  "RETAS STUDIO",
+                                  "START_OPTGROUP",
+                                  "Oekaki BBS",
+                                  "Oekaki Chat",
+                                  "Tegaki Blog",
+                                  "drawr",
+                                  "pixiv Sketch",
+                                  "kokuban.in",
+                                  "Processing",
+                                  "START_OPTGROUP",
+                                  "Blender",
+                                  "Maya",
+                                  "3dsMax",
+                                  "CINEMA4D",
+                                  "XSI",
+                                  "modo",
+                                  "Lightwave3D",
+                                  "START_OPTGROUP",
+                                  "Poser",
+                                  "DAZ Studio",
+                                  "VRoid Studio",
+                                  "Comi Po!",
+                                  "START_OPTGROUP",
+                                  "ZBrush",
+                                  "Sculptris",
+                                  "3D-Coat",
+                                  "START_OPTGROUP",
+                                  "Vue",
+                                  "VistaPro",
+                                  "Bryce",
+                                  "STRATA",
+                                  "SketchUp",
+                                  "Metasequoia",
+                                  "Shade",
+                                  "CARRARA",
+                                  "Hexagon King",
+                                  "AnimationMaster",
+                                  "Sunny3D",
+                                  "Paint 3D",
+                                  "START_OPTGROUP",
+                                  "Mechanical pencil",
+                                  "Pencil",
+                                  "Colored pencil",
+                                  "Pastels",
+                                  "Crayon",
+                                  "Coupy pencil",
+                                  "START_OPTGROUP",
+                                  "Watercolors",
+                                  "Paint",
+                                  "Acrylic paint",
+                                  "Oil paint",
+                                  "Gansai",
+                                  "START_OPTGROUP",
+                                  "Ballpoint pen",
+                                  "Thin marker",
+                                  "Copic marker",
+                                  "Dip pen",
+                                  "Calligraphy pen",
+                                  "Felt-tip pen",
+                                  "Magic marker",
+                                  "Watercolor brush",
+                                  "Brush",
+                                  "Fountain pen",
+                                  "Airbrush",
+                                  "Color ink",
+                                  "mdiapp"
+                                  ) }} -->
+              {{- yield twSelect(name=name, values=values, labels=labels, activeState=.QueriesC.Query["Tool"]) }}
+            </div>
+          </div>
+
+          <button type="submit" class="filled-button font-medium ms-auto gap-2 mt-8">
+            <span class="material-symbols-rounded-20">arrow_forward</span>
+            Go
+          </button>
+        </form>
+      {{- end -}}
+    </div>
+
+    {{- if Queries.category == "novels" -}}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-12">
+        {{- range i := .Data.Novels.Data -}}
+          {{- if i != 0 -}}
+            {{- if i % 2 == 0 -}}
+              <hr class="hidden lg:block col-span-2 border-neutral-800">
+            {{- end -}}
+            <hr class="block lg:hidden col-span-1 border-neutral-800">
+          {{- end -}}
+          <div class="col-span-1">
+            {{- include "fragments/twNovel-tn" . -}}
+          </div>
+        {{- end -}}
+      </div>
+    {{- else if Queries.category == "users" -}}
+      <div class="flex flex-col w-full gap-y-8">
+        {{- range .Data.Users.Data }}
+          {{- include "fragments/twUser-tn" }}
+        {{- end }}
+      </div>
+    {{- else -}}
+      {{- data := !Queries.category ? .Data.IllustManga.Data : Queries.category == "artworks" ? .Data.IllustManga.Data : Queries.category == "illustrations" ? .Data.Illustrations.Data : Queries.category == "manga" ? .Data.Manga.Data : nil -}}
+      {{- if data != nil -}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {{- include "fragments/twSmall-tn" data -}}
+        </div>
+      {{- end -}}
+    {{- end -}}
+
+    <!-- Pagination -->
+    {{ lastPage := -1 }}
+    {{ if .Data.LastPage }}
+      {{- lastPage = .Data.LastPage -}}
+    {{ end }}
+
+    {{- url := unfinishedQuery(.QueriesC, "page") -}}
+    {{- paginationData := createPaginator(url, "#checkpoint", .Page, lastPage, 0, 5) -}}
+    {{- yield twPagination(data=paginationData) -}}
+  </div>
+
+
+  <!-- Search options modal -->
+  <!-- NOTE: unlike the modals on the ranking and calendar ranking pages, this one uses mb-4 due to the amount of options, which causes mb-3 to feel cluttered -->
+</div>
+<!-- End of main content -->
+{{- end }}

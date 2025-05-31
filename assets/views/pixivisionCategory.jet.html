@@ -1,0 +1,50 @@
+{{- extends "layout/twDefault" -}}
+{{- import "blocks/twPixivisionEntry" }}
+{{- import "blocks/twPagination" -}}
+
+{{- block body() -}}
+
+<div class="flex flex-col w-full gap-8">
+  <div class="relative rounded overflow-hidden -mt-6 -mx-4">
+    <img
+      src="{{- .Category.Thumbnail -}}"
+      alt="{{- .Category.Title -}}"
+      class="w-full object-cover md:h-84 h-32"
+      width="690"
+      height="160"
+    />
+
+    <div
+      class="absolute inset-0 z-1 flex items-center justify-center w-full h-full rounded-t bg-linear-to-b from-neutral-900/60 to-neutral-900 p-8"
+    >
+      {{- if .Category.Title && .Category.Description -}}
+      <div class="w-full max-w-7xl">
+        <div class="flex flex-col md:max-w-4xl gap-4">
+          <p class="text-sm text-neutral-300 font-medium">Category</p>
+
+          <p class="font-bold text-3xl -mt-3">{{- .Category.Title -}}</p>
+
+          <!-- Description - hidden on mobile, shown on desktop -->
+          <p class="hidden md:block text-sm/6 text-neutral-300">{{- .Category.Description -}}</p>
+        </div>
+      </div>
+      {{- end -}}
+    </div>
+  </div>
+
+  <!-- Mobile-only description - shown below the image on mobile -->
+  <p class="block md:hidden text-sm/6 text-neutral-300 px-4 -mt-2">{{- .Category.Description -}}</p>
+
+  <div id="checkpoint" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-7xl gap-8 scroll-mt-20 mx-auto">
+    {{- range _, article := .Category.Articles -}}
+      {{- yield twPixivisionEntry(data=article, extended=true, nocategory=true) -}}
+    {{- end -}}
+  </div>
+
+  <!-- Pagination -->
+  {{- url := "/pixivision/c/" + .ID + "?p=" -}}
+  {{- paginationData := createPaginator(url, "#checkpoint", .Page, -1, 1, 5) -}}
+  {{- yield twPagination(data=paginationData) -}}
+</div>
+
+{{- end -}}

@@ -1,0 +1,85 @@
+{{- relativeTimeData := relativeTime(.CommentDate) -}}
+
+<div class="flex shrink-0 items-start gap-4">
+  {{- if !.IsDeletedUser -}}
+    <a
+      href="/users/{{- .UserId -}}/bookmarks"
+      class="contents"
+    >
+      <img
+        src="{{- .Img -}}"
+        alt="{{- .UserName -}}"
+        loading="lazy"
+        class="aspect-square object-cover size-10 shrink-0 rounded-full avatar-outline-glow"
+      />
+    </a>
+    {{- else -}}
+    <img
+      src="/img/deleted.png"
+      alt="{{- .UserName -}}"
+      loading="lazy"
+      class="aspect-square object-cover size-10 shrink-0 rounded-full"
+    />
+  {{- end -}}
+
+  <div class="flex flex-col w-full gap-2">
+    <div class="flex flex-wrap items-baseline text-sm text-neutral-400 gap-y-0.5 gap-x-1.5">
+      {{- if !.IsDeletedUser -}}
+        <a href="/users/{{- .UserId -}}/bookmarks" class="text-neutral-100 font-semibold animated-underline">{{- .UserName -}}</a>
+        {{- else -}}
+        <p class="text-neutral-400 font-semibold">Deleted user</p>
+      {{- end -}}
+
+      {{- if .UserId == .WorkUserId -}}
+        <div class="badge-primary">Author</div>
+      {{- end -}}
+
+      <div class="select-none">•</div>
+
+      <div title="{{- naturalTime: .CommentDate -}}">
+        {{ relativeTimeData.Value }} {{ relativeTimeData.Description }} {{ if relativeTimeData.Time }}{{ relativeTimeData.Time }}{{ end }}
+      </div>
+
+      {*
+      <div class="hidden sm:block text-neutral-500 text-xs ms-auto">
+        #{{- .Id -}}
+      </div>
+      *}
+    </div>
+
+    {{- if .StampLink -}}
+      {{- raw: .StampLink -}}
+      {{- else -}}
+      <!-- Comment with emojis -->
+      <p class="flex flex-wrap text-wrap wrap-anywhere text-neutral-300 text-base/7 gap-2">
+        {{- raw: parseEmojis(.Comment) -}}
+      </p>
+
+      {*
+      NOTE: the layout *would* break with deeply nested reply chains,
+            but pixiv uses a flat hierarchy for replies so it's fine
+      *}
+      {{- if .HasReplies -}}
+        {{- replyCount := len(.Replies)}}
+
+        <details class="group mt-2" open>
+          <summary class="tonal-button-neutral text-xs font-medium">
+            <span class="inline group-open:hidden">
+              Read {{ prettyNumber(replyCount) }} {{ if replyCount == 1 }}reply{{ else }}replies{{ end }}
+            </span>
+            <span class="hidden group-open:inline">
+              Hide {{ if replyCount == 1 }}reply{{ else }}replies{{ end }}
+            </span>
+          </summary>
+
+          {* Replies container *}
+          <div class="flex flex-col gap-6 mt-6">
+            {{ range .Replies }}
+              {{ include "twCommentsContainer" . }}
+            {{ end }}
+          </div>
+        </details>
+      {{- end -}}
+    {{- end -}}
+  </div>
+</div>

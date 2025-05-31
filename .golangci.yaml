@@ -1,0 +1,27 @@
+# -- .golangci.yaml
+# ref: https://github.com/golangci/golangci-lint/blob/HEAD/.golangci.reference.yml
+version: "2"
+
+linters:
+  # -- Default set of linters.
+  default: all
+
+  disable:
+    - depguard          # not particularly useful in our environment, maybe later
+    - exhaustruct       # not useful
+    - gochecknoglobals  # we use global variables
+    - ireturn           # not useful
+    - tagliatelle       # the pixiv API uses snake_case keys
+
+  settings:
+    # -- Go analyzer checking that the length of a variable's name matches its usage scope.
+    # ref: https://github.com/blizzy78/varnamelen
+    varnamelen:
+      # -- Optional list of variable declarations that should be ignored completely.
+      ignore-decls:
+        - w http.ResponseWriter
+        - r *http.Request
+        - ua string # abbreviation for "user agent"
+        - ok bool
+        - wg sync.WaitGroup
+        - k string

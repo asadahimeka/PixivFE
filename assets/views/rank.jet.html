@@ -1,0 +1,247 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twPagination" }}
+{{- import "blocks/twTabNavAlt" }}
+{{- import "blocks/twUnderlineNav" }}
+{{- import "blocks/twRadioGroup" }}
+{{- import "blocks/twSelect" }}
+{{- import "blocks/twModal" -}}
+
+{{- block twRankingNav(ctx) -}}
+  {{- Mode := isset(Queries.mode) ? Queries.mode : "daily" }}
+  {{- url := "/ranking?content=" + Content + "&mode=" + Mode + "&page=1" -}}
+
+  <div class="flex flex-col gap-8">
+    <div
+      class="flex items-end justify-center sm:justify-between h-fit"
+      aria-label="Date navigation"
+    >
+      <a
+        href="{{- url -}}&date={{- ctx.NextDate -}}"
+        class="hidden sm:flex"
+        {{- ctx.NextDate == "false" ? " aria-disabled=\"true\"" : "" -}}
+      >
+        <div class="filled-icon-button text-sm font-medium gap-2 !pe-4">
+          <span class="material-symbols-rounded-20">arrow_back</span>
+          <span class="hidden sm:inline">{{- ctx.NextDate -}}</span>
+        </div>
+      </a>
+      <div class="flex items-center gap-2 -me-12">
+        <div class="flex flex-col items-center">
+          <h1 class="text-neutral-400 font-medium">{{- ctx.Title -}}</h1>
+          <div class="text-2xl font-bold">{{- ctx.CurrentDate -}}</div>
+        </div>
+        <button
+          popovertarget="rankingOptions"
+          class="group flex items-center justify-center cursor-pointer hover:bg-neutral-800 rounded-full size-10 transition"
+        >
+          <span class="material-symbols-rounded-24">tune</span>
+        </button>
+
+        {{- yield twModal(id="rankingOptions", title="Options", widthClasses="w-full max-w-11/12 md:max-w-96") content -}}
+          <form action="/ranking" method="get">
+            <div class="flex flex-col h-fit gap-6">
+              <h3 class="text-neutral-300 text-sm font-medium">
+                Filter by
+              </h3>
+
+              <div class="flex justify-start gap-16 -mt-4">
+              {{- if Content == "all" }}
+                {{- name := "mode" }}
+                {{- values := slice(
+                                  "START_OPTGROUP",
+                                  "daily",
+                                  "weekly",
+                                  "monthly",
+                                  "rookie",
+                                  "START_OPTGROUP",
+                                  "daily_r18",
+                                  "weekly_r18",
+                                  "r18g",
+                                  "START_OPTGROUP",
+                                  "original",
+                                  "daily_ai",
+                                  "male",
+                                  "female",
+                                  "START_OPTGROUP",
+                                  "daily_r18_ai",
+                                  "male_r18",
+                                  "female_r18"
+                                  ) }}
+                {{- labels := slice(
+                                  "Time frame",
+                                  "Daily",
+                                  "Weekly",
+                                  "Monthly",
+                                  "Rookie",
+                                  "Time frame (R-18)",
+                                  "Daily (R-18)",
+                                  "Weekly (R-18)",
+                                  "Weekly (R-18G)",
+                                  "Specialized",
+                                  "Original",
+                                  "AI-generated",
+                                  "Popular among males",
+                                  "Popular among females",
+                                  "Specialized (R-18)",
+                                  "AI-generated (R-18)",
+                                  "Popular among males (R-18)",
+                                  "Popular among females (R-18)"
+                                  ) }}
+                {{- yield twSelect(name=name, values=values, labels=labels, activeState=Mode) }}
+              {{- else if Content != "ugoira" }}
+                {{- name := "mode" }}
+                {{- values := slice("daily", "weekly", "monthly", "rookie", "daily_r18", "weekly_r18", "r18g") }}
+                {{- labels := slice("Daily", "Weekly", "Monthly", "Rookie", "Daily (R-18)", "Weekly (R-18)", "Weekly (R-18G)") }}
+                {{- yield twSelect(name=name, values=values, labels=labels, activeState=Mode) }}
+              {{- else }}
+                {{- name := "mode" }}
+                {{- values := slice("daily", "weekly", "daily_r18", "weekly_r18", "r18g") }}
+                {{- labels := slice("Daily", "Weekly", "Daily (R-18)", "Weekly (R-18)", "Weekly (R-18G)") }}
+                {{- yield twSelect(name=name, values=values, labels=labels, activeState=Mode) }}
+              {{- end }}
+              </div>
+
+              <p class="text-xs text-neutral-400 text-nowrap -mt-4">
+                Works are ranked using a sliding window.
+              </p>
+
+              <h3 class="text-neutral-300 text-sm font-medium">
+                Date
+              </h3>
+
+              <div class="flex items-center gap-3 -mt-4">
+                <input
+                  id="date"
+                  name="date"
+                  type="date"
+                  value="{{- .Data.CurrentDate -}}"
+                  min="2007-09-13"
+                  class="form-control"
+                />
+              </div>
+
+              <!-- Hidden input for Content local variable -->
+              <input type="hidden" name="content" value="{{ Content }}" />
+
+              <div class="flex items-center justify-between gap-8">
+                <a href="/ranking" type="button" class="flex items-center w-fit cursor-pointer hover:bg-red-500/10 rounded-full text-red-300 fill-red-300 transition gap-2 px-3 py-2">
+                  <span class="material-symbols-rounded-20">reset_wrench</span>
+                  Reset
+                </a>
+                <button
+                  type="submit"
+                  class="filled-button font-medium gap-2"
+                >
+                  <span class="material-symbols-rounded-20">arrow_forward</span>
+                  Go
+                </button>
+              </div>
+            </div>
+          </form>
+        {{- end -}}
+      </div>
+      {{- if ctx.PrevDate != "false" -}}
+      <a
+        href="{{- url -}}&date={{- ctx.PrevDate -}}"
+        class="hidden sm:flex"
+      >
+        <div class="filled-icon-button text-sm font-medium gap-2 !ps-4">
+          <span class="hidden sm:inline">{{- ctx.PrevDate -}}</span>
+          <span class="material-symbols-rounded-20">arrow_forward</span>
+        </div>
+      </a>
+      {{- end -}}
+    </div>
+
+    <div class="flex sm:hidden items-center justify-between">
+      <a
+        href="{{- url -}}&date={{- ctx.NextDate -}}"
+        {{- ctx.NextDate == "false" ? " aria-disabled=\"true\"" : "" -}}
+      >
+        <div class="filled-icon-button text-sm font-medium gap-2 !pe-4">
+          <span class="material-symbols-rounded-20">arrow_back</span>
+          {{- ctx.NextDate -}}
+        </div>
+      </a>
+      <a
+        href="{{- url -}}&date={{- ctx.PrevDate -}}"
+      >
+        <div class="filled-icon-button text-sm font-medium gap-2 !ps-4">
+          {{- ctx.PrevDate -}}
+          <span class="material-symbols-rounded-20">arrow_forward</span>
+        </div>
+      </a>
+    </div>
+  </div>
+{{- end -}}
+
+{{- block body() }}
+
+{{- Mode := isset(Queries.mode) ? Queries.mode : "daily" }}
+{{- Content := isset(Queries.content) ? Queries.content : "all" }}
+
+<div class="grid grid-cols-10 w-full max-w-7xl gap-8 mx-auto">
+  <div class="col-span-10 flex flex-col gap-6">
+    {{- url := "" }}
+    {{- if Mode == "original" || Mode == "male" || Mode == "female" || Mode == ""}}
+      {{ url = "/ranking?date=" + .Data.CurrentDate + "&page=1&content=" }}
+      {{- else }}
+        {{- url = "/ranking?mode=" + "daily" + "&date=" + .Data.CurrentDate + "&page=1&content=" }}
+    {{- end }}
+    {{- paths := slice(
+                      "all",
+                      "illust",
+                      "ugoira",
+                      "manga"
+                      ) -}}
+    {{- names := slice(
+                      "Overall",
+                      "Illustrations",
+                      "Ugoira",
+                      "Manga"
+                      ) -}}
+    {{- icons := slice(
+                      `<span class="material-symbols-rounded-20">home</span>`,
+                      `<span class="material-symbols-rounded-20">image</span>`,
+                      `<span class="material-symbols-rounded-20">slideshow</span>`,
+                      `<span class="material-symbols-rounded-20">manga</span>`,
+                      ) }}
+    <div id="category-nav" class="text-sm border-neutral-800 border-b-2 *:-mb-[2px]">
+      {{- yield twUnderlineNav(baseURL=url, paths=paths, names=names, icons=icons, activeState=Content)}}
+    </div>
+
+    <div id="checkpoint" class="scroll-mt-20">
+      {{- yield twRankingNav(ctx=.Data) -}}
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {{- include "fragments/twRanking-tn" .Data.Contents }}
+    </div>
+
+    <!-- Pagination -->
+    {{- paginationURL := "/ranking?content=" + Content +"&date=" + .Data.CurrentDate + "&mode=" + Mode + "&page=" }}
+    {{- paginationData := createPaginator(paginationURL, "#checkpoint", .Page, .PageLimit, 0, 5) }}
+    {{- yield twPagination(data=paginationData) }}
+  </div>
+</div>
+
+<!-- Prefetch links -->
+{{- nextDateURL := "" }}
+{{- if Mode == "original" || Mode == "male" || Mode == "female" || Mode == ""}}
+  {{ nextDateURL = "/ranking?date=" + .Data.NextDate + "&page=1&content=" + Content }}
+  {{- else }}
+    {{- nextDateURL = "/ranking?mode=" + "daily" + "&date=" + .Data.NextDate + "&page=1&content=" + Content }}
+{{- end }}
+
+{{- prevDateURL := "" }}
+{{- if Mode == "original" || Mode == "male" || Mode == "female" || Mode == ""}}
+  {{ prevDateURL = "/ranking?date=" + .Data.PrevDate + "&page=1&content=" + Content }}
+  {{- else }}
+    {{- prevDateURL = "/ranking?mode=" + "daily" + "&date=" + .Data.PrevDate + "&page=1&content=" + Content }}
+{{- end }}
+
+<link rel="prefetch" href="{{- nextDateURL -}}">
+<link rel="prefetch" href="{{- prevDateURL -}}">
+
+<!-- End of main content -->
+{{- end }}

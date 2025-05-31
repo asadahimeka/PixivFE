@@ -1,0 +1,101 @@
+name: 🌐 Add instance
+description: Submit a new PixivFE instance to be added
+title: "Add instance: <domain name>"
+labels: instance/add
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Provide the following details about the PixivFE instance you would like to add. In the issue title, replace `<domain-name>` with the instance's actual domain name.
+
+  - type: input
+    id: domain-name
+    attributes:
+      label: Domain name
+      description: |
+        Provide the instance's [fully qualified domain name (FQDN)](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) without a period at the end.
+
+        Example: `pixivfe.example.com`
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: |
+        Provide the complete URL for accessing the instance, including the protocol (e.g. `https://` for HTTPS).
+
+        Example: `https://pixivfe.example.com/`.
+    validations:
+      required: true
+
+  - type: input
+    id: country
+    attributes:
+      label: Country
+      description: |
+        Provide the [ISO 3166-1 alpha-2 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements) for the country where the instance is hosted.
+
+        Example: Enter `US` for an instance hosted in the United States.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cloudflare
+    attributes:
+      label: Cloudflare proxy
+      description: |
+        Answer "Yes" if the instance uses Cloudflare as a proxy. If Cloudflare is only used for DNS resolution (shown as a gray cloud icon in the Cloudflare DNS dashboard), answer "No".
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: analytics
+    attributes:
+      label: Analytics
+      description: |
+        Answer "Yes" or "No" to indicate if the instance uses any analytics.
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+
+  - type: textarea
+    id: analytics-description
+    attributes:
+      label: Analytics description
+      description: |
+        If you answered "Yes" for analytics, describe what analytics platform or tools are used.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: alternative-access
+    attributes:
+      label: Alternative access methods
+      description: Select any alternative access methods available for this instance.
+      options:
+        - label: Tor onion service
+        - label: I2P eepsite
+        - label: Lokinet
+        - label: Other (please specify in the details below)
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternative-access-details
+    attributes:
+      label: Alternative access details
+      description: |
+        If you selected any alternative access methods above, please provide the following details:
+        - For Tor: The .onion address (e.g. `pixivfe.onion`)
+        - For I2P: The I2P address (e.g. `pixivfe.i2p`)
+        - For Lokinet: The .loki address (e.g. `pixivfe.loki`)
+        - For other methods: The method name and corresponding address
+    validations:
+      required: false

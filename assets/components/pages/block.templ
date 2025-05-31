@@ -1,0 +1,24 @@
+package pages
+
+// BlockData holds data specific to the block page.
+type BlockData struct {
+	Title      string
+	Reason     string
+	StatusCode int
+	Path       string
+}
+
+templ Block(pageData BlockData) {
+	<div class="flex flex-col justify-center h-fit max-w-212 text-sm gap-6">
+		<h1 class="text-2xl font-semibold">{ pageData.StatusCode } You have been blocked temporarily</h1>
+		<p class="text-neutral-200 -mt-2">
+			You were trying to access { pageData.Path }.
+		</p>
+		<p class="text-neutral-200 -mt-2">
+			For the following reason:
+		</p>
+		<div class="w-full bg-black border border-neutral-700 text-fuchsia-400 font-mono rounded-lg p-6">
+			{ pageData.Reason }
+		</div>
+	</div>
+}

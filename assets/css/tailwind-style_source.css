@@ -1,0 +1,845 @@
+/* Yet another front end framework rewrite */
+
+/*
+Compile this project with Tailwind v4.0:
+  tailwindcss -i assets/css/tailwind-style_source.css -o assets/css/tailwind-style.css --watch --minify
+*/
+@import "tailwindcss";
+
+@theme {
+  /* PixivFE color scale, derived from #7aa2f7 using uicolors.app */
+  --color-pixivfe-50: #eff4ff;
+  --color-pixivfe-100: #dce6fd;
+  --color-pixivfe-200: #c1d3fc;
+  --color-pixivfe-300: #96b8fa;
+  --color-pixivfe-400: #7aa2f7;
+  --color-pixivfe-500: #406cf1;
+  --color-pixivfe-600: #2b4de5;
+  --color-pixivfe-700: #2239d3;
+  --color-pixivfe-800: #2230ab;
+  --color-pixivfe-900: #212e87;
+  --color-pixivfe-950: #191f52;
+}
+
+/*
+Material symbols setup
+*/
+
+/*
+Material Symbols (unfilled)
+*/
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/material-symbols-rounded.woff2?v=15') format('woff2');
+}
+
+/* Base styles for unfilled variants */
+.material-symbols-rounded-16,
+.material-symbols-rounded-20,
+.material-symbols-rounded-24,
+.material-symbols-rounded-40,
+.material-symbols-rounded-48 {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
+  font-variation-settings: 'FILL' 0;
+}
+
+/* Size variants for unfilled icons */
+/*
+.material-symbols-rounded-16 is non-standard
+
+Currently only used for (update with any new uses):
+  - open_in_new
+  - collections_bookmark on twMangaSeries-tn
+  - collections_bookmark on twNovelSeries-tn
+  - popular search info button on tagOptions
+*/
+.material-symbols-rounded-16 {
+  font-size: 16px;
+  font-variation-settings: 'FILL' 0, 'opsz' 20;
+}
+
+.material-symbols-rounded-20 {
+  font-size: 20px;
+  font-variation-settings: 'FILL' 0, 'opsz' 20;
+}
+
+.material-symbols-rounded-24 {
+  font-size: 24px;
+  font-variation-settings: 'FILL' 0, 'opsz' 24;
+}
+
+.material-symbols-rounded-40 {
+  font-size: 40px;
+  font-variation-settings: 'FILL' 0, 'opsz' 40;
+}
+
+.material-symbols-rounded-48 {
+  font-size: 48px;
+  font-variation-settings: 'FILL' 0, 'opsz' 48;
+}
+
+/*
+Material Symbols (filled)
+
+NOTE: we generally prefer unfilled icons in the UI,
+      so we can use a leaner font file here by explicitly
+      defining the icons we want in the icon_names query parameter
+*/
+@font-face {
+  font-family: 'Material Symbols Rounded Fill';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/material-symbols-rounded-fill.woff2?v=7') format('woff2');
+}
+
+/* Base styles for filled variants */
+.material-symbols-rounded-fill-20,
+.material-symbols-rounded-fill-24,
+.material-symbols-rounded-fill-40,
+.material-symbols-rounded-fill-48 {
+  font-family: 'Material Symbols Rounded Fill';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
+  font-variation-settings: 'FILL' 1;
+}
+
+/* Size variants for filled icons */
+.material-symbols-rounded-fill-20 {
+  font-size: 20px;
+  font-variation-settings: 'FILL' 1, 'opsz' 20;
+}
+
+.material-symbols-rounded-fill-24 {
+  font-size: 24px;
+  font-variation-settings: 'FILL' 1, 'opsz' 24;
+}
+
+.material-symbols-rounded-fill-40 {
+  font-size: 40px;
+  font-variation-settings: 'FILL' 1, 'opsz' 40;
+}
+
+.material-symbols-rounded-fill-48 {
+  font-size: 48px;
+  font-variation-settings: 'FILL' 1, 'opsz' 48;
+}
+
+/*
+NOTE: Scale transforms cause massive lag on Chromium for some reason, so width transforms are used here instead
+      Using Tailwind's @apply uses the calc() function so that's avoided as well
+*/
+.animated-underline {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  transition: background-size 150ms ease-in-out;
+}
+
+.animated-underline:hover {
+  background-size: 100% 2px;
+}
+
+/*
+Alternate version of animated-underline that uses a pseudo-element
+to properly work with the visited: pseudo-state (visited:text-purple-400)
+but does not follow line breaks
+*/
+.animated-underline-alt {
+  position: relative;
+  text-decoration: none;
+}
+
+.animated-underline-alt::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: currentColor;
+  transition: width 150ms ease-in-out;
+}
+
+.animated-underline-alt:hover::after {
+  width: 100%;
+}
+
+.outline-glow {
+  @apply outline-2 outline-offset-4 outline-white/0 hover:outline-white transition-all;
+}
+
+.group-outline-glow {
+  @apply outline-2 outline-offset-4 outline-white/0 group-hover/image:outline-white transition-all;
+}
+
+.avatar-outline-glow-sm {
+  @apply outline-1 outline-offset-2 outline-white/0 hover:outline-white transition-all;
+}
+
+.avatar-outline-glow {
+  @apply outline-2 outline-offset-2 outline-white/0 hover:outline-white transition-all;
+}
+
+/*
+.outline-glow {
+  @apply outline-2 outline-offset-4 outline-transparent hover:outline-white hover:drop-shadow-[0_10px_8px_rgba(255,255,255,0.04),_0_4px_3px_rgba(255,255,255,0.1)] transition-all;
+}
+
+.group-outline-glow {
+  @apply outline-2 outline-offset-4 outline-transparent group-hover/image:outline-white group-hover/image:drop-shadow-[0_10px_8px_rgba(255,255,255,0.04),_0_4px_3px_rgba(255,255,255,0.1)] transition-all;
+}
+
+.avatar-outline-glow-sm {
+  @apply outline-1 outline-offset-2 outline-transparent hover:outline-white hover:drop-shadow-[0_4px_3px_rgba(255,255,255,0.07),_0_2px_2px_rgba(255,255,255,0.06)] transition-all;
+}
+
+.avatar-outline-glow {
+  @apply outline-2 outline-offset-2 outline-transparent hover:outline-white hover:drop-shadow-[0_4px_3px_rgba(255,255,255,0.07),_0_2px_2px_rgba(255,255,255,0.06)] transition-all;
+}
+*/
+
+/* .fade-bottom {
+  mask-image: linear-gradient(to bottom, oklch(0 0 0), oklch(0 0 0 / 0));
+  -webkit-mask-image: linear-gradient(to bottom, oklch(0 0 0), oklch(0 0 0 / 0));
+} */
+
+.fade-bottom-sharp {
+  mask-image: linear-gradient(to bottom,
+    oklch(0 0 0) 90%,
+    oklch(0 0 0 / 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(to bottom,
+    oklch(0 0 0) 90%,
+    oklch(0 0 0 / 0) 100%
+  );
+}
+
+.description a {
+  @apply hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 underline underline-offset-2 font-sans leading-normal tracking-normal
+}
+
+.emoji {
+  @apply size-6
+}
+
+.stamp {
+  @apply size-24 rounded object-cover
+}
+
+img:not(.emoji) {
+  @apply bg-neutral-800
+}
+
+code {
+  @apply font-mono text-fuchsia-400 rounded px-1 py-0.5
+}
+
+/* Loading indicator for hx-requests */
+/* ref: https://stackoverflow.com/questions/63787241/css-how-to-create-an-infinitely-moving-repeating-linear-gradient/63787567#63787567 */
+#loading-indicator {
+  background-image: repeating-linear-gradient(-0.25turn, #118bee 0vw, transparent 40vw);
+  opacity: 0;
+
+  &.htmx-request {
+    opacity: 1;
+  }
+}
+
+@keyframes rolling-something {
+  0% {
+    background-position-x: 0vw;
+  }
+  100% {
+    background-position-x: 40vw;
+  }
+}
+
+.htmx-indicator {
+  display: none;
+}
+.htmx-request .htmx-indicator {
+  display: inline;
+}
+.htmx-request.htmx-indicator {
+  display: inline;
+}
+
+.fade-in {
+  @apply duration-300 ease-out opacity-100 transition-opacity
+}
+
+.htmx-swapped-out-group {
+  @apply group-[.htmx-swapping]/swapped:opacity-0 duration-100 ease-in opacity-100 transition-opacity
+}
+
+.htmx-swapped-out {
+  @apply [.htmx-swapping]:opacity-0 duration-100 ease-in opacity-100 transition-opacity
+}
+
+.htmx-added-in {
+  @apply [.htmx-added]:opacity-0 duration-200 ease-out opacity-100 transition-opacity
+}
+
+/*
+For links inside a text body
+
+Add .text-color and .hover:text-color manually,
+should be one shade and two shades lighter than text body respectively
+*/
+.text-link {
+  @apply decoration-blue-400 underline decoration-1 hover:decoration-2 underline-offset-3 font-medium
+}
+
+/*
+.text-link but without an initial underline
+
+Prefer this class for text links that wrap across lines
+*/
+.text-link-alt {
+  @apply decoration-blue-400 no-underline hover:underline decoration-2 underline-offset-3 font-medium
+}
+
+/*
+For standalone text links not inside a text body, styling as a standard blue link
+*/
+.blue-link {
+  @apply text-blue-400 hover:text-blue-300 hover:underline decoration-1 underline-offset-3
+}
+
+/*
+Links in a breadcrumb element
+*/
+.breadcrumb-link {
+  @apply text-neutral-400 hover:text-neutral-100 hover:underline decoration-1 underline-offset-3 transition
+}
+
+/* Default popover styling */
+/* [popover] {
+  position: fixed;
+  inset: 0;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+  border: solid;
+  padding: 0.25em;
+  overflow: auto;
+  color: CanvasText;
+  background-color: Canvas;
+} */
+
+/*
+## Style guide
+
+  - Uses RFC 2119 definitions to indicate requirement levels because it works well here
+  - This design system is mostly guided by Refactoring UI, and somewhat based on Material Design 3 (https://m3.material.io/)
+
+### Typography
+
+#### Text emphasis hierarchy
+Text styles SHOULD (roughly) follow this hierarchy (from highest to lowest emphasis):
+
+1. Primary information (e.g. titles, headings)
+    - Size: text-3xl
+    - Weight: font-bold
+    - Color: text-neutral-100 or text-neutral-200
+
+2. Interactive elements (e.g. usernames, primary links)
+    - Size: text-lg
+    - Weight: font-bold for emphasis, font-medium otherwise
+    - Color: text-neutral-200 with hover:text-neutral-100
+
+3. Supporting content (e.g. metadata, counts)
+    - Size: text-sm
+    - Weight: Use font-semibold for emphasis, font-normal otherwise
+    - Color: text-neutral-300 to text-neutral-400
+
+4. Body content (e.g. descriptions)
+    - Size: text-base
+    - Weight: normal
+    - Color: text-neutral-300
+
+#### Text link states
+- For all text links, the following classes SHOULD be added:
+  - text-blue-400
+  - hover:text-blue-300
+
+- If an actual page navigation is afforded, the following classes SHOULD be added:
+  - .visited:text-purple-400
+  - .hover:visited:text-purple-300
+
+### Components & actions
+
+#### Button hierarchy guidelines
+- Two hierarchies of actions on a page?
+  -> Use .filled-button for primary action, .outlined-button for secondary actions
+
+- Two hierarchies but multiple primary actions?
+  -> Use .filled-button for main primary actions. Use .filled-button with smaller text (reduces button size) for less important primary actions, using layout and positioning to differentiate from main primary actions. Use .outlined-button for secondary actions.
+
+- Three hierarchies of actions on a page? (rare case, e.g. pagination with prev + next, page numbers, and go-to function)
+  -> Use .filled-button for primary action, .outlined-button for secondary actions, .tonal-button-neutral for tertiary actions
+
+- Single hierarchy of actions on a page, with none of them directly blocking user flows? (rare case, e.g. discovery pages)
+  -> Use .tonal-button-neutral for all actions, and consider clustering as a navigation component.
+
+- Text buttons: Use sparingly and only for actions that don't fit the main visual hierarchy of the page. These provide a low-emphasis alternative.
+  (ref: https://m3.material.io/components/buttons/specs#899b9107-0127-4a01-8f4c-87f19323a1b4)
+
+### Layout & spacing
+
+#### Spacing guidelines
+- .gap-* utilities with flexbox SHOULD be used over .space-* utilities wherever possible
+
+- .gap-8 (preferred) or .gap-10 for general page layout
+- .gap-6 for where grouping via a card component could exist
+- .gap-2, .gap-3, and .gap-4 for spacing between elements within a given component/area
+
+- Use .flex with .items-center for alignment of elements within a component/area
+
+#### Layout organization
+- A page MUST ensure that emphasis of information is properly degraded
+  - If all information has the same emphasis (text color, text size, font weight, etc), something has gone wrong and the UI needs to be reworked
+
+- How to establish visual hierarchy and group information?
+  - Primary information:
+    - SHOULD be styled using tiers 1 and 2 from the text emphasis hierarchy
+    - SHOULD be established and grouped using a prominent page position
+      - SHOULD NOT be grouped within a visible element (e.g. a card)
+
+  - Secondary information:
+    - SHOULD be styled using tiers 2, 3, and 4 from the text emphasis hierarchy
+    - MAY be grouped using filled cards with a shade lighter than the page background (i.e. .bg-neutral-800)
+      - When using a card, fill color SHOULD NOT receive opacity changes due to real-world lighting affecting contrast
+
+  - Tertiary information:
+    - SHOULD be styled using tiers 2, 3, and 4 from the text emphasis hierarchy
+    - MAY be grouped using using outlined cards (e.g. .border-neutral-700)
+
+- How to group information within a card?
+  - If using a filled card, fill SHOULD be added to the primary information segment with a shade lighter than the body of the card, beginning from 20 opacity then adding in steps of 20
+  - If using an outlined card, a horizontal rule with a border that is a single shade lighter than the surface beneath the card MAY be used (usually .border-neutral-800)
+    - Results from the <hr /> itself, as well as spacing via .gap-*
+
+### Usage of pixivfe color scale
+- Color accents via color-pixivfe-400 or lighter MAY be used to break up a monotonous page layout, however:
+  - Shades darker than color-pixivfe-400 MUST NOT be used
+  - Opacity changes to the pixivfe color scale MUST NOT be made
+  - The pixivfe color scale MUST NOT be used for fill (use for accents only)
+*/
+
+/*
+## Components
+
+These classes __do not__ define the following utilities:
+  - Text color  (text-color-*)
+  - Text size   (text-*)
+  - Font weight (font-*)
+  - Gap         (gap-*)
+  - Margin      (m-*)
+
+.*-icon-button classes adapt their padding at small viewport widths to properly accomodate a single icon.
+*/
+
+.outlined-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    border-1
+    border-neutral-600
+
+    /* Interactive states */
+    cursor-pointer
+    hover:border-neutral-500
+    hover:bg-neutral-700
+    active:bg-neutral-800
+    active:scale-95
+
+    /* Disabled states */
+    disabled:text-neutral-500
+    disabled:fill-neutral-500
+    disabled:border-neutral-800
+    disabled:cursor-not-allowed
+    disabled:hover:border-neutral-800
+    disabled:hover:bg-transparent
+    disabled:active:scale-100
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    py-2
+    px-3;
+}
+
+.outlined-icon-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    bg-transparent
+    border-1
+    border-neutral-600
+
+    /* Interactive states */
+    cursor-pointer
+    hover:border-neutral-500
+    hover:bg-neutral-700
+    active:bg-neutral-800
+    active:scale-95
+
+    /* Disabled states */
+    disabled:text-neutral-500
+    disabled:fill-neutral-500
+    disabled:border-neutral-800
+    disabled:cursor-not-allowed
+    disabled:hover:border-neutral-800
+    disabled:hover:bg-transparent
+    disabled:active:scale-100
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    p-2
+    sm:px-3;
+}
+
+.outlined-danger-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    border-1
+    border-red-400
+    text-red-400
+    fill-red-400
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-red-400/10
+    active:bg-red-400/20
+    active:scale-95
+
+    /* Disabled states */
+    /* TODO */
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    py-2
+    px-3;
+}
+
+.filled-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    bg-neutral-100
+    text-neutral-900
+    fill-neutral-900
+    border-0
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-neutral-300
+    active:bg-neutral-400
+    active:scale-95
+
+    /* Disabled states */
+    disabled:bg-neutral-100/50
+    disabled:cursor-not-allowed
+    disabled:active:scale-100
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    py-2
+    px-3;
+}
+
+.filled-icon-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    bg-neutral-100
+    text-neutral-900
+    fill-neutral-900
+    border-0
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-neutral-300
+    active:bg-neutral-400
+    active:scale-95
+
+    /* Disabled states */
+    disabled:bg-neutral-100/50
+    disabled:cursor-not-allowed
+    disabled:active:scale-100
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    p-2
+    sm:px-3;
+}
+
+.tonal-button-neutral {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    bg-neutral-800
+    text-neutral-200
+    border-0
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-neutral-300
+    hover:text-neutral-900
+    hover:fill-neutral-900
+    active:scale-95
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    py-2
+    px-3;
+}
+
+.tonal-icon-button-neutral {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-full
+    bg-neutral-800
+    text-neutral-200
+    border-0
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-neutral-300
+    hover:text-neutral-900
+    hover:fill-neutral-900
+    active:scale-95
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    p-2
+    sm:px-3;
+}
+
+/* For reference only, adapt shades according to the actual surface the component is on */
+.text-button {
+  @apply text-blue-400 hover:text-blue-300
+}
+
+/* Deprecated due to contrast/color scale issues; favor using .tonal-button-neutral instead */
+.tonal-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-lg
+    bg-pixivfe-400/25
+    text-pixivfe-50
+    border-0
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-pixivfe-400/50
+    active:bg-pixivfe-400/35
+    active:scale-95
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    py-2
+    px-3;
+}
+
+/* Deprecated due to contrast/color scale issues; favor using .tonal-icon-button-neutral instead */
+.tonal-icon-button {
+  @apply
+    /* Layout */
+    flex
+    items-center
+    w-fit
+    select-none
+
+    /* Appearance */
+    rounded-lg
+    bg-pixivfe-400/25
+    text-pixivfe-50
+    border-0
+
+    /* Interactive states */
+    cursor-pointer
+    hover:bg-pixivfe-400/50
+    active:bg-pixivfe-400/35
+    active:scale-95
+
+    /* Transitions */
+    transition
+
+    /* Spacing */
+    p-2
+    sm:px-3;
+}
+
+.badge-primary {
+  @apply flex border border-blue-500 bg-blue-500/10 text-white text-xs font-semibold rounded-lg px-2 py-1
+}
+
+.badge-primary.interactive {
+  @apply cursor-pointer transition hover:bg-blue-500/30 active:scale-95
+}
+
+.badge-warning {
+  @apply flex border border-yellow-500 bg-yellow-500/10 text-white text-sm font-semibold rounded-lg px-2 py-1
+}
+
+.badge-danger {
+  @apply flex border border-red-500 bg-red-500/10 text-white text-xs font-semibold rounded-lg px-2 py-1
+}
+
+.form-label {
+  @apply text-sm text-neutral-100 font-medium
+}
+
+/* Helper text directly under inputs */
+.form-text {
+  @apply text-xs text-neutral-400
+}
+
+/* Base styling for form inputs */
+.form-control, .form-select {
+  @apply
+    /* Typography */
+    text-sm
+    text-neutral-300
+    /* fill-neutral-300 */
+    placeholder:text-neutral-500
+    focus:placeholder:text-neutral-400
+
+    /* Appearance */
+    rounded
+    bg-neutral-800
+    border-neutral-500
+    focus:bg-neutral-700
+    focus:border-neutral-400
+    border
+
+    /* Spacing */
+    px-3
+    py-2;
+}
+
+.form-check {
+  @apply flex items-center gap-2
+}
+
+#novel-section {
+  max-height: 80vh;
+  margin: 0 auto; /* The Tailwind class didn’t apply! */
+}
+
+[data-font=mincho][data-font=jp] {
+  font-family: "Source Han Serif JP", "Noto Serif JP", "Yu Mincho", YuMincho, "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Source Han Serif", "BIZ UDMincho Medium", "Source Serif Pro", "Source Serif", "Noto Serif", "Times New Roman", "Georgia Pro", Georgia, Simsun, PMingLiu, AppleMyungjo, "Source Han Serif K", "Source Han Serif KR", "Noto Serif KR", Batang, serif;
+}
+[data-font=mincho][data-font=zh-cn],
+[data-font=mincho][data-font=zh-hans] {
+  font-family: "Songti SC", "Source Han Serif SC", "Noto Serif SC", "Source Han Serif CN", "Yu Mincho", YuMincho, "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Source Han Serif", "BIZ UDMincho Medium", "Source Serif Pro", "Source Serif", "Noto Serif", "Times New Roman", "Georgia Pro", Georgia, Simsun, PMingLiu, AppleMyungjo, "Source Han Serif K", "Source Han Serif KR", "Noto Serif KR", Batang, serif;
+}
+[data-font=mincho][data-font=zh-tw],
+[data-font=mincho][data-font=zh-hk],
+[data-font=mincho][data-font=zh-hant] {
+  font-family: "Songti TC", "Source Han Serif TC", "Noto Serif TC", "Source Han Serif TW", "Source Han Serif HK", "Yu Mincho", YuMincho, "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Source Han Serif", "BIZ UDMincho Medium", "Source Serif Pro", "Source Serif", "Noto Serif", "Times New Roman", "Georgia Pro", Georgia, Simsun, PMingLiu, AppleMyungjo, "Source Han Serif K", "Source Han Serif KR", "Noto Serif KR", Batang, serif;
+}
+[data-font=mincho] {
+  font-family: "Yu Mincho", YuMincho, "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Source Han Serif", "BIZ UDMincho Medium", "Source Serif Pro", "Source Serif", "Noto Serif", "Times New Roman", "Georgia Pro", Georgia, Simsun, PMingLiu, AppleMyungjo, "Source Han Serif K", "Source Han Serif KR", "Noto Serif KR", Batang, serif;
+}
+[data-font=gothic] {
+  font-family: YuGothic, "Hiragino Kaku Gothic Pro", Meiryo, "Source Han Sans", "Source Han Sans JP", "Noto Sans CJK JP", "Avenir Next", Avenir, "Source Sans", "Noto Sans", Roboto, Verdana, "Pingfang TC", "Pingfang HK", "Hiragino Sans CNS", "Lantinghei TC", "Source Han Sans TW", "Source Han Sans HK", "Noto Sans CJK TC", "Microsoft JhengHei", "Pingfang SC", "Hiragino Sans GB", "Lantinghei SC", "Source Han Sans CN", "Noto Sans CJK SC", "Microsoft Yahei", DengXian, "Apple SD Gothic Neo", "Source Han Sans K", "Source Han Sans KR", "Noto Sans CJK KR", "Malgun Gothic", sans-serif;
+}
+[data-view="2"] {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+/* TODO: add an option for pure sans, serif and... monospace? */

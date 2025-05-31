@@ -1,0 +1,102 @@
+{{- import "../blocks/twActionIndicator" }}
+{{- import "../blocks/twModal" -}}
+
+<div
+  class="flex items-center overflow-x-auto gap-2 pb-2 -mb-2"
+>
+  {{- if isset(.Illust.BookmarkData) && LoggedIn -}}
+    {{- include "../partials/deleteBookmarkPartial" . -}}
+    {{- else -}}
+    {{- include "../partials/addBookmarkPartial" . -}}
+  {{- end -}}
+
+  {{- if .Illust.Liked && LoggedIn -}}
+    {{- include "../partials/unlikePartial" . -}}
+    {{- else -}}
+    {{- include "../partials/likePartial" . -}}
+  {{- end -}}
+
+  {{ if .Illust.CommentOff }}
+    <button
+      disabled
+      class="outlined-button text-sm font-medium gap-2"
+      title="The creator has turned comments off."
+    >
+      <span class="material-symbols-rounded-20">comments_disabled</span>
+    </button>
+  {{ else }}
+    <button popovertarget="comments" class="outlined-button text-sm font-medium gap-2">
+      <span class="material-symbols-rounded-20">comment</span>
+      {{ prettyNumber(.Illust.Comments) }}
+    </button>
+
+    {* Comments section *}
+    {* if we have htmx capability, async load the comments section, otherwise just load them normally *}
+    {{ if IsHtmxRequest }}
+      <div
+        id="tw-artwork-comments"
+        class="htmx-swapped-out contents"
+        hx-get="/api/v1/comments?type=artwork&id={{ .Illust.ID }}&userid={{- .Illust.UserID -}}&sanitylevel={{- .Illust.SanityLevel -}}"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="outerHTML swap:100ms settle:200ms show:none"
+      >
+      </div>
+    {{ else }}
+      {{ include "modals/comments" .Illust.CommentsData }}
+    {{ end }}
+  {{ end }}
+
+  <button
+    popovertarget="sharingMenu"
+    class="outlined-button text-sm font-medium gap-2"
+  >
+    <span class="material-symbols-rounded-20">share</span>
+    Share
+  </button>
+
+  {* #shareMenu is borked for some reason *}
+  {{- yield twModal(id="sharingMenu", title="Share", widthClasses="") content -}}
+    <label for="share_permalink" class="form-label -mb-2">Permalink</label>
+    <div class="flex items-center gap-2">
+      <input
+        id="share_permalink"
+        type="text"
+        readonly
+        value="{{ BaseURL + CurrentPath }}"
+        class="form-control w-full"
+      />
+      <div
+        class="filled-button text-xs font-medium"
+        hx-on:click="
+              navigator.clipboard.writeText(this.previousElementSibling.value);
+              this.textContent = 'Copied!';
+              setTimeout(() => { this.textContent = 'Copy'; }, 3000)
+            "
+      >
+        Copy
+      </div>
+    </div>
+
+    <label for="share_artwork_id" class="form-label -mb-2">Artwork ID</label>
+    <div class="flex items-center gap-2">
+      <input
+        id="share_artwork_id"
+        type="text"
+        readonly
+        value="{{ .Illust.ID }}"
+        class="form-control w-full"
+      />
+      <div
+        class="filled-button text-xs font-medium"
+        hx-on:click="
+              navigator.clipboard.writeText(this.previousElementSibling.value);
+              this.textContent = 'Copied!';
+              setTimeout(() => { this.textContent = 'Copy'; }, 3000)
+            "
+      >
+        Copy
+      </div>
+    </div>
+  {{- end -}}
+</div>

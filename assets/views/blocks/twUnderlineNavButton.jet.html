@@ -1,0 +1,33 @@
+{*
+This is a variant of twUnderlineNavInput. Basically the same component
+but for IDs navigation.
+*}
+
+{{- block twUnderlineNavButton(ids, names) -}}
+
+<div id="category-nav" class="text-sm border-neutral-700 border-b">
+  <div class="grid grid-flow-col auto-cols-min justify-items-start overflow-x-auto gap-2 -mb-[1px]">
+    {{- range i, k := ids -}}
+      <div>
+        {* NOTE: lack of hover: styling is intentional *}
+        <div
+          class="select-none pb-1
+                border-transparent border-b-3 peer-checked:border-pixivfe-400
+                font-medium peer-checked:font-semibold
+                text-neutral-200 [&_.material-symbols-rounded-20]:text-neutral-400
+                peer-checked:text-neutral-100 peer-checked:[&_.material-symbols-rounded-20]:text-neutral-300"
+        >
+          <a
+            href="#{{- ids[i] -}}"
+            class="cursor-pointer flex items-center
+                hover:bg-neutral-700 rounded-lg px-3 py-2 w-max gap-2 transition"
+          >
+            {* wrapping with raw() for icon support *}
+            {{- raw(names[i]) -}}
+          </a>
+        </div>
+      </div>
+    {{- end -}}
+  </div>
+</div>
+{{- end -}}

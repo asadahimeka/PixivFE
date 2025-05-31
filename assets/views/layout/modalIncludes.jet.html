@@ -1,0 +1,55 @@
+{* modal includes *}
+
+{* -- non-modal popovers -- *}
+
+{* user menu popover *}
+{{- try -}}
+  {{ include "../fragments/modals/userMenu" . }}
+{{- end -}}
+
+{* -- modal popovers -- *}
+
+{*
+NOTE: using try blocks for these popovers so that Jet doesn't die when the data doesn't exist
+
+      .pointer-events-none and .open:pointer-events-auto are added due to .flex being needed for transitions
+
+      .-z-1 and .open:z-999 could be applied but seem redundant
+*}
+
+{{- try -}}
+  {{ include "../fragments/modals/sidebar" . }}
+{{- end -}}
+
+{* comments modal *}
+{* NOTE: included in the actual artwork page as it needs to render with the full content, not on the initial page load *}
+
+{* share menu modal *}
+{{- try -}}
+  {{ include "../fragments/modals/shareMenu" . }}
+{{- end -}}
+
+{* ranking options modal *}
+{{- try -}}
+  {{ include "../fragments/modals/rankingOptions" . }}
+{{- end -}}
+
+{* ranking calendar options modal *}
+{{- try -}}
+  {{ include "../fragments/modals/rankingCalendarOptions" . }}
+{{- end -}}
+
+{* tag options modal *}
+{{- try -}}
+  {{ include "../fragments/modals/tagOptions" . }}
+{{- end -}}
+
+{* user profile modal *}
+{{- try -}}
+  {{ include "../fragments/modals/userProfile" . }}
+{{- end -}}
+
+{* search bar modal *}
+{{- try -}}
+  {{ include "../fragments/modals/searchMenu" . }}
+{{- end -}}

@@ -1,0 +1,145 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twFollowButtons" }}
+
+{{- block body() }}
+
+{{- if !.LoggedIn }}
+<div class="flex flex-col w-full max-w-7xl gap-8 mx-auto">
+
+  <div class="bg-blue-100 border-t-4 border-blue-500 rounded-b
+	      text-blue-900 px-4 py-3 mx-auto shadow-md max-w-lg" role="alert">
+    <div class="flex">
+      <div class="py-1"><span class="material-symbols-rounded-20">info</span></div>
+      <div>
+	<p class="font-bold">You are not logged in.</p>
+	<p class="text-sm">Log in with your Pixiv account for more
+	personalized contents and features!</p>
+      </div>
+    </div>
+  </div>
+
+  <h1 class="text-2xl font-bold">Today's rankings</h1>
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-6">
+    {{- include "fragments/twSmall-tn" .Data.Rankings.Contents }}
+  </div>
+  <h1 class="text-2xl font-bold">Newest articles on pixivision</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {{- range .Data.Pixivision }}
+      <div>
+        <div>
+          <a href="/pixivision/a/{{ .ID }}" class="w-fit">
+            <img src="{{ .Thumbnail }}" alt="{{ .Title }}" />
+          </a>
+        </div>
+        <div>
+          <a href="/pixivision/a/{{ .ID }}" class="w-fit">
+            <div class="text-lg font-bold text-neutral-200
+            hover:text-neutral-100 animated-underline">{{ .Title }}</div>
+          </a>
+        </div>
+      </div>
+    {{- end }}
+  </div>
+
+  {*
+  <h1 class="text-2xl font-bold">Newest works</h1>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+    {{- include "fragments/twSmall-tn" .Data.Newest }}
+  </div>
+  *}
+</div>
+
+{{- else }}
+<div class="flex flex-col w-full max-w-7xl gap-8 mx-auto">
+  <h1 class="text-2xl font-bold">Newest works you're following</h1>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+  {{- if len(.Data.Following) > 0 }}
+    {{- include "fragments/twSmall-tn" .Data.Following }}
+  {{- end }}
+  </div>
+
+  <a href="/self/followingWorks" class="peer-checked:!hidden filled-button font-medium mx-auto">
+    View more
+  </a>
+
+  <h1 class="text-2xl font-bold">Recommended works</h1>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+    {{- include "fragments/twSmall-tn" .Data.Recommended }}
+  </div>
+
+  <h1 class="text-2xl font-bold">Recommended users</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {{- range .Data.RecommendUser }}
+    <div>
+      {* For user's avatar and info *}
+      <div class="flex justify-between gap-1 mb-2">
+	<a href="/users/{{ .ID }}" title="{{ .Name }}"
+	   class="aspect-square object-cover rounded-full size-14 mr-2 avatar-outline-glow">
+	  <img src="{{ .Avatar }}" alt="{{ .Name }}'s avatar"
+	       class="size-14 aspect-square rounded-full">
+	</a>
+
+	<div class="w-full">
+	  <div class="flex gap-4 justify-between items-center">
+	    <a href="/users/{{ .ID }}" class="text-xl font-bold
+	    line-clamp-1 text-ellipsis animated-underline-alt">{{ .Name }}</a>
+	    {{ yield twFollowButtons(data=., style="filled") }}
+	  </div>
+	  {{- if .Comment }}
+	  <small class="text-sm line-clamp-1 text-ellipsis">{{ raw: parsePixivRedirect(.Comment) }}</small>
+	  {{- end }}
+	</div>
+      </div>
+
+
+      {* For artworks *}
+      <div class="flex flex-wrap justify-around">
+	{{- range .Artworks }}
+	<div class="flex flex-col w-3/10">
+	  {{- include "fragments/twThumbnail-dt" . }}
+	  <div class="py-[2px]"></div>
+	  {{- include "fragments/twThumbnail-tt" . }}
+	</div>
+	{{- end }}
+      </div>
+    </div>
+    {{- end }}
+  </div>
+
+  <h1 class="text-2xl font-bold">Popular tags</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {{- range .Data.PopularTag }}
+    {* NOTE: Trending indicator not implemented yet *}
+    <div class="flex flex-col gap-4 w-full">
+      <a href="/tags/{{ .Name }}" class="text-lg font-bold
+      hover:visited:text-purple-300 visited:text-purple-400
+      hover:text-blue-300 text-blue-400 animated-underline-alt w-fit">#{{ .Name }}</a>
+      <div class="flex flex-wrap
+		  {{ if len(.Artworks) < 3 }} gap-6 {{ else }} justify-around {{ end }}">
+	{{- range .Artworks }}
+	<div class="flex flex-col w-3/10">
+	  {{- include "fragments/twThumbnail-dt" . }}
+	  {{- include "fragments/twThumbnail-tt" . }}
+	</div>
+	{{- end }}
+      </div>
+    </div>
+    {{- end }}
+  </div>
+
+  {{- range .Data.RecommendByTags }}
+    <h2 class="text-xl font-bold">Recommended illustrations tagged <a href="/tags/{{ .Name }}" class="hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 font-medium animated-underline-alt">#{{ .Name }}</a></h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+      {{- include "fragments/twSmall-tn" .Artworks }}
+    </div>
+  {{- end }}
+
+
+  <h1 class="text-2xl font-bold">Newest works</h1>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+    {{- include "fragments/twSmall-tn" .Data.Newest }}
+  </div>
+
+</div>
+{{- end }}
+{{- end }}

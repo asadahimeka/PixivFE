@@ -1,0 +1,146 @@
+{{- block twFollowButtons(data, style) -}}
+  {{- if data.IsFollowed && LoggedIn -}}
+    <form
+      action="/api/v1/follow"
+      method="post"
+      hx-delete="/api/v1/follow"
+      hx-target="this"
+      hx-target-4*="body"
+      hx-swap="outerHTML show:none"
+      hx-push-url="false"
+    >
+      <!-- action FormValue for backwards compatibility with POST -->
+      <input
+        type="hidden"
+        id="unfollowAction-{{ data.ID }}"
+        name="action"
+        class="hidden"
+        value="unfollow"
+      >
+
+      <input
+        type="hidden"
+        id="unfollowUserID-{{ data.ID }}"
+        name="user_id"
+        class="hidden"
+        value="{{ data.ID }}"
+      >
+
+      <input
+        type="hidden"
+        id="unfollowReturnPath-{{ data.ID }}"
+        name="return_path"
+        class="hidden"
+        value='{{ if HtmxCurrentPath != "" }} {{- HtmxCurrentPath -}} {{ else }} {{- CurrentPath -}} {{ end }}'
+      >
+
+      <button type="submit" class="outlined-button text-sm font-medium gap-2">
+        <span class="material-symbols-rounded-20">person_off</span>
+        <span class="inline">Unfollow</span>
+      </button>
+    </form>
+    {{- else -}}
+    <form
+      action="/api/v1/follow"
+      method="post"
+      hx-put="/api/v1/follow"
+      hx-target="this"
+      hx-target-4*="body"
+      hx-swap="outerHTML show:none"
+      hx-push-url="false"
+    >
+      <div class="flex items-center group/followPrivacyToggle">
+        <!-- action FormValue for backwards compatibility with POST -->
+        <input
+          type="hidden"
+          id="followAction-{{ data.ID }}"
+          name="action"
+          class="hidden"
+          value="follow"
+        >
+
+        <input
+          type="hidden"
+          id="followUserID-{{ data.ID }}"
+          name="user_id"
+          class="hidden"
+          value="{{ data.ID }}"
+        >
+
+        <input
+          type="checkbox"
+          id="followPrivacyToggle-{{ data.ID }}"
+          name="private"
+          class="hidden"
+        >
+
+        <input
+          type="hidden"
+          id="followReturnPath-{{ data.ID }}"
+          name="return_path"
+          class="hidden"
+          value='{{ if HtmxCurrentPath != "" }} {{- HtmxCurrentPath -}} {{ else }} {{- CurrentPath -}} {{ end }}'
+        >
+
+        {{ if style == "outlined"}}
+          <!-- Follow button -->
+          <button type="submit" class="flex items-center w-fit rounded-s-full select-none bg-transparent border-1 border-neutral-600 hover:border-neutral-500 text-neutral-100 text-sm font-medium cursor-pointer hover:bg-neutral-700 active:bg-neutral-800 transition-all gap-2 py-2 px-3 -me-[1px]">
+            <span class="material-symbols-rounded-20">person_add</span>
+            <span class="inline">Follow</span>
+          </button>
+
+          <label
+            for="followPrivacyToggle-{{ data.ID }}"
+            class="group hover:text-neutral-300 hover:fill-neutral-300 flex items-center w-fit rounded-e-full select-none bg-transparent border-1 border-neutral-600 hover:border-neutral-500 text-neutral-400 fill-neutral-400 text-sm font-medium cursor-pointer hover:bg-neutral-700 active:bg-neutral-800 transition-all gap-2 py-2 px-3">
+
+            <!-- Public icon -->
+            <span
+              class="material-symbols-rounded-20
+                    group-has-[input:checked]/followPrivacyToggle:!hidden !inline"
+            >
+              visibility
+            </span>
+
+            <!-- Private icon -->
+            <span
+              class="material-symbols-rounded-20
+                    group-has-[input:checked]/followPrivacyToggle:!inline !hidden"
+            >
+              visibility_off
+            </span>
+          </label>
+          {{ else if style == "filled" }}
+          <!-- Follow button -->
+          <button
+            type="submit"
+            class="flex items-center w-fit rounded-s-full select-none bg-neutral-100 hover:bg-neutral-300 active:bg-neutral-400 text-neutral-900 fill-neutral-900 text-sm font-medium cursor-pointer transition gap-2 py-2 px-3 me-[1px]"
+          >
+            <span class="material-symbols-rounded-20">person_add</span>
+            <span class="inline">Follow</span>
+          </button>
+
+          <label
+            for="followPrivacyToggle-{{ data.ID }}"
+            class="flex items-center w-fit rounded-e-full select-none bg-neutral-100 hover:bg-neutral-300 active:bg-neutral-400 text-neutral-900 fill-neutral-900 text-sm font-medium cursor-pointer transition gap-2 py-2 px-3"
+          >
+            <!-- Public icon -->
+            <span
+              class="material-symbols-rounded-20
+                    group-has-[input:checked]/followPrivacyToggle:!hidden !inline"
+            >
+              visibility
+            </span>
+
+            <!-- Private icon -->
+            <span
+              class="material-symbols-rounded-20
+                    group-has-[input:checked]/followPrivacyToggle:!inline !hidden"
+            >
+              visibility_off
+            </span>
+          </label>
+        {{ end }}
+      </div>
+    </form>
+  {{- end -}}
+{{- end -}}

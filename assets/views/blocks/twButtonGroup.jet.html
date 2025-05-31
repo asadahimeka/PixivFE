@@ -1,0 +1,33 @@
+{{- block twButtonGroup(baseURL, paths, names, icons, activeState="") -}}
+<div class="flex flex-row w-fit max-w-full border border-neutral-600 rounded-full text-nowrap overflow-x-auto">
+  {{- range i, k := paths -}}
+    <a
+      class="flex items-center px-4 py-2 text-sm transition
+             {{ i == 0 ? "rounded-s-full" : "" }}
+             {{ i == len(paths) - 1 ? "rounded-e-full" : "border-e" }}
+             border-neutral-600
+             {{ activeState == k ? "bg-neutral-800 hover:bg-neutral-700 text-neutral-100 font-medium" : "hover:bg-neutral-800 text-neutral-200 hover:text-neutral-100 font-medium" }}"
+      href="{{ baseURL }}{{k}}"
+    >
+      {{ names[i] }}
+    </a>
+  {{- end -}}
+</div>
+{{- end -}}
+
+{{- block twButtonGroup_r18(baseURL, paths, names, icons, activeState="") -}}
+<div class="flex flex-row w-fit max-w-full border border-red-500/50 rounded-full text-nowrap overflow-x-auto">
+  {{- range i, k := paths -}}
+    <a
+      class="flex items-center px-4 py-2 text-sm transition
+             {{ i == 0 ? "rounded-s-full" : "" }}
+             {{ i == len(paths) - 1 ? "rounded-e-full" : "border-e" }}
+             border-red-500/50  font-medium
+             {{ activeState == k ? "bg-red-700/10 hover:bg-red-700/20 text-red-100" : "hover:bg-red-700/10 text-red-200 hover:text-red-100" }}"
+      href="{{ baseURL }}{{k}}"
+    >
+      {{ names[i] }}
+    </a>
+  {{- end -}}
+</div>
+{{- end -}}

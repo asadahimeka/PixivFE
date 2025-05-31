@@ -1,0 +1,83 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/novelnav" }}
+{{- block body() }}
+
+{{ fontType := .FontType }}
+{{ viewMode := .ViewMode }}
+
+<!-- Prefetch links -->
+<link rel="prefetch" href="/users/{{ .User.ID }}/novels">
+{{- if .Novel.SeriesNavData }}
+<link rel="prefetch" href="/novel/series/{{ .Novel.SeriesNavData.SeriesID }}">
+{{- end }}
+
+<div class="flex flex-col w-full max-w-7xl gap-8 mx-auto">
+  <div class="relative flex flex-col rounded-lg w-full bg-neutral-800
+                                 gap-4 p-5">
+    <div class="flex">
+      <div class="p-5">
+        <a href="{{ .Novel.CoverURL }}">
+          <img src="{{ .Novel.CoverURL }}" alt="{{ .Novel.Title }}
+          cover" style="max-width: 250px;" />
+        </a>
+      </div>
+      <div class="flex flex-col gap-4 my-2 justify-between">
+        <div class="flex flex-col gap-4">
+          <!-- Title -->
+          <h1 class="text-2xl font-bold">{{ .Novel.Title }}</h1>
+          <!-- User -->
+          {{- include "fragments/twAvatarUser" .User }}
+        </div>
+        <div>
+          <p class="text-neutral-200 text-sm/6">
+          <span>{{ .Novel.WordCount }} word(s)</span> &middot; <span>{{
+            floor: .Novel.ReadingTime / 60 }} mins</span>
+          </p>
+          <div class="flex flex-wrap text-sm items-baseline gap-2 mt-2">
+            {{- if .Novel.AiType == 2 -}}
+            <div class="badge-warning">AI-generated</div>
+            {{- end -}}
+            {{- range .Novel.Tags.Tags -}}
+              <!-- Early block to catch the R-18 tag -->
+              {{- if isEmphasize(.Name) -}}
+              <div class="badge-danger">{{ .Name -}}</div>
+              {{- end -}}
+            {{- end -}}
+            {{- range .Novel.Tags.Tags -}}
+              {{- if isEmphasize(.Name) -}}
+              <!-- Intentionally empty to avoid duplication -->
+              {{- else -}}
+              <div class="flex flex-wrap items-baseline gap-x-1">
+                <a href="/tags/{{ escapeString(.Name) -}}" class="hover:visited:text-purple-300 visited:text-purple-400 hover:text-blue-300 text-blue-400 font-medium animated-underline-alt">#{{ .Name -}}</a>
+              </div>
+              {{- end -}}
+            {{- end -}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Description -->
+    <details>
+      <summary>Description</summary>
+        <p>
+          {{- raw: parsePixivRedirect(.Novel.Description) -}}
+        </p>
+    </details>
+  </div>
+  <a href="/settings?showtab=cat-nav-novels" class="outlined-button text-sm font-medium gap-2">
+    <span class="material-symbols-rounded-fill-20">settings</span>
+    Novel page settings
+  </a>
+
+  <div id="novel-section"
+       data-font="{{ .FontType }}"
+       data-view="{{ .ViewMode }}"
+       data-lang="{{ .Language }}" class="flex flex-col rounded-lg
+       w-full mx-2 bg-neutral-800 gap-4 p-5 overflow-auto text-[1.4rem] leading-[1rem]" >
+    <p>
+      {{- raw(parseNovelContent(.Novel.Content)) }}
+    </p>
+  </div>
+</div>
+
+{{- end }}

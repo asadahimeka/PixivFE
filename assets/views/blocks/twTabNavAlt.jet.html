@@ -1,0 +1,35 @@
+{{- block twTabNavAlt(baseURL, paths, names, icons, categoryCounts, activeState="") -}}
+
+{{- effectivePaths := 0 -}}
+{{- range i := paths -}}
+  {{- if categoryCounts[i] > 0 -}}
+    {{- effectivePaths = effectivePaths + 1 -}}
+  {{- end -}}
+{{- end -}}
+
+<div class="flex flex-row {{ if effectivePaths > 3 }}justify-start sm:justify-center{{ else }}justify-center{{ end }} items-end gap-4 w-full sm:px-8 mx-auto {{ if effectivePaths > 3 }}overflow-x-scroll fade-right pe-16{{ end }}">
+  {{- range i, k := paths -}}
+    {{- if categoryCounts[i] > 0 }}
+      <div class="flex flex-col items-center h-fit w-20 gap-2 mx-2">
+        <a href="{{ baseURL }}{{k}}" class="flex size-fit">
+          <div
+            class="{{- activeState == k ? "text-pixivfe-200 fill-pixivfe-200" : "text-neutral-300 fill-neutral-300" }}
+            flex flex-col items-center size-fit text-sm font-medium hover:fill-neutral-50 hover:text-neutral-50 hover:bg-neutral-700 rounded-lg transition p-2 gap-1"
+            {{ activeState == k ? `aria-current="page"` : "" }}
+          >
+            {{ if icons[i] != "" }}
+              {{ raw(icons[i]) }}
+            {{ end }}
+            {{ names[i] }}
+          </div>
+        </a>
+        {{ if activeState == k }}
+          <div class="border-t-4 rounded-t-full border-pixivfe-200 w-8/12"></div>
+          {{ else }}
+          <div class="border-t-4 rounded-t-full border-transparent w-8/12"></div>
+        {{ end }}
+      </div>
+    {{- end -}}
+  {{- end -}}
+</div>
+{{- end -}}

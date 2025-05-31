@@ -1,0 +1,17 @@
+{* the conditional goes here since we only know whether there are related works or not by doing a pixiv API call *}
+{{- if len(.Illust.RelatedWorks) != 0 }}
+  <hr class="border-neutral-800 my-6">
+
+  <div class="text-xl font-bold">
+    Related works
+  </div>
+  {*
+  <div class="text-xs text-neutral-500 -mt-7">
+    Recommended based on this work's content and user activity.
+  </div>
+  *}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 starting:opacity-0 opacity-100 transition gap-6 -mt-2">
+    {{- include "twSmall-tn" .Illust.RelatedWorks }}
+  </div>
+{{ end }}

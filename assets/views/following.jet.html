@@ -1,0 +1,41 @@
+{{- extends "layout/twDefault" -}}
+{{- import "blocks/twTabNavAlt" -}}
+{{- import "blocks/twPillNav" -}}
+{{- import "blocks/twPagination" -}}
+
+{{- block body() -}}
+
+<div id="checkpoint" class="flex flex-col w-full max-w-7xl gap-8 scroll-mt-20">
+  <div class="flex flex-row items-center gap-4">
+    {{- Mode := isset(Queries.mode) ? Queries.mode : "safe" -}}
+    {{- url := "/self/followingWorks" + "?mode=" -}}
+    {{- path := slice("all", "safe", "r18") -}}
+    {{- name := slice("All", "Safe", "R-18") -}}
+    {{- fragment := "" -}}
+    {{- yield twPillNav(baseURL=url, paths=path, names=name, activeState=Mode) -}}
+
+    <a
+      href="/discovery"
+      class="border border-neutral-700 text-neutral-200 flex items-center w-fit hover:text-neutral-900 hover:bg-neutral-300 active:scale-95 text-sm font-semibold rounded-full px-6 py-1.5 transition"
+    >
+      Reset
+    </a>
+  </div>
+
+  {{- if len(.Data.Body.Thumbnails.Illust) > 0 -}}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      {{- include "fragments/twSmall-tn" .Data.Body.Thumbnails.Illust -}}
+    </div>
+    {{- else -}}
+    <p class="text-neutral-300">Nothing here yet&#8212;find a user to follow!</p>
+  {{- end -}}
+
+  <!-- Pagination -->
+  {{- if len(.Data.Body.Thumbnails.Illust) > 0 -}}
+    {{- url :=  "/self/followingWorks" + "?mode=" + .Mode + "&page=" -}}
+    {{- paginationData := createPaginator(url, "#checkpoint", .Page, -1, 1, 5) -}}
+    {{- yield twPagination(data=paginationData) -}}
+  {{- end -}}
+</div>
+
+{{- end -}}

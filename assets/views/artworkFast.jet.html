@@ -1,0 +1,36 @@
+{{- extends "layout/twDefault" }}
+{{- import "blocks/twImageDisplay" }}
+
+{{- block body() }}
+
+{{ visualEffectsEnabled := CookieList["pixivfe-VisualEffectsEnabled"] }}
+
+{{ relativeTimeData := relativeTime(.Illust.Date) }}
+
+<!-- Prefetch links -->
+<!-- <link rel="prefetch" href="/users/{{ .Illust.User.ID }}" /> -->
+
+<div class="flex flex-col w-full max-w-7xl gap-8">
+  <div
+    id="tw-artwork"
+    class="group/swapped flex flex-col gap-8"
+    hx-get="/api/v1/artwork?id={{ .Illust.ID }}&userid={{ .Illust.UserID }}&illusttype={{- .Illust.IllustType -}}&pages={{- .Illust.Pages -}}&webpurl={{- .Illust.Images[0].MasterWebp_1200 -}}"
+    hx-trigger="load"
+    hx-target="this"
+    hx-swap="outerHTML swap:100ms settle:200ms show:none"
+  >
+    {{- include "fragments/twArtworkDisplay" .Illust -}}
+
+    {{- include "fragments/twArtworkTitle" .Illust -}}
+
+    <div class="htmx-swapped-out-group flex flex-wrap items-start sm:items-center justify-between w-full gap-6 -mt-4">
+      <div class="block rounded bg-neutral-800 animate-pulse w-[300px] h-12"></div>
+
+      <div class="block rounded bg-neutral-800 animate-pulse w-[380px] h-12"></div>
+    </div>
+
+    <div class="htmx-swapped-out-group block rounded bg-neutral-800 animate-pulse w-full h-[181px] -mt-2"></div>
+  </div>
+</div>
+
+{{- end }}

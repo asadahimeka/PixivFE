@@ -1,0 +1,14 @@
+<div class="flex flex-nowrap overflow-x-auto fade-right-sharp gap-2 pe-24 pb-4 -mb-4 -mt-2">
+  {{- range . }}
+    <a href="/tags/{{ escapeString(.Name) }}" class="group">
+      <div class="flex flex-col items-center h-full group-hover:bg-neutral-800 rounded gap-1 px-3 py-2 transition">
+        <div href="/tags/{{ escapeString(.Name) }}" class="text-sm font-semibold visited:text-purple-400 text-blue-400 text-nowrap transition">#{{ .Name }}</div>
+        {{- if .TagTranslations.En -}}
+          <div class="text-xs text-neutral-300 text-nowrap">({{ .TagTranslations.En }})</div>
+          {{- else -}}
+          <div class="text-xs text-neutral-500 text-nowrap">&#8212;</div>
+        {{- end -}}
+      </div>
+    </a>
+  {{- end }}
+</div>

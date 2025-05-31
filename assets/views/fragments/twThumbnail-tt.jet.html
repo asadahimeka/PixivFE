@@ -1,0 +1,32 @@
+{*
+  This fragment (twThumbnail-tt.jet.html) templates in the artwork title
+*}
+
+{{- target := CookieList["pixivfe-ThumbnailToNewTab"] -}}
+
+{* Initialize fields with fallback values *}
+{{- Pages := 1 -}}
+{{- illustType := 0 -}}
+{{- artistId := "" -}}
+
+{{- try -}}
+  {{- artistId = .UserID -}}
+  {{- Pages = .Pages -}}
+  {{- illustType = .IllustType -}}
+{{ catch -}}
+  {{- artistId = .AuthorDetails.UserID -}}
+  {{- Pages = .PageCount -}}
+  {{- illustType = .Type -}}
+{{- end -}}
+
+<a
+  target="{{ target }}"
+  href="/artworks/{{ .ID }}"
+  title="{{ .Title }}"
+  class="w-fit"
+  hx-headers='{ "Fast-Request": "true", "Artwork-ID": "{{- .ID -}}", "Artwork-User-ID": "{{- artistId -}}", "Artwork-Title": "{{- .Title -}}", "Artwork-IllustType": "{{- illustType -}}", "Artwork-Master-Webp-1200-Url": "{{- .Thumbnails.MasterWebp_1200 -}}", "Artwork-Original-Url": "{{- .Thumbnails.OriginalPNG -}}", "Artwork-Width": "{{- .Width -}}", "Artwork-Height": "{{- .Height -}}", "Artwork-Pages": "{{- Pages -}}" }'
+>
+  <div class="animated-underline line-clamp-1 w-fit font-bold">
+  {{ .Title }}
+  </div>
+</a>

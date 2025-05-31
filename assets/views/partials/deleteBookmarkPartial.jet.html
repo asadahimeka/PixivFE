@@ -1,0 +1,36 @@
+{{- import "../blocks/twActionIndicator" }}
+
+{{ deleteBookmarkIndicatorID := "deleteBookmarkIndicatorID" }}
+
+<form
+  action="/self/deleteBookmark/{{ .Illust.BookmarkData.ID }}"
+  method="post"
+  hx-target="this"
+  hx-target-4*="body"
+  hx-swap="outerHTML show:none"
+  hx-indicator="#actionIndicator-{{ deleteBookmarkIndicatorID }}"
+  hx-disabled-elt="#deleteBookmarkButton"
+  hx-push-url="false"
+>
+  <input type="hidden" id="bookmark_artwork_id" name="artwork_id" class="hidden" value="{{ .Illust.ID }}">
+
+  <input
+    type="hidden"
+    id="bookmark_return_path"
+    name="return_path"
+    class="hidden"
+    value='{{ if HtmxCurrentPath != "" }} {{- HtmxCurrentPath -}} {{ else }} {{- CurrentPath -}} {{ end }}'
+  >
+
+  <input type="hidden" id="bookmark_count" name="bookmark_count" class="hidden" value="{{ .Illust.Bookmarks }}">
+
+  <button
+    id="deleteBookmarkButton"
+    type="submit"
+    class="outlined-button text-sm font-medium gap-2"
+  >
+    <span class="material-symbols-rounded-fill-20">favorite</span>
+    <span class="inline">{{- prettyNumber(.Illust.Bookmarks) -}}</span>
+    {{- yield twActionIndicator(id=deleteBookmarkIndicatorID, theme="dark") -}}
+  </button>
+</form>
