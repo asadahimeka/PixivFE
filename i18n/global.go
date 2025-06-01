@@ -17,7 +17,7 @@ import (
 
 var goroutineLocale = routine.NewInheritableThreadLocal[string]()
 
-const BaseLocale = "en"
+const BaseLocale = "zh-CN"
 
 func GetLocale() string {
 	locale := goroutineLocale.Get()

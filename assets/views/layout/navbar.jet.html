@@ -34,6 +34,13 @@
       </span>
     </button>
 
+    <button
+      id="toggle-theme-btn"
+      class="flex items-center justify-center size-8 hover:bg-neutral-700 active:scale-95 transition rounded cursor-pointer text-neutral-300 hover:text-neutral-100 p-1"
+    >
+      <svg role="presentation" viewBox="0 0 24 24"><path d="M12,18V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,15.31L23.31,12L20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31Z" style="fill: currentcolor;"></path></svg>
+    </button>
+
     {{ if username != "" && userID != "" && userAvatar != "" }}
     <div class="flex items-center gap-2">
       <button

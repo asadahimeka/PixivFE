@@ -13,6 +13,7 @@ This is a necessary workaround for a bug in the forge software (Codeberg) that p
   <a href="https://crowdin.com/project/pixivfe" rel="nofollow"><img src="https://badges.crowdin.net/pixivfe/localized.svg" alt="Localization percentage on Crowdin" /></a>
 </h1>
 
+
 <!-- Relative paths are used here for PR -->
 <p align="center">
   <b>
@@ -20,6 +21,8 @@ This is a necessary workaround for a bug in the forge software (Codeberg) that p
     <a href="README.zh-CN.md">简体中文</a>
   </b>
 </p>
+
+> Fork of https://codeberg.org/PixivFE/PixivFE
 
 PixivFE (lit. _Pixiv FrontEnd_) is a open-source, self-hostable alternative front-end for [pixiv](https://en.wikipedia.org/wiki/Pixiv).
 

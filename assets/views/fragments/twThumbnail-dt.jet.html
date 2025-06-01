@@ -36,8 +36,8 @@ and user preferences
 {{- marginHack := "" -}}
 
 {* this logic block is wrapped in an HTML comment otherwise it breaks syntax highlighting in Zed *}
-<!--
-{{- if (.XRestrict == 1 && visibilityR18 == "censor") || (.XRestrict == 2 && visibilityR18G == "censor") -}}
+
+{{- if (.XRestrict == 1 && (visibilityR18 == "censor"||visibilityR18 == "")) || (.XRestrict == 2 && (visibilityR18G == "censor"||visibilityR18G == "")) -}}
   {{- showOverlay = true -}}
   {{- overlayBgClass = "bg-black/80 group-hover/image:bg-black/40" -}}
   {{- loadReplacementImage = true -}}
@@ -45,11 +45,10 @@ and user preferences
   {{- showOverlay = true -}}
   {{- overlayBgClass = "bg-black/80 group-hover/image:bg-black/40" -}}
 {{- end -}}
--->
+
 
 {{- if !loadReplacementImage && isFirstPathPart(CurrentPath, "/ranking") && .Width > .Height -}}
-  {{- aspectClass = "aspect-2/1" -}}
-  {{- marginHack = "-mb-[0.775rem]" -}}
+  {{- aspectClass = "aspect-1/1" -}}
 {{- end -}}
 
 {* Empty div for the illust preview (it needs to wrap the anchor) *}
@@ -124,13 +123,13 @@ and user preferences
           <div class="flex flex-col gap-y-1">
             {{- if isset(.Rank) -}}
               <div
-                class="flex w-fit text-xl font-bold rounded-tl rounded-br drop-shadow px-3 py-1.5 -ms-2 -mt-2
+                class="rank-index flex w-fit text-xl font-bold rounded-tl rounded-br drop-shadow px-3 py-1.5 -ms-2 -mt-2
                       {{ if .Rank == 1 -}}
-                        bg-amber-400/90 text-black
+                        bg-amber-400/90 text-black rank-index-1
                       {{- else if .Rank == 2 -}}
-                        bg-zinc-300/90 text-black
+                        bg-zinc-300/90 text-black rank-index-2
                       {{- else if .Rank == 3 -}}
-                        bg-amber-800/90 text-white
+                        bg-amber-800/90 text-white rank-index-3
                       {{- else -}}
                         bg-neutral-800/80 text-white
                       {{- end -}}"
@@ -144,7 +143,7 @@ and user preferences
               </div>
             {{- end -}}
             {{- if AiType == 2 -}}
-              <div class="flex size-fit bg-yellow-500 text-black text-xs font-bold rounded drop-shadow px-1 py-0.5">
+              <div class="flex size-fit bg-yellow-500 text-xs font-bold rounded drop-shadow px-1 py-0.5">
                 AI
               </div>
             {{- end -}}

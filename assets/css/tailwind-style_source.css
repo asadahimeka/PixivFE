@@ -33,7 +33,7 @@ Material Symbols (unfilled)
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url('../fonts/material-symbols-rounded.woff2?v=15') format('woff2');
+  src: url('../fonts/material-symbols-rounded.woff2?v=16') format('woff2');
 }
 
 /* Base styles for unfilled variants */
@@ -104,7 +104,7 @@ NOTE: we generally prefer unfilled icons in the UI,
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url('../fonts/material-symbols-rounded-fill.woff2?v=7') format('woff2');
+  src: url('../fonts/material-symbols-rounded-fill.woff2?v=8') format('woff2');
 }
 
 /* Base styles for filled variants */

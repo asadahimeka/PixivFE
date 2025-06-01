@@ -16,7 +16,7 @@ import (
 	"codeberg.org/pixivfe/pixivfe/core"
 )
 
-const defaultLanguage = "en" // defaultLanguage defines the default language used for pixivision requests
+const defaultLanguage = "zh" // defaultLanguage defines the default language used for pixivision requests
 
 // generatePixivisionURL creates a URL for pixivision based on the route and language
 func generatePixivisionURL(route string, lang []string) string {

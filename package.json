@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "npm run build:dev && npm run exe:dev",
+    "dev": "cross-env PIXIVFE_DEV=true npm-run-all --parallel tw:dev exe:dev",
+    "build:dev": "cross-env PIXIVFE_DEV=true CGO_ENABLED=0 go build -v -ldflags=\"-extldflags=-static -X codeberg.org/pixivfe/pixivfe/config.revision=2025.05.31-a15ff4f\" -o \"pixivfe\"",
+    "tw:dev": "tailwindcss -i assets/css/tailwind-style_source.css -o assets/css/tailwind-style.css --watch --minify",
+    "exe:dev": "cross-env PIXIVFE_DEV=true pixivfe.exe",
+    "predev": "npm run build:dev",
+    "prebuild:dev": "rimraf pixivfe pixivfe.exe",
+    "postbuild:dev": "ren pixivfe pixivfe.exe"
+  }
+}

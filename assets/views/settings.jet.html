@@ -425,22 +425,6 @@
       <button type="submit" class="outlined-button text-sm font-medium">Save</button>
     </form>
     <div class="form-htmx-target" hidden></div>
-
-    <hr class="border-neutral-700 my-2">
-
-    <div class="text-base font-bold text-neutral-100 -mb-2">Logo style</div>
-    {{- logoStyleValue := CookieList["pixivfe-LogoStyle"] }}
-    <p>Choose between the standard PixivFE logo or an alternative design created by <a href="https://codeberg.org/PixivFE/PixivFE/issues/4#issuecomment-1017835" rel="noopener" class="text-link text-neutral-200 hover:text-neutral-100">@dragongoose</a> as a fun variation.</p>
-    <form id="locale-form" action="/settings/set-cookie" method="post" class="contents" class="row g-2 me-2">
-      <input type="hidden" name="key" value="pixivfe-LogoStyle">
-      <select class="form-select w-32 max-w-full" id="locale" name="value" required>
-        <option value="standard" {{- if logoStyleValue == "standard" || logoStyleValue == "" }} selected{{- end }}>Standard</option>
-        <option value="alternative" {{- if logoStyleValue == "alternative" }} selected{{- end }}>Alternative</option>
-      </select>
-
-      <button type="submit" class="outlined-button text-sm font-medium">Save</button>
-    </form>
-    <div class="form-htmx-target" hidden></div>
   </div>
 
   <!-- Filter -->
@@ -474,9 +458,10 @@
 
       <label for="visibility-art-r18" class="form-label -mb-2">R-18 content visibility</label>
       <select class="form-select w-48 max-w-full -mb-2" id="visibility-art-r18" name="visibility-art-r18">
-        {{- isCurrent := visibilityArtR18 == "" -}}
-        <option value="" {{ if isCurrent }} selected{{- end -}}>
-          Show {{ isCurrent ? "(default, current)" : "(default)" }}
+        <option value="">- Select -</option>
+        {{- isCurrent := visibilityArtR18 == "show" -}}
+        <option value="show" {{ if isCurrent }} selected{{- end -}}>
+          Show {{ isCurrent ? "(current)" : "" }}
         </option>
 
         {{- isCurrent := visibilityArtR18 == "censor" -}}
@@ -495,9 +480,10 @@
 
       <label for="visibility-art-r18g" class="form-label -mb-2">R-18G content visibility</label>
       <select class="form-select w-48 max-w-full -mb-2" id="visibility-art-r18g" name="visibility-art-r18g">
-        {{- isCurrent := visibilityArtR18G == "" -}}
-        <option value="" {{ if isCurrent }} selected{{- end -}}>
-          Show {{ isCurrent ? "(default, current)" : "(default)" }}
+        <option value="">- Select -</option>
+        {{- isCurrent := visibilityArtR18G == "show" -}}
+        <option value="show" {{ if isCurrent }} selected{{- end -}}>
+          Show {{ isCurrent ? "(current)" : "" }}
         </option>
 
         {{- isCurrent := visibilityArtR18G == "censor" -}}
@@ -518,7 +504,7 @@
       <select class="form-select w-48 max-w-full -mb-2" id="visibility-art-ai" name="visibility-art-ai">
         {{- isCurrent := visibilityArtAI == "" -}}
         <option value="" {{ if isCurrent }} selected{{- end -}}>
-          Show {{ isCurrent ? "(default, current)" : "(default)" }}
+          Show {{ isCurrent ? "(current)" : "" }}
         </option>
 
         {{- isCurrent := visibilityArtAI == "censor" -}}
@@ -697,14 +683,19 @@ stablediffusion
             English {{ isCurrent ? "(current)" : "" }}
           </option>
 
-          {{- isCurrent := localeValue == "vi-VN" -}}
-          <option value="vi-VN" {{ if isCurrent }} selected{{- end -}}>
-            Vietnamese {{ isCurrent ? "(current)" : "" }}
+          {{- isCurrent := localeValue == "zh-CN" -}}
+          <option value="zh-CN" {{ if isCurrent }} selected{{- end -}}>
+            简体中文 {{ isCurrent ? "(current)" : "" }}
           </option>
 
           {{- isCurrent := localeValue == "zh-TW" -}}
           <option value="zh-TW" {{ if isCurrent }} selected{{- end -}}>
             Chinese Traditional {{ isCurrent ? "(current)" : "" }}
+          </option>
+
+          {{- isCurrent := localeValue == "vi-VN" -}}
+          <option value="vi-VN" {{ if isCurrent }} selected{{- end -}}>
+            Vietnamese {{ isCurrent ? "(current)" : "" }}
           </option>
         </select>
       </div>

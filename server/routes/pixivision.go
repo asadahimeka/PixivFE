@@ -16,7 +16,7 @@ import (
 
 func PixivisionHomePage(w http.ResponseWriter, r *http.Request) error {
 	page := GetQueryParam(r, "p", "1")
-	data, err := pixivision.GetHomepage(r, page, "en")
+	data, err := pixivision.GetHomepage(r, page, "zh")
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func PixivisionHomePage(w http.ResponseWriter, r *http.Request) error {
 
 func PixivisionArticlePage(w http.ResponseWriter, r *http.Request) error {
 	id := GetPathVar(r, "id")
-	lang := []string{"en"}
+	lang := []string{"zh"}
 
 	data, doc, err := pixivision.ParseArticle(r, id, lang)
 	if err != nil {
@@ -63,7 +63,7 @@ func PixivisionArticlePage(w http.ResponseWriter, r *http.Request) error {
 		if err != nil {
 			return err
 		}
-	
+
 		return template.RenderHTML(w, r, Data_pixivisionArticleFreeform{
 			Children: data.Content,
 			Title:    data.Title,
@@ -79,7 +79,7 @@ func PixivisionArticlePage(w http.ResponseWriter, r *http.Request) error {
 func PixivisionCategoryPage(w http.ResponseWriter, r *http.Request) error {
 	page := GetQueryParam(r, "p", "1")
 	id := GetPathVar(r, "id")
-	data, err := pixivision.GetCategory(r, id, page, "en")
+	data, err := pixivision.GetCategory(r, id, page, "zh")
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func PixivisionTagPage(w http.ResponseWriter, r *http.Request) error {
 	id := GetPathVar(r, "id")
 	page := GetQueryParam(r, "p", "1")
 
-	data, err := pixivision.GetTag(r, id, page, "en")
+	data, err := pixivision.GetTag(r, id, page, "zh")
 	if err != nil {
 		return err
 	}

@@ -15,6 +15,8 @@
   </b>
 </p>
 
+> 原仓库地址： https://codeberg.org/PixivFE/PixivFE
+
 PixivFE（全称 _Pixiv FrontEnd_）是一个开源的、可自托管的 [pixiv](https://zh.wikipedia.org/wiki/Pixiv) 替代前端。
 
 您可以立即通过我们的[官方公共实例](https://pixiv.perennialte.ch/)体验，或查看[公共实例列表](https://pixivfe-docs.pages.dev/instance-list/)。

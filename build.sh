@@ -7,15 +7,13 @@ set -o errexit
 BINARY_NAME="pixivfe"
 GOOS=${GOOS:-$(go env GOOS)}
 GOARCH=${GOARCH:-$(go env GOARCH)}
-# GIT_COMMIT_DATE=$(git show -s --format=%cd --date=format:"%Y.%m.%d")
-GIT_COMMIT_DATE="2025.05.31"
-# GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
-GIT_COMMIT_HASH="a15ff4f"
+GIT_COMMIT_DATE=$(git show -s --format=%cd --date=format:"%Y.%m.%d")
+GIT_COMMIT_HASH=$(git rev-parse --short HEAD)
 REVISION="${GIT_COMMIT_DATE}-${GIT_COMMIT_HASH}"
-# UNCOMMITTED_CHANGES=$(git status --porcelain)
-# if [ -n "$UNCOMMITTED_CHANGES" ]; then
-# 	REVISION="${REVISION}+dirty"
-# fi
+UNCOMMITTED_CHANGES=$(git status --porcelain)
+if [ -n "$UNCOMMITTED_CHANGES" ]; then
+	REVISION="${REVISION}+dirty"
+fi
 
 # Check for .env file and load it unless explicitly told not to
 if [ "$1" != "--no-env-file" ] && [ -f .env ]; then
@@ -228,9 +226,9 @@ execute_command() {
 	i18n_download) i18n_download ;;
 	check_css) check_css ;;
 	run) run ;;
-	# watch) watch ;;
+	watch) watch ;;
 	clean) clean ;;
-	# install-pre-commit) install_pre_commit ;;
+	install-pre-commit) install_pre_commit ;;
 	help) help ;;
 	all) all ;;
 	*)

@@ -6,8 +6,7 @@ this template is just to achieve a mosaic layout via master1200 thumbnails on th
 
 {{- if !(AiType == 2 && hideAi) }}
   {{- range . }}
-    <div class="flex flex-col h-fit gap-2
-                {{ if .Width > .Height }}col-span-2{{ else }}col-span-1{{ end }}"
+    <div class="flex flex-col h-fit gap-2 col-span-1"
     >
       {{ include "twThumbnail-dt" . }}
       {{ include "twThumbnail-tt" . }}

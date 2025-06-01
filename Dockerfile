@@ -9,11 +9,9 @@ RUN apk add --no-cache git=2.47.2-r0
 COPY . .
 
 # Build the application
-# RUN --mount=type=cache,target=/go/pkg \
-#     --mount=type=cache,target=/root/.cache/go-build \
-#     ./build.sh build_docker
-RUN chmod +x ./build.sh
-RUN ./build.sh build_docker
+RUN --mount=type=cache,target=/go/pkg \
+    --mount=type=cache,target=/root/.cache/go-build \
+    ./build.sh build_docker
 
 # Minimal passwd entry for non-privileged user
 RUN echo "pixivfe:x:10001:10001::/:/" >> /etc/passwd

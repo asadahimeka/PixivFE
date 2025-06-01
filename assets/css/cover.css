@@ -1,0 +1,155 @@
+@layer theme {
+
+  html {
+    --font-sans: 'LXGW WenKai Screen', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  }
+
+  html.theme-light {
+    --color-red-700: oklch(93.6% .032 17.717) !important;
+    --color-red-500: oklch(88.5% .062 18.334) !important;
+    --color-red-400: oklch(80.8% .114 19.571) !important;
+    --color-red-300: oklch(70.4% .191 22.216) !important;
+    --color-red-200: oklch(63.7% .237 25.331) !important;
+    --color-red-100: oklch(50.5% .213 27.518) !important;
+    --color-amber-800: oklch(82.8% .189 84.429) !important;
+    --color-amber-400: oklch(47.3% .137 46.201) !important;
+    --color-yellow-500: oklch(97.3% .071 103.193) !important;
+    --color-yellow-100: oklch(79.5% .184 86.047) !important;
+    --color-green-300: oklch(87.1% .15 154.449) !important;
+    --color-sky-600: oklch(58.8% .158 241.966) !important;
+    --color-blue-900: oklch(93.2% .032 255.585) !important;
+    --color-blue-500: oklch(80.9% .105 251.813) !important;
+    --color-blue-400: oklch(70.7% .165 254.624) !important;
+    --color-blue-300: oklch(62.3% .214 259.815) !important;
+    --color-blue-100: oklch(37.9% .146 265.522) !important;
+    --color-purple-400: oklch(82.7% .119 306.383) !important;
+    --color-purple-300: oklch(71.4% .203 305.504) !important;
+    --color-fuchsia-400: oklch(74% .238 322.16) !important;
+    --color-gray-400: oklch(96.7% .003 264.542) !important;
+    --color-gray-300: oklch(87.2% .01 258.338) !important;
+    --color-gray-100: oklch(70.7% .022 261.325) !important;
+    --color-zinc-300: oklch(87.1% .006 286.286) !important;
+
+    --color-neutral-50: oklch(14.5% 0 0) !important;
+    --color-neutral-100: oklch(20.5% 0 0) !important;
+    --color-neutral-200: oklch(26.9% 0 0) !important;
+    --color-neutral-300: oklch(37.1% 0 0) !important;
+    --color-neutral-400: oklch(43.9% 0 0) !important;
+    --color-neutral-500: oklch(55.6% 0 0) !important;
+    --color-neutral-600: oklch(70.8% 0 0) !important;
+    --color-neutral-700: oklch(87% 0 0) !important;
+    --color-neutral-800: oklch(92.2% 0 0) !important;
+    --color-neutral-900: oklch(97% 0 0) !important;
+    --color-neutral-950: oklch(98.5% 0 0) !important;
+
+    --color-white: #000 !important;
+    --color-black: #fff !important;
+
+    --color-pixivfe-400: #eff4ff !important;
+    --color-pixivfe-300: #c1d3fc !important;
+    --color-pixivfe-200: #96b8fa !important;
+    --color-pixivfe-50: #7aa2f7 !important;
+  }
+}
+
+html.theme-light body {
+  color-scheme: light;
+}
+
+html.theme-light *::-webkit-scrollbar,
+html.theme-light::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html.theme-light *::-webkit-scrollbar-track,
+html.theme-light::-webkit-scrollbar-track {
+  background: #e6e6e6;
+  border-left: 1px solid #dadada;
+}
+
+html.theme-light *::-webkit-scrollbar-thumb,
+html.theme-light::-webkit-scrollbar-thumb {
+  background: #b0b0b0;
+  border: solid 3px #e6e6e6;
+  border-radius: 7px;
+}
+
+html.theme-light *::-webkit-scrollbar-thumb:hover,
+html.theme-light::-webkit-scrollbar-thumb:hover {
+  background: black;
+}
+
+html.theme-light .badge-warning {
+  border-color: var(--color-yellow-100);
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+  html.theme-light .badge-warning {
+    background-color: color-mix(in oklab, var(--color-yellow-100) 10%, transparent);
+  }
+}
+
+html.theme-light .badge-danger {
+  border-color: var(--color-red-100);
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+  html.theme-light .badge-danger {
+    background-color: color-mix(in oklab, var(--color-red-100) 10%, transparent);
+  }
+}
+
+html.theme-light .border-pixivfe-400,
+html.theme-light .peer-checked\:border-pixivfe-400:is(:where(.peer):checked~*) {
+  border-color: var(--color-pixivfe-50) !important;
+}
+
+html.theme-light  .text-pixivfe-200 {
+  color: var(--color-pixivfe-50) !important;
+}
+
+html.theme-light .fill-pixivfe-200 {
+  fill: var(--color-pixivfe-50) !important;
+}
+
+html.theme-light .media-target[id^="original-media-"] .size-fit.bg-yellow-500.text-black {
+  color: black;
+}
+
+.flex.flex-col.h-fit:has(img[src*="nsfw.png"]) {
+  pointer-events: none;
+}
+
+#checkpoint .flex.flex-row.justify-start.items-end.gap-4.w-full.mx-auto.overflow-x-scroll.fade-right.pe-16 {
+  overflow-x: auto;
+}
+
+html.theme-light .rank-index {
+  --color-amber-400: oklch(82.8% .189 84.429) !important;
+  --color-amber-800: oklch(47.3% .137 46.201) !important;
+}
+
+html.theme-light .rank-index-1 {
+  color: #000 !important;
+}
+html.theme-light .rank-index-2 {
+  color: #000 !important;
+}
+html.theme-light .rank-index-3 {
+  color: #fff !important;
+}
+
+#category-nav>div>div:has(#cat-nav-pixiv),
+#category-nav>div>div:has(#cat-nav-language),
+#category-nav>div>div:has(#cat-nav-advanced),
+#cat-nav-pixiv,
+#cat-nav-pixiv + div,
+#cat-nav-language,
+#cat-nav-language + div,
+#cat-nav-advanced,
+#cat-nav-advanced + div {
+  display: none;
+}

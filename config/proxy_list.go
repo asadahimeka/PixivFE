@@ -12,15 +12,15 @@ const (
 // the list of proxies on /settings.
 var BuiltInImageProxyList = []string{
 	// !!!! WE ARE NOT AFFILIATED WITH MOST OF THE PROXIES !!!!
-	"https://pixiv.ducks.party",
+	"https://i.pixiv.re",
 	"https://pximg.cocomi.eu.org",
+	"https://pi.169889.xyz",
 	"https://i.suimoe.com",
 	"https://i.yuki.sh",
 	"https://pximg.obfs.dev",
+	"https://pixiv.ducks.party",
 	"https://pixiv.darkness.services",
-	"https://pixiv.tatakai.top",
-	"https://pi.169889.xyz",
-	"https://i.pixiv.re",
+	// "https://pixiv.tatakai.top",
 	// "https://pximg.exozy.me", Rest in peace...
 	// "https://mima.localghost.org/proxy/pximg", // only supports HTTP/0.9 and HTTP/1.x when using TLS.
 	// "https://pximg.chaotic.ninja", // incompatible

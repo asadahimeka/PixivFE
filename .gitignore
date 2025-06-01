@@ -21,7 +21,7 @@ i18n/*_strings.json
 # assets/css/tailwind-style.css
 # npm artifacts
 node_modules/
-package.json
+# package.json
 package-lock.json
 .aider*
 # macOS .DS_Store files
@@ -29,3 +29,5 @@ package-lock.json
 */.DS_Store
 # Editor configuration
 .vscode/
+/config.yml
+/pixivfe.exe
